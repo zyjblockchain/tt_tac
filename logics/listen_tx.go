@@ -22,10 +22,21 @@ type TacProcess struct {
 	TransferMiddleAddress string                       // 中转地址
 	FromChainWatcher      *eth_watcher.AbstractWatcher // 跨链from watcher
 	ToChainWatcher        *eth_watcher.AbstractWatcher // 跨链 to watcher
-	lock                  *sync.Mutex
+	lock                  sync.Mutex
 }
 
-// 监听erc20代币收款地址
+func NewTacProcess(chainNet, listenTokenAddress, transferTokenAddress, transferMiddleAddress string, fromChainWatcher, toChainWatcher *eth_watcher.AbstractWatcher) *TacProcess {
+	return &TacProcess{
+		ChainNetUrl:           chainNet,
+		ListenTokenAddress:    listenTokenAddress,
+		TransferTokenAddress:  transferTokenAddress,
+		TransferMiddleAddress: transferMiddleAddress,
+		FromChainWatcher:      fromChainWatcher,
+		ToChainWatcher:        toChainWatcher,
+	}
+}
+
+// ListenErc20CollectionAddress 监听erc20代币收款地址
 func (t *TacProcess) ListenErc20CollectionAddress() {
 	t.FromChainWatcher.RegisterTxReceiptPlugin(plugin.NewERC20TransferPlugin(func(tokenAddress, from, to string, amount decimal.Decimal, isRemoved bool) {
 		if tokenAddress == t.ListenTokenAddress && utils.FormatHex(to) == utils.FormatHex(t.TransferMiddleAddress) {

@@ -8,13 +8,13 @@ const (
 )
 
 type Order struct {
+	gorm.Model
 	FromAddr      string
 	RecipientAddr string
 	Amount        string
 	OrderType     int
 	State         int  // 订单状态, 0: pending; 1. 完成；2. 失败; 3. 超时
 	CollectionId  uint // collection 表的外键
-	gorm.Model
 }
 
 // Create

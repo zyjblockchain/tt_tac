@@ -3,6 +3,7 @@ package models
 import "github.com/jinzhu/gorm"
 
 type TxTransfer struct {
+	gorm.Model
 	SenderAddress   string
 	ReceiverAddress string
 	TokenAddress    string // token合约地址
@@ -11,7 +12,6 @@ type TxTransfer struct {
 	TxStatus        int    // 交易状态：0. pending; 1. 成功；2. 失败; 3. 超时
 	OwnChain        int    // 所属链
 	ErrMsg          string // 如果交易失败，则记录失败信息
-	gorm.Model
 }
 
 func (t *TxTransfer) Create() error {

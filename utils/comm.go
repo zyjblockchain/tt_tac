@@ -6,6 +6,14 @@ import (
 	"strings"
 )
 
+var (
+	VerifyParamsErrCode = 40001
+	VerifyParamsErrMsg  = "参数校验失败"
+
+	OrderLogicErrCode = 40002
+	OrderLogicErrMsg  = "创建跨链转账订单失败"
+)
+
 // FormatHex 去除前置的0
 func FormatHex(s string) string {
 	if strings.HasPrefix(s, "0x") || strings.HasPrefix(s, "0X") {

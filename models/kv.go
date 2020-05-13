@@ -3,9 +3,9 @@ package models
 import "github.com/jinzhu/gorm"
 
 type Kv struct {
+	gorm.Model
 	Key string
 	Val string
-	gorm.Model
 }
 
 func SetKv(k, v string) error {

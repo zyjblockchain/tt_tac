@@ -12,7 +12,8 @@ type Order struct {
 	OrderType     int    `json:"orderType" binding:"required"`
 }
 
-func (ord *Order) CreateOrder() error {
+// CreateOrder 返回订单号
+func (ord *Order) CreateOrder() (uint, error) {
 	order := &models.Order{
 		FromAddr:      utils.FormatHex(ord.FromAddr),
 		RecipientAddr: utils.FormatHex(ord.RecipientAddr),
@@ -22,5 +23,9 @@ func (ord *Order) CreateOrder() error {
 	}
 	// 保存到数据库
 	err := order.Create()
-	return err
+	if err != nil {
+		return 0, err
+	} else {
+		return order.ID, nil
+	}
 }

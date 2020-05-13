@@ -3,6 +3,7 @@ package models
 import "github.com/jinzhu/gorm"
 
 type CollectionTx struct {
+	gorm.Model
 	From         string
 	To           string
 	TokenAddress string
@@ -10,7 +11,6 @@ type CollectionTx struct {
 	ChainNetUrl  string // 所属链
 	TxId         uint   // tx表的外键
 	IsValid      int    // 是否有效订单的收集, 0: false; 1. true
-	gorm.Model
 }
 
 func (c *CollectionTx) Create() error {

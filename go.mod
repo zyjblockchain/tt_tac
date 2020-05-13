@@ -6,6 +6,7 @@ require (
 	github.com/btcsuite/btcd v0.20.1-beta
 	github.com/denisenkom/go-mssqldb v0.0.0-20200428022330-06a60b6afbbc // indirect
 	github.com/ethereum/go-ethereum v1.9.13
+	github.com/gin-contrib/cors v1.3.1
 	github.com/gin-gonic/gin v1.6.3
 	github.com/go-sql-driver/mysql v1.5.0 // indirect
 	github.com/golang/protobuf v1.4.1 // indirect

@@ -10,13 +10,28 @@ import (
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/ethereum/go-ethereum/rpc"
+	"github.com/zyjblockchain/sandy_log/log"
 	"github.com/zyjblockchain/tt_tac/utils"
 	"math/big"
+	"sync"
 )
+
+var stableNonceMap map[string]uint64
+var latestNonceMap map[string]uint64
+
+func init() {
+	// 初始化stableNonceMap 和 latestNonceMap
+	once := &sync.Once{}
+	once.Do(func() {
+		stableNonceMap = make(map[string]uint64)
+		latestNonceMap = make(map[string]uint64)
+	})
+}
 
 type ChainClient struct {
 	Client  *ethclient.Client
 	ChainId *big.Int
+	mutex   sync.Mutex
 }
 
 // tt链上的rpc接口和eth是通用的
@@ -29,7 +44,43 @@ func NewChainClient(chainNetUrl string, chainId *big.Int) *ChainClient {
 	return &ChainClient{
 		Client:  ethclient.NewClient(rpcDial),
 		ChainId: chainId,
+		mutex:   sync.Mutex{},
 	}
+}
+
+// GetLatestNonce
+func (c *ChainClient) GetLatestNonce(address string) (uint64, error) {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+
+	txNonce, err := c.GetNonce(common.HexToAddress(address))
+	if err != nil {
+		log.Errorf("从链上获取nonce失败：%v", err)
+		return 0, err
+	}
+	stable, ok := stableNonceMap[address]
+	if ok { // 存在
+		if txNonce == stable {
+			latest := latestNonceMap[address]
+			txNonce = latest + 1
+			latestNonceMap[address] = txNonce
+		} else {
+			// 最新的链上nonce已经大于stable
+			stableNonceMap[address] = txNonce
+			// txNonce和latestNonce比较
+			latest := latestNonceMap[address]
+			if txNonce <= latest {
+				txNonce = latest + 1
+			}
+			// 更新latestNonce
+			latestNonceMap[address] = txNonce
+		}
+	} else {
+		// 记录新地址
+		stableNonceMap[address] = txNonce
+		latestNonceMap[address] = txNonce
+	}
+	return txNonce, nil
 }
 
 func (c *ChainClient) GetNonce(address common.Address) (uint64, error) {
@@ -117,19 +168,26 @@ func (c *ChainClient) EstimateTokenTxGas(tokenAmount *big.Int, from, tokenAddres
 }
 
 // SendTokenTx 发送token交易
-func (c *ChainClient) SendTokenTx(private string, nonce, gasLimit uint64, gasPrice *big.Int, tokenReceiver, tokenAddr common.Address, tokenAmount *big.Int) (*types.Transaction, error) {
-	rawTx := newTokenRawTx(nonce, tokenReceiver, tokenAddr, gasLimit, gasPrice, tokenAmount)
+func (c *ChainClient) SendTokenTx(private string, nonce, gasLimit uint64, gasPrice *big.Int, receiver, tokenAddress common.Address, tokenAmount *big.Int) (*types.Transaction, error) {
+	signedTx, err := c.NewSignedTokenTx(private, nonce, gasLimit, gasPrice, receiver, tokenAddress, tokenAmount)
+	if err != nil {
+		log.Errorf("生成签名交易失败：error: %v", err)
+		return nil, err
+	}
+	// 把签好名的交易发送到网络
+	err = c.Client.SendTransaction(context.Background(), signedTx)
+	return signedTx, err
+}
+
+// NewSignedTokenTx 新建一个签名交易
+func (c *ChainClient) NewSignedTokenTx(private string, nonce, gasLimit uint64, gasPrice *big.Int, receiver, tokenAddress common.Address, tokenAmount *big.Int) (*types.Transaction, error) {
+	rawTx := newTokenRawTx(nonce, receiver, tokenAddress, gasLimit, gasPrice, tokenAmount)
 	// 对原生交易进行签名
 	prv, err := crypto.ToECDSA(common.FromHex(private))
 	if err != nil {
 		panic(err)
 	}
 	signedTx, err := signRawTx(rawTx, c.ChainId, prv)
-	if err != nil {
-		panic(err)
-	}
-	// 把签好名的交易发送到网络
-	err = c.Client.SendTransaction(context.Background(), signedTx)
 	return signedTx, err
 }
 

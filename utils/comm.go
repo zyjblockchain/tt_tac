@@ -29,3 +29,9 @@ func PrivateToAddress(private string) (common.Address, error) {
 	addr := crypto.PubkeyToAddress(p.PublicKey)
 	return addr, nil
 }
+
+// TransformAmount 跨链转账涉及到两条链的token兑换比例和gas fee的问题
+func TransformAmount(oldAmount string, orderType int) string {
+	// todo 目前不考虑兑换比例和交易gas fee的问题，后面有需求可以加上
+	return oldAmount
+}

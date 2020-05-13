@@ -61,7 +61,14 @@ func (watcher *AbstractWatcher) RegisterBlockPlugin(plugin plugin.IBlockPlugin) 
 }
 
 func (watcher *AbstractWatcher) RegisterTxPlugin(plugin plugin.ITxPlugin) {
+	watcher.lock.Lock()
+	defer watcher.lock.Unlock()
 	watcher.TxPlugins = append(watcher.TxPlugins, plugin)
+}
+func (watcher *AbstractWatcher) UnRegisterTxPlugin(pluginIdex int) {
+	watcher.lock.Lock()
+	defer watcher.lock.Unlock()
+	watcher.TxPlugins[pluginIdex] = nil
 }
 
 func (watcher *AbstractWatcher) RegisterTxReceiptPlugin(plugin plugin.ITxReceiptPlugin) {
@@ -95,7 +102,9 @@ func (watcher *AbstractWatcher) RunTillExitFromBlock(startBlockNum uint64) error
 			txPlugins := watcher.TxPlugins
 			for i := 0; i < len(txPlugins); i++ {
 				txPlugin := txPlugins[i]
-
+				if txPlugin == nil {
+					continue
+				}
 				for j := 0; j < len(block.GetTransactions()); j++ {
 					tx := structs.NewRemovableTx(block.GetTransactions()[j], false)
 					txPlugin.AcceptTx(tx)

@@ -1,9 +1,16 @@
 package conf
 
 const (
-	TTMainNet   = "https://mainnet-rpc.thundercore.com"
-	TTMainNetID = 108
+	TTChainNet = "https://mainnet-rpc.thundercore.com"
+	TTChainID  = 108
+	TTChainTag = 11
 
-	EthNet   = "https://rinkeby.infura.io/v3/36b98a13557c4b8583d57934ede2f74d"
-	EthNetID = 4
+	EthChainNet = "https://rinkeby.infura.io/v3/36b98a13557c4b8583d57934ede2f74d"
+	EthChainID  = 4
+	EthChainTag = 22
+)
+
+const (
+	MiddleAddress        = "0x59375A522876aB96B0ed2953D0D3b92674701Cc2"
+	MiddleAddressPrivate = "middle address private"
 )

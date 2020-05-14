@@ -16,6 +16,9 @@ var (
 
 	OrderLogicErrCode = 40002
 	OrderLogicErrMsg  = "创建跨链转账订单失败"
+
+	OrderFindErrCode = 40003
+	OrderFindErrMsg  = "查询不到此订单"
 )
 
 // FormatHex 去除前置的0

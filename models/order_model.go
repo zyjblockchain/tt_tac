@@ -20,8 +20,8 @@ func (o *Order) Create() error {
 	return nil
 }
 
-// GetByAddr
-func (o *Order) GetByAddr() (*Order, error) {
+// GetOrder
+func (o *Order) GetOrder() (*Order, error) {
 	oo := Order{}
 	err := DB.Where(o).Last(&oo).Error
 	return &oo, err

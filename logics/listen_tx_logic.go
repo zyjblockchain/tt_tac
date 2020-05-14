@@ -80,7 +80,7 @@ func (t *TacProcess) processCollectionTx(from, amount string) error {
 	}
 
 	// 2. 从订单表中查询是否存在from的订单
-	ord, err := (&models.Order{FromAddr: from}).GetByAddr()
+	ord, err := (&models.Order{FromAddr: from}).GetOrder()
 	if err != nil {
 		// todo 监听到的收款信息在order中查不到，可能是充值余额到中转地址的操作，所以不用退还，需要钉钉推送通知
 		content := fmt.Sprintf("tac 收到了一笔没有转账订单的转入交易；\nfrom: %s, \nto: %s, \ntokenAddress: %s, \namount: %s",

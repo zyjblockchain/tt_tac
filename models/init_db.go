@@ -24,6 +24,7 @@ func InitDB(dsn string) {
 
 	DB = db
 	autoCreateTable()
+	log.Infof("数据库连接成功")
 }
 
 // autoCreateTable 自动建表

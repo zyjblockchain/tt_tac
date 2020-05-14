@@ -13,7 +13,7 @@ type Order struct {
 	RecipientAddr string
 	Amount        string
 	OrderType     int
-	State         int  // 订单状态, 0: pending; 1. 完成；2. 失败; 3. 超时
+	State         int  // 订单状态, 0: pending; 1.完成；2.失败; 3. 超时
 	CollectionId  uint // collection 表的外键
 }
 

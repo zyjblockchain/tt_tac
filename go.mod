@@ -24,7 +24,7 @@ require (
 	github.com/sirupsen/logrus v1.6.0
 	github.com/spf13/cobra v1.0.0
 	github.com/stretchr/objx v0.1.1 // indirect
-	github.com/stretchr/testify v1.5.1 // indirect
+	github.com/stretchr/testify v1.5.1
 	github.com/tidwall/gjson v1.6.0 // indirect
 	github.com/zyjblockchain/sandy_log v0.0.0-20200511104534-4b44418a24b7
 	golang.org/x/crypto v0.0.0-20200510223506-06a226fb4e37

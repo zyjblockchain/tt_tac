@@ -3,6 +3,8 @@ package utils
 import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/zyjblockchain/tt_tac/conf"
+	"math/big"
 	"strings"
 )
 
@@ -43,5 +45,24 @@ func PrivateToAddress(private string) (common.Address, error) {
 // TransformAmount 跨链转账涉及到两条链的token兑换比例和gas fee的问题
 func TransformAmount(oldAmount string, orderType int) string {
 	// todo 目前不考虑兑换比例和交易gas fee的问题，后面有需求可以加上
-	return oldAmount
+	var fee *big.Int
+	var newAmount string
+	if orderType == conf.EthToTtOrderType { // 以太坊转入tt链
+		fee = big.NewInt(1 * 100000000) // 1 pala
+	} else if orderType == conf.TtToEthOrderType { // tt 链转到以太坊
+		fee = big.NewInt(3 * 100000000) // 3 pala
+	}
+	amount, ok := new(big.Int).SetString(oldAmount, 10)
+	if !ok {
+		newAmount = oldAmount
+	} else {
+		// 判断amount 和 fee的大小
+		if amount.Cmp(fee) <= 0 {
+			newAmount = big.NewInt(0).String()
+		} else {
+			newAmount = new(big.Int).Sub(amount, fee).String()
+		}
+
+	}
+	return newAmount
 }

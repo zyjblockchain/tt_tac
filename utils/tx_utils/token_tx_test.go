@@ -71,3 +71,10 @@ func TestChainClient_SendTokenTx(t *testing.T) {
 	t.Log(err)
 	t.Log(tx.Hash().String())
 }
+
+func TestChainClient_Close(t *testing.T) {
+
+	// amount, ok := new(big.Int).SetString("0", 10)
+	// t.Log(ok)
+	t.Log(big.NewInt(0).String() == "0")
+}

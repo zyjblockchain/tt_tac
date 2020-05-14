@@ -2,11 +2,6 @@ package models
 
 import "github.com/jinzhu/gorm"
 
-const (
-	EthToTtOrderType = 1 // 以太坊转tt链
-	TtToEthOrderType = 2 // tt链转以太坊
-)
-
 type Order struct {
 	gorm.Model
 	FromAddr      string

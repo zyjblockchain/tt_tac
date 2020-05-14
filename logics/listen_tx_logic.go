@@ -78,13 +78,12 @@ func (t *TacProcess) processCollectionTx(from, amount string) error {
 		log.Errorf("保存collection失败：error: %v", err)
 		return err
 	}
-	log.Infof("检测create record之后是否会返回整条记录；Id: %d; ", cc.ID)
 
 	// 2. 从订单表中查询是否存在from的订单
 	ord, err := (&models.Order{FromAddr: from}).GetByAddr()
 	if err != nil {
 		// todo 监听到的收款信息在order中查不到，可能是充值余额到中转地址的操作，所以不用退还，需要钉钉推送通知
-		content := fmt.Sprintf("tac 收到了一笔没有转账订单的转入交易；/nfrom: %s, /nto: %s, /ntokenAddress: %s, /namount: %s",
+		content := fmt.Sprintf("tac 收到了一笔没有转账订单的转入交易；\nfrom: %s, \nto: %s, \ntokenAddress: %s, \namount: %s",
 			utils.FormatHex(from), utils.FormatHex(t.TransferMiddleAddress), utils.FormatHex(t.TransferTokenAddress), amount)
 		_ = ding_robot.NewRobot(utils.WebHook).SendText(content, nil, true)
 		log.Errorf("通过fromAddr查询订单表失败：from: %s, err: %v", from, err)
@@ -109,11 +108,11 @@ func (t *TacProcess) processCollectionTx(from, amount string) error {
 	var chainNetUrl string
 	var chainId int64
 	var chainTag int
-	if ord.OrderType == models.EthToTtOrderType { // 以太坊上的token转到tt链上的token
+	if ord.OrderType == conf.EthToTtOrderType { // 以太坊上的token转到tt链上的token
 		chainNetUrl = conf.TTChainNet
 		chainId = conf.TTChainID
 		chainTag = conf.TTChainTag
-	} else if ord.OrderType == models.TtToEthOrderType {
+	} else if ord.OrderType == conf.TtToEthOrderType {
 		chainNetUrl = conf.EthChainNet
 		chainId = conf.EthChainID
 		chainTag = conf.EthChainTag
@@ -214,7 +213,7 @@ func (t *TacProcess) processCollectionTx(from, amount string) error {
 	t.ToChainWatcher.RegisterTxPlugin(plugin.NewTxHashPlugin(func(txHash string, isRemoved bool) {
 		if strings.ToLower(signedTx.Hash().String()) == strings.ToLower(txHash) {
 			// 监听到此交易
-			log.Infof("监听到跨链转账交易；txHash: %s", txHash)
+			log.Infof("链上监听到成功发送的跨链转账交易；txHash: %s", txHash)
 			// 1. 修改交易状态为成功 todo 事务更新
 			if err := tt.Update(models.TxTransfer{TxStatus: 1}); err != nil {
 				log.Errorf("修改交易状态为success error: %v. txHash: %s", err, txHash)

@@ -1,5 +1,7 @@
 package conf
 
+import "os"
+
 const (
 	TTChainNet = "https://mainnet-rpc.thundercore.com"
 	TTChainID  = 108
@@ -11,11 +13,18 @@ const (
 )
 
 const (
-	MiddleAddress        = "0x59375A522876aB96B0ed2953D0D3b92674701Cc2"
-	MiddleAddressPrivate = "69F657EAF364969CCFB2531F45D9C9EFAC0A63E359CEA51E5F7D8340784168D2"
-)
-
-const (
 	EthToTtOrderType = 1 // 以太坊转tt链
 	TtToEthOrderType = 2 // tt链转以太坊
 )
+
+var (
+	MiddleAddress        = ""
+	MiddleAddressPrivate = ""
+	Dsn                  = ""
+)
+
+func InitConf() {
+	MiddleAddress = os.Getenv("MiddleAddress")
+	MiddleAddressPrivate = os.Getenv("MiddleAddressPrivate")
+	Dsn = os.Getenv("MYSQL_DSN")
+}

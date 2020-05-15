@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
+	"github.com/joho/godotenv"
 	"github.com/zyjblockchain/sandy_log/log"
 	"github.com/zyjblockchain/tt_tac/conf"
 	"github.com/zyjblockchain/tt_tac/logics"
@@ -12,12 +13,17 @@ import (
 )
 
 func main() {
-	// 1. 初始化日志级别、格式、是否保存到文件
+	// 0. 初始化日志级别、格式、是否保存到文件
 	log.Setup(log.LevelDebug, true, true)
+	// 1. 读取配置文件
+	if err := godotenv.Load("config_dev"); err != nil {
+		panic(err)
+	}
+	// init conf
+	conf.InitConf()
 	// 2. 数据库链接
-	// dsn := "tac_user:tac_good123@tcp(rm-j6c49n23e4d07l8ijmo.mysql.rds.aliyuncs.com:3306)/tac_db?charset=utf8&parseTime=True&loc=Local"
-	dsn := "tac_user:NwHJhkcTKHmDr2RZ@tcp(223.27.39.183:3306)/tac_db?charset=utf8mb4&parseTime=True&loc=Local"
-	models.InitDB(dsn)
+	// dsn := "tac_user:NwHJhkcTKHmDr2RZ@tcp(223.27.39.183:3306)/tac_db?charset=utf8mb4&parseTime=True&loc=Local"
+	models.InitDB(conf.Dsn)
 
 	// 3. 启动跨链转账服务
 	// ethChainApi := "https://mainnet.infura.io/v3/19d753b2600445e292d54b1ef58d4df4"

@@ -13,6 +13,7 @@ require (
 	github.com/jarcoal/httpmock v1.0.5 // indirect
 	github.com/jinzhu/gorm v1.9.12
 	github.com/jinzhu/now v1.1.1 // indirect
+	github.com/joho/godotenv v1.3.0
 	github.com/labstack/gommon v0.3.0
 	github.com/lib/pq v1.5.2 // indirect
 	github.com/mattn/go-sqlite3 v2.0.3+incompatible // indirect

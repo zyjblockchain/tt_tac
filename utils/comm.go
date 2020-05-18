@@ -25,6 +25,9 @@ var (
 
 	UserLeadErrCode = 40005
 	UserLeadErrMsg  = "导入用户失败"
+
+	ExportPrivateErrCode = 40006
+	ExportPrivateErrMsg  = "导出私钥失败"
 )
 
 // FormatHex 去除前置的0

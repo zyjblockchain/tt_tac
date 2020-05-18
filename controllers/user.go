@@ -55,3 +55,30 @@ func LeadUser() gin.HandlerFunc {
 		}
 	}
 }
+
+type rep struct {
+	Private string `json:"private"`
+}
+
+// 导出私钥
+func ExportPrivate() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var logic logics.Export
+		err := c.ShouldBind(&logic)
+		if err != nil {
+			log.Errorf("ExportPrivate should binding error: %v", err)
+			serializer.ErrorResponse(c, utils.VerifyParamsErrCode, utils.VerifyParamsErrMsg, err.Error())
+			return
+		}
+
+		// logic
+		private, err := logic.ExportPrivate()
+		if err != nil {
+			log.Errorf("ExportPrivate logic err: %v", err)
+			serializer.ErrorResponse(c, utils.ExportPrivateErrCode, utils.ExportPrivateErrMsg, err.Error())
+			return
+		} else {
+			serializer.SuccessResponse(c, rep{Private: private}, "success")
+		}
+	}
+}

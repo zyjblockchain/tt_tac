@@ -5,6 +5,7 @@ import (
 	"github.com/zyjblockchain/sandy_log/log"
 	"github.com/zyjblockchain/tt_tac/models"
 	"github.com/zyjblockchain/tt_tac/utils"
+	"strings"
 )
 
 type CreateUser struct {
@@ -89,4 +90,32 @@ func (l *LeadUser) LeadUser() (string, error) {
 	}
 	// 返回address
 	return newUser.Address, nil
+}
+
+// 导出私钥
+type Export struct {
+	Address  string `json:"address" binding:"required"`
+	Password string `json:"password" binding:"required,min=6"`
+}
+
+// ExportPrivate
+func (e *Export) ExportPrivate() (string, error) {
+	// 通过address查询出user
+	u, err := new(models.User).GetUserByAddress(e.Address)
+	if err != nil {
+		log.Errorf("通过address从表中查询user失败， err: %v, address: %s", err, e.Address)
+		return "", err
+	}
+	// 校验password
+	if !u.CheckPassword(e.Password) {
+		log.Errorf("password交易失败， 输入的密码不正确")
+		return "", errors.New("输入的密码有误")
+	}
+	// 返回private
+	private, err := utils.DecryptPrivate(u.PrivateCrypted)
+	if err != nil {
+		return "", err
+	} else {
+		return strings.ToUpper(private[2:]), nil // 去除0x并把转成大写形式：F234120DE07D7F5CE27EAA1D7B954F55BDC49E6C3B2B19FB78C5000A191CEE4F
+	}
 }

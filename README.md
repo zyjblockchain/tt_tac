@@ -119,4 +119,44 @@
 }
 ```
 ----
+#### 导出私钥
+###### 请求url
+- POST /tac/export_private
+###### 请求参数
+```$xslt
+{
+	"address":"0xb86ebA9f29Fcc6cA8dE202889111dC1c6BEdDf16",
+	"password":"123456"
+	
+}
+```
+###### 参数说明
+1. address: 钱包地址
+2. password: 支付密码
+###### 返回示例
+```$xslt
+// 成功返回示例
+{
+    "status": 200,
+    "data": {
+        "private": "F234120DE07D7F5CE27EAA1D7B954F55BDC49E6C3B2B19FB78C5000A191CEE4F"
+    },
+    "msg": "success",
+    "error": ""
+}
 
+// password失败返回示例
+{
+    "status": 40006,
+    "data": null,
+    "msg": "导出私钥失败",
+    "error": "输入的密码有误"
+}
+// address有误的返回示例
+{
+    "status": 40006,
+    "data": null,
+    "msg": "导出私钥失败",
+    "error": "record not found"
+}
+```

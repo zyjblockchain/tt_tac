@@ -23,6 +23,8 @@ func NewRouter(addr string) {
 		v1.POST("/create_user", controllers.CreateUser())
 		// 4. 导入用户
 		v1.POST("/lead_user", controllers.LeadUser())
+		// 5. 导出私钥
+		v1.POST("/export_private", controllers.ExportPrivate())
 	}
 	if err := r.Run(addr); err != nil {
 		panic(err)

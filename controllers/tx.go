@@ -12,7 +12,7 @@ type tHash struct {
 	TxHash string `json:"tx_hash"`
 }
 
-// SendTacTx
+// SendTacTx 发送跨链转账
 func SendTacTx() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var logic logics.SendTacTx
@@ -33,3 +33,5 @@ func SendTacTx() gin.HandlerFunc {
 		}
 	}
 }
+
+// 发送闪兑交易

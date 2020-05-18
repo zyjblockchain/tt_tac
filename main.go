@@ -45,10 +45,10 @@ func main() {
 	}()
 
 	// new eth -> tt process
-	ethToTtProcess := logics.NewTacProcess(ethChainApi, conf.EthPalaTokenAddress, conf.TtPalaTokenAddress, conf.MiddleAddress, ethChainWather, ttChainWather)
+	ethToTtProcess := logics.NewTacProcess(ethChainApi, conf.EthPalaTokenAddress, conf.TtPalaTokenAddress, conf.TacMiddleAddress, ethChainWather, ttChainWather)
 	ethToTtProcess.ListenErc20CollectionAddress()
 	// new tt -> eth process
-	ttToEthProcess := logics.NewTacProcess(ttChainApi, conf.TtPalaTokenAddress, conf.EthPalaTokenAddress, conf.MiddleAddress, ttChainWather, ethChainWather)
+	ttToEthProcess := logics.NewTacProcess(ttChainApi, conf.TtPalaTokenAddress, conf.EthPalaTokenAddress, conf.TacMiddleAddress, ttChainWather, ethChainWather)
 	ttToEthProcess.ListenErc20CollectionAddress()
 
 	// 4. 启动服务

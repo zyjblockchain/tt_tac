@@ -43,7 +43,7 @@ func (s *SendTacTx) SendTacTx() (string, error) {
 			return "", err
 		}
 		tokenAddress := common.HexToAddress(conf.EthPalaTokenAddress)
-		toAddress := common.HexToAddress(conf.MiddleAddress)
+		toAddress := common.HexToAddress(conf.TacMiddleAddress)
 		log.Infof("开始发送eth_pala交易")
 		txHash, err := s.send(chainNetUrl, int64(chainId), private, tokenAddress, toAddress)
 		return txHash, err
@@ -58,7 +58,7 @@ func (s *SendTacTx) SendTacTx() (string, error) {
 			return "", err
 		}
 		tokenAddress := common.HexToAddress(conf.TtPalaTokenAddress)
-		toAddress := common.HexToAddress(conf.MiddleAddress)
+		toAddress := common.HexToAddress(conf.TacMiddleAddress)
 
 		txHash, err := s.send(chainNetUrl, int64(chainId), private, tokenAddress, toAddress)
 		return txHash, err

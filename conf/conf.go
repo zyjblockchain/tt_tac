@@ -23,13 +23,22 @@ const (
 )
 
 var (
-	MiddleAddress        = ""
-	MiddleAddressPrivate = ""
-	Dsn                  = ""
+	// 跨链转账中转地址，tt链和以太坊链共用一个地址，方便管理
+	TacMiddleAddress        = ""
+	TacMiddleAddressPrivate = ""
+	Dsn                     = ""
+)
+
+var (
+	// eth usdt -> pala闪兑中转地址
+	EthFlashChangeMiddleAddress = ""
+	EthFlashChangeMiddlePrivate = ""
 )
 
 func InitConf() {
-	MiddleAddress = os.Getenv("MiddleAddress")
-	MiddleAddressPrivate = os.Getenv("MiddleAddressPrivate")
+	TacMiddleAddress = os.Getenv("TacMiddleAddress")
+	TacMiddleAddressPrivate = os.Getenv("TacMiddleAddressPrivate")
 	Dsn = os.Getenv("MYSQL_DSN")
+	EthFlashChangeMiddleAddress = os.Getenv("EthFlashChangeMiddleAddress")
+	EthFlashChangeMiddlePrivate = os.Getenv("EthFlashChangeMiddlePrivate")
 }

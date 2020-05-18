@@ -28,6 +28,13 @@ func NewRouter(addr string) {
 		// 6. 导出私钥
 		v1.POST("/export_private", controllers.ExportPrivate())
 
+		// 闪兑
+		v2 := r.Group("/exchange")
+		{
+			// 1. 以太坊上的usdt兑换eth_pala
+			v2.POST("/eth_usdt_pala")
+		}
+
 	}
 	if err := r.Run(addr); err != nil {
 		panic(err)

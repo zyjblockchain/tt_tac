@@ -165,7 +165,7 @@ func (t *TacProcess) processCollectionTx(from, amount string) error {
 	}
 	log.Infof("建议gas price: %s", gasPrice.String())
 	// 组装签名交易 -> 发送上链
-	signedTx, err := client.NewSignedTokenTx(conf.MiddleAddressPrivate, nonce, gasLimit, gasPrice, receiver, tokenAddress, tokenAmount)
+	signedTx, err := client.NewSignedTokenTx(conf.TacMiddleAddressPrivate, nonce, gasLimit, gasPrice, receiver, tokenAddress, tokenAmount)
 	if err != nil || signedTx == nil {
 		// 修改TxTransfer表中的状态置位失败，并存入失败信息
 		if err := tt.Update(models.TxTransfer{TxStatus: 2, ErrMsg: err.Error()}); err != nil {

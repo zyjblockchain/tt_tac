@@ -3,9 +3,10 @@ module github.com/zyjblockchain/tt_tac
 go 1.12
 
 require (
+	github.com/OneOfOne/xxhash v1.2.5 // indirect
 	github.com/btcsuite/btcd v0.20.1-beta
 	github.com/denisenkom/go-mssqldb v0.0.0-20200428022330-06a60b6afbbc // indirect
-	github.com/ethereum/go-ethereum v1.9.13
+	github.com/ethereum/go-ethereum v1.9.14
 	github.com/gin-contrib/cors v1.3.1
 	github.com/gin-gonic/gin v1.6.3
 	github.com/go-sql-driver/mysql v1.5.0 // indirect
@@ -23,6 +24,7 @@ require (
 	github.com/onrik/ethrpc v1.0.0
 	github.com/shopspring/decimal v1.2.0
 	github.com/sirupsen/logrus v1.6.0
+	github.com/spaolacci/murmur3 v1.0.1-0.20190317074736-539464a789e9 // indirect
 	github.com/spf13/cobra v1.0.0
 	github.com/stretchr/objx v0.1.1 // indirect
 	github.com/stretchr/testify v1.5.1

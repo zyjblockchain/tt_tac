@@ -19,6 +19,10 @@ func NewRouter(addr string) {
 		v1.POST("/apply_order", controllers.ApplyOrder())
 		// 2. 通过订单id查询订单详情 http://127.0.0.1:3000/tac/order/111
 		v1.GET("/order/:id", controllers.GetOrder())
+		// 3. 创建用户
+		v1.POST("/create_user", controllers.CreateUser())
+		// 4. 导入用户
+		v1.POST("/lead_user", controllers.LeadUser())
 	}
 	if err := r.Run(addr); err != nil {
 		panic(err)

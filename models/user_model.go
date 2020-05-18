@@ -12,7 +12,7 @@ const (
 
 type User struct {
 	gorm.Model
-	Address             string `gorm:"unique"` // 用户地址
+	Address             string // 用户地址
 	PrivateCrypted      string // 通过aes加密过后的私钥
 	PasswordDigest      string // 用户的加密之后的支付密码
 	LocalEthPalaBalance string // 用户的平台eth_pala余额
@@ -43,9 +43,9 @@ func (u *User) GetUserByAddress(Address string) (*User, error) {
 }
 
 // AddUser 增加user并返回结果
-func (u *User) AddUser(newUser *User) (error, *User) {
+func (u *User) AddUser(newUser *User) (*User, error) {
 	err := DB.Create(newUser).Error
-	return err, newUser
+	return newUser, err
 }
 
 func (u *User) UpdateUserLocalBalance(address, newBalance string) error {

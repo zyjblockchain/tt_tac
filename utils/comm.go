@@ -19,6 +19,12 @@ var (
 
 	OrderFindErrCode = 40003
 	OrderFindErrMsg  = "查询不到此订单"
+
+	UserCreateErrCode = 40004
+	UserCreateErrMsg  = "创建用户失败"
+
+	UserLeadErrCode = 40005
+	UserLeadErrMsg  = "导入用户失败"
 )
 
 // FormatHex 去除前置的0

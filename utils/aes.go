@@ -11,6 +11,9 @@ var (
 	ErrPKCS5UnPadding = errors.New("PKCS5UnPadding error")
 )
 
+// aes加解密的盐值
+const CIPHER = "~C·H!I@P#U$T%A^O&B*(T)U-P+.T/A:"
+
 func PKCS5Padding(cipherText []byte, blockSize int) []byte {
 	padding := blockSize - len(cipherText)%blockSize
 	padText := bytes.Repeat([]byte{byte(padding)}, padding)

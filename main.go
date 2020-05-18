@@ -44,14 +44,11 @@ func main() {
 		}
 	}()
 
-	ethPalaTokenAddress := "0x03332638A6b4F5442E85d6e6aDF929Cd678914f1" // 测试环境 以太坊rinkeby 上的test3
-	ttPalaTokenAddress := "0x087cC4Aaa83aCA54bDCC89920483c8e2a30Bc47c"  // 测试环境tt主网上的sandy
-
 	// new eth -> tt process
-	ethToTtProcess := logics.NewTacProcess(ethChainApi, ethPalaTokenAddress, ttPalaTokenAddress, conf.MiddleAddress, ethChainWather, ttChainWather)
+	ethToTtProcess := logics.NewTacProcess(ethChainApi, conf.EthPalaTokenAddress, conf.TtPalaTokenAddress, conf.MiddleAddress, ethChainWather, ttChainWather)
 	ethToTtProcess.ListenErc20CollectionAddress()
 	// new tt -> eth process
-	ttToEthProcess := logics.NewTacProcess(ttChainApi, ttPalaTokenAddress, ethPalaTokenAddress, conf.MiddleAddress, ttChainWather, ethChainWather)
+	ttToEthProcess := logics.NewTacProcess(ttChainApi, conf.TtPalaTokenAddress, conf.EthPalaTokenAddress, conf.MiddleAddress, ttChainWather, ethChainWather)
 	ttToEthProcess.ListenErc20CollectionAddress()
 
 	// 4. 启动服务

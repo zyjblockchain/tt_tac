@@ -69,9 +69,40 @@
 4. `order_type`: 订单类型，为1表示从以太坊的pala转到tt链的pala, 为2表示从tt链的pala转到以太坊上的pala
 5. `state`: 订单状态，为0表示订单进行中，为1表示订单完成，为2表示订单失败，为3表示订单超时
 ---
-#### 创建user
+
+#### 发送跨链转账交易
 ###### 请求url
-- POST `/tac/create_user`
+- POST `/tac/send_tac_tx`
+###### 请求参数
+```$xslt
+{
+	"address": "0x59375A522876aB96B0ed2953D0D3b92674701Cc2",
+	"password":"123456",
+	"amount":"911000000",
+	"order_type":2
+}
+```
+###### 参数说明
+1. address: 钱包地址
+2. password: 钱包支付密钥
+3. amount: 跨链金额
+4. order_type: 跨链类型。1表示从eth_pala转到tt_pala，2则相反
+###### 返回示例
+```$xslt
+// 返回交易hash
+{
+    "status": 200,
+    "data": {
+        "tx_hash": "0x9687dc46485f0be3791d8054c39a8d3b9f10ac108f7d8157494ae0391e671081"
+    },
+    "msg": "success",
+    "error": ""
+}
+```
+
+#### 创建wallet
+###### 请求url
+- POST `/tac/create_wallet`
 ###### 请求参数
 ```$xslt
 {
@@ -93,9 +124,9 @@
 }
 ```
 ----
-#### 通过私钥导入user
+#### 通过私钥导入wallet
 ###### 请求url
-- POST /tac/lead_user
+- POST /tac/lead_wallet
 ###### 请求参数
 ```$xslt
 {

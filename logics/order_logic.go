@@ -16,8 +16,8 @@ type Order struct {
 // CreateOrder 返回订单号
 func (ord *Order) CreateOrder() (uint, error) {
 	order := &models.Order{
-		FromAddr:      strings.ToLower(utils.FormatHex(ord.FromAddr)),
-		RecipientAddr: strings.ToLower(utils.FormatHex(ord.RecipientAddr)),
+		FromAddr:      strings.ToLower(utils.FormatAddressHex(ord.FromAddr)),
+		RecipientAddr: strings.ToLower(utils.FormatAddressHex(ord.RecipientAddr)),
 		Amount:        ord.Amount,
 		OrderType:     ord.OrderType,
 		State:         0,

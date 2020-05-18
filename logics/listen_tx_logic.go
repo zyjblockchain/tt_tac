@@ -43,18 +43,18 @@ func NewTacProcess(chainNet, listenTokenAddress, transferTokenAddress, transferM
 // ListenErc20CollectionAddress 监听erc20代币收款地址
 func (t *TacProcess) ListenErc20CollectionAddress() {
 	t.FromChainWatcher.RegisterTxReceiptPlugin(plugin.NewERC20TransferPlugin(func(tokenAddress, from, to string, amount decimal.Decimal, isRemoved bool) {
-		// log.Infof("tokenAddress: %s; from: %s, to: %s, amount: %s", tokenAddress, utils.FormatHex(from), utils.FormatHex(to), amount.String())
-		if strings.ToLower(utils.FormatHex(tokenAddress)) == strings.ToLower(t.ListenTokenAddress) && strings.ToLower(utils.FormatHex(to)) == strings.ToLower(utils.FormatHex(t.TransferMiddleAddress)) {
-			log.Infof("监听到跨链转账交易：tokenAddress: %s; from: %s, to: %s, amount: %s", tokenAddress, utils.FormatHex(from), utils.FormatHex(to), amount.String())
+		// log.Infof("tokenAddress: %s; from: %s, to: %s, amount: %s", tokenAddress, utils.FormatAddressHex(from), utils.FormatAddressHex(to), amount.String())
+		if strings.ToLower(utils.FormatAddressHex(tokenAddress)) == strings.ToLower(t.ListenTokenAddress) && strings.ToLower(utils.FormatAddressHex(to)) == strings.ToLower(utils.FormatAddressHex(t.TransferMiddleAddress)) {
+			log.Infof("监听到跨链转账交易：tokenAddress: %s; from: %s, to: %s, amount: %s", tokenAddress, utils.FormatAddressHex(from), utils.FormatAddressHex(to), amount.String())
 			// 监听到转入的交易
 			// 开启一个协程来执行处理此交易
 			go func() {
 				err := t.processCollectionTx(from, amount.String())
 				if err != nil {
 					// 钉钉群推送
-					content := fmt.Sprintf("tac 跨链转账失败；\nfrom：%s, \ntokenAddress: %s, \namount: %s", utils.FormatHex(from), tokenAddress, amount.String())
+					content := fmt.Sprintf("tac 跨链转账失败；\nfrom：%s, \ntokenAddress: %s, \namount: %s", utils.FormatAddressHex(from), tokenAddress, amount.String())
 					_ = ding_robot.NewRobot(utils.WebHook).SendText(content, nil, true)
-					log.Errorf("执行跨链转账逻辑失败，error: %v；from: %s; to: %s; amount: %s; tokenAddress: %s", err, utils.FormatHex(from), utils.FormatHex(to), amount.String(), tokenAddress)
+					log.Errorf("执行跨链转账逻辑失败，error: %v；from: %s; to: %s; amount: %s; tokenAddress: %s", err, utils.FormatAddressHex(from), utils.FormatAddressHex(to), amount.String(), tokenAddress)
 				}
 			}()
 		}
@@ -64,7 +64,7 @@ func (t *TacProcess) ListenErc20CollectionAddress() {
 // processCollectionTx 处理接收token逻辑
 func (t *TacProcess) processCollectionTx(from, amount string) error {
 	if len(from) != 42 {
-		from = utils.FormatHex(from)
+		from = utils.FormatAddressHex(from)
 	}
 	// 1. 保存监听到的转入交易到collection表中
 	cc := &models.CollectionTx{
@@ -84,7 +84,7 @@ func (t *TacProcess) processCollectionTx(from, amount string) error {
 	if err != nil {
 		// todo 监听到的收款信息在order中查不到，可能是充值余额到中转地址的操作，所以不用退还，需要钉钉推送通知
 		content := fmt.Sprintf("tac 收到了一笔没有转账订单的转入交易；\nfrom: %s, \nto: %s, \ntokenAddress: %s, \namount: %s",
-			utils.FormatHex(from), utils.FormatHex(t.TransferMiddleAddress), utils.FormatHex(t.TransferTokenAddress), amount)
+			utils.FormatAddressHex(from), utils.FormatAddressHex(t.TransferMiddleAddress), utils.FormatAddressHex(t.TransferTokenAddress), amount)
 		_ = ding_robot.NewRobot(utils.WebHook).SendText(content, nil, true)
 		log.Errorf("通过fromAddr查询订单表失败：from: %s, err: %v", from, err)
 		return nil

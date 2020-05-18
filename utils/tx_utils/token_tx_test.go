@@ -18,7 +18,7 @@ const (
 func TestGetTokenBalance(t *testing.T) {
 	client := NewChainClient(TTMainNet, big.NewInt(TTMainNetID))
 	defer client.Close()
-	address := "0x67Adf250F70F6100d346cF8FE3af6DC7A2C23213"
+	address := "0x59375A522876aB96B0ed2953D0D3b92674701Cc2"
 	tokenAddr := "0x087cC4Aaa83aCA54bDCC89920483c8e2a30Bc47c"
 	balance, err := client.GetTokenBalance(common.HexToAddress(address), common.HexToAddress(tokenAddr))
 	t.Log(err)

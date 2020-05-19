@@ -1,6 +1,9 @@
 package models
 
-import "github.com/jinzhu/gorm"
+import (
+	"github.com/jinzhu/gorm"
+	"github.com/zyjblockchain/sandy_log/log"
+)
 
 type FlashChangeOrder struct {
 	gorm.Model
@@ -23,6 +26,13 @@ func (f *FlashChangeOrder) Get() (*FlashChangeOrder, error) {
 	tt := FlashChangeOrder{}
 	err := DB.Where(f).Last(&tt).Error
 	return &tt, err
+}
+
+func (f *FlashChangeOrder) Exist(operateAddr, fromTokenAddr, toTokenAddr string, state int) bool {
+	var ff FlashChangeOrder
+	err := DB.Where("operate_address = ? AND from_token_address = ? AND	to_token_address = ? AND state = ?", operateAddr, fromTokenAddr, toTokenAddr, state).First(&ff).Error
+	log.Errorf("////: %v", err)
+	return !(err == gorm.ErrRecordNotFound)
 }
 
 func (f *FlashChangeOrder) Update(ff FlashChangeOrder) error {

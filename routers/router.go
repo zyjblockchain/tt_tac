@@ -29,7 +29,7 @@ func NewRouter(addr string) {
 		v1.POST("/export_private", controllers.ExportPrivate())
 
 		// 闪兑
-		v2 := r.Group("/exchange")
+		v2 := v1.Group("/exchange")
 		{
 			// 1. 以太坊上的usdt兑换eth_pala
 			v2.POST("/eth_usdt_pala", controllers.FlashChange())

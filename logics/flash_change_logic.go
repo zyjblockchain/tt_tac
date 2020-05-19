@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/jinzhu/gorm"
 	"github.com/shopspring/decimal"
 	"github.com/zyjblockchain/sandy_log/log"
 	"github.com/zyjblockchain/tt_tac/conf"
@@ -31,13 +32,8 @@ type FlashChange struct {
 
 func (f *FlashChange) FlashChange() (string, error) {
 	// 1. 查看operateAddress 是否存在正在进行中的闪兑订单
-	_, err := (&models.FlashChangeOrder{
-		OperateAddress:   f.OperateAddress,
-		FromTokenAddress: f.FromTokenAddress,
-		ToTokenAddress:   f.ToTokenAddress,
-		State:            0,
-	}).Get()
-	if err == nil {
+	exist := new(models.FlashChangeOrder).Exist(f.OperateAddress, f.FromTokenAddress, f.ToTokenAddress, 0)
+	if exist {
 		// 存在则返回
 		log.Errorf("存在正在进行中的同类型的闪兑订单。operateAddress: %s, fromToken: %s, toToken: %s", f.OperateAddress, f.FromTokenAddress, f.ToTokenAddress)
 		return "", errors.New(fmt.Sprintf("存在正在进行中的同类型的闪兑订单。operateAddress: %s, fromToken: %s, toToken: %s", f.OperateAddress, f.FromTokenAddress, f.ToTokenAddress))
@@ -229,6 +225,8 @@ func (w *WatchFlashChange) processCollectFlashChangeTx(from, amount string) erro
 		log.Errorf("更新FlashChangeOrder的collectionId 字段失败：%v", err)
 		return err
 	}
+	// 更新闪兑的第一笔发送usdt交易的状态为成功
+	_ = (&models.TxTransfer{Model: gorm.Model{ID: fo.SendTxId}}).Update(models.TxTransfer{TxStatus: 1})
 
 	// 4. 执行闪兑逻辑的发送闪兑的pala交易
 	client := transaction.NewChainClient(conf.EthChainNet, big.NewInt(conf.EthChainID))

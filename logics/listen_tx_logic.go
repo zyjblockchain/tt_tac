@@ -73,6 +73,7 @@ func (t *TacProcess) processCollectionTx(from, amount string) error {
 		TokenAddress: t.ListenTokenAddress,
 		Amount:       amount,
 		ChainNetUrl:  t.ChainNetUrl,
+		ExtraInfo:    "跨链转账",
 	}
 	if err := cc.Create(); err != nil {
 		log.Errorf("保存collection失败：error: %v", err)

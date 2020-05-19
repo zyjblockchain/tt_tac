@@ -152,18 +152,22 @@ func (t *TacProcess) processCollectionTx(from, amount string) error {
 	receiver := common.HexToAddress(tt.ReceiverAddress)
 	tokenAddress := common.HexToAddress(tt.TokenAddress)
 
-	gasLimit, err := client.EstimateTokenTxGas(tokenAmount, common.HexToAddress(tt.SenderAddress), tokenAddress, receiver)
-	log.Infof("预估gasLimit: %d", gasLimit)
-	if err != nil {
-		log.Errorf("调用预估交易gas接口失败：%v", err)
-		return err
-	}
-	gasPrice, err := client.SuggestGasPrice()
+	// gasLimit, err := client.EstimateTokenTxGas(tokenAmount, common.HexToAddress(tt.SenderAddress), tokenAddress, receiver)
+	// log.Infof("预估gasLimit: %d", gasLimit)
+	// if err != nil {
+	// 	log.Errorf("调用预估交易gas接口失败：%v", err)
+	// 	return err
+	// }
+	gasLimit := uint64(60000)
+	suggestGasPrice, err := client.SuggestGasPrice()
 	if err != nil {
 		log.Errorf("获取建议的gas price失败：%v", err)
 		return err
 	}
-	log.Infof("建议gas price: %s", gasPrice.String())
+	log.Infof("建议gas price: %s", suggestGasPrice.String())
+	gasPrice := suggestGasPrice.Mul(suggestGasPrice, big.NewInt(2)) // 两倍的建议gas价格
+	// 把 gasPrice更新到txTransfer中
+	_ = tt.Update(models.TxTransfer{GasPrice: gasPrice.String()})
 	// 组装签名交易 -> 发送上链
 	signedTx, err := client.NewSignedTokenTx(conf.TacMiddleAddressPrivate, nonce, gasLimit, gasPrice, receiver, tokenAddress, tokenAmount)
 	if err != nil || signedTx == nil {
@@ -187,7 +191,7 @@ func (t *TacProcess) processCollectionTx(from, amount string) error {
 		log.Errorf("marshal tx err: %v", err)
 		return err
 	}
-	if err := models.SetKv(signedTx.Hash().String(), string(byteTx)); err != nil {
+	if err := models.SetKv(signedTx.Hash().String(), byteTx); err != nil {
 		log.Errorf("把交易保存到kv表中失败：%v", err)
 		return err
 	}

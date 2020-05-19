@@ -31,6 +31,9 @@ var (
 
 	SendTacTxErrCode = 40007
 	SendTacTxErrMsg  = "发送pala跨链交易失败"
+
+	SendFlashChangeTxErrCode = 40008
+	SendFlashChangeTxErrMsg  = "发送闪兑交易失败"
 )
 
 // FormatHex 去除前置的0

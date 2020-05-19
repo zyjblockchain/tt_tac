@@ -5,16 +5,17 @@ import "os"
 const (
 	TTChainNet = "https://mainnet-rpc.thundercore.com"
 	TTChainID  = 108
-	TTChainTag = 11
+	TTChainTag = 77
 
 	EthChainNet = "https://rinkeby.infura.io/v3/36b98a13557c4b8583d57934ede2f74d"
 	EthChainID  = 4
-	EthChainTag = 22
+	EthChainTag = 17
 )
 
 const (
 	EthPalaTokenAddress = "0x03332638A6b4F5442E85d6e6aDF929Cd678914f1" // 测试环境 以太坊rinkeby 上的test3
 	TtPalaTokenAddress  = "0x087cC4Aaa83aCA54bDCC89920483c8e2a30Bc47c" // 测试环境tt主网上的sandy
+	EthUSDTTokenAddress = "0x03332638A6b4F5442E85d6e6aDF929Cd678914f1" // 以太坊上的usdt erc20 地址
 )
 
 const (

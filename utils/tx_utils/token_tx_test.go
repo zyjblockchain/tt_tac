@@ -1,6 +1,7 @@
 package transaction
 
 import (
+	"context"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/zyjblockchain/tt_tac/utils"
 	"math/big"
@@ -76,5 +77,11 @@ func TestChainClient_Close(t *testing.T) {
 
 	// amount, ok := new(big.Int).SetString("0", 10)
 	// t.Log(ok)
-	t.Log(big.NewInt(0).String() == "0")
+	client := NewChainClient("https://mainnet.infura.io/v3/19d753b2600445e292d54b1ef58d4df4", big.NewInt(1))
+	defer client.Close()
+	gasPrice, err := client.SuggestGasPrice()
+	txReceipt, _ := client.Client.TransactionReceipt(context.Background(), common.HexToHash("0x508f4e9b015ed31c7a9df470b9beb4c54a7940b932f0b7f41983583a3e4937ca"))
+	t.Log(txReceipt.GasUsed)
+	t.Log(err)
+	t.Log(gasPrice.String())
 }

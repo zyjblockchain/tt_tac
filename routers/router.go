@@ -32,7 +32,7 @@ func NewRouter(addr string) {
 		v2 := r.Group("/exchange")
 		{
 			// 1. 以太坊上的usdt兑换eth_pala
-			v2.POST("/eth_usdt_pala")
+			v2.POST("/eth_usdt_pala", controllers.FlashChange())
 		}
 
 	}

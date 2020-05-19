@@ -23,6 +23,7 @@ import (
 
 // 闪兑 usdt -> eth_pala
 type FlashChange struct {
+	Password         string `json:"password" binding:"required"`          // 支付密码
 	FromTokenAddress string `json:"from_token_address"`                   // usdt token address，目前是写死，后面为了扩展会要求前端传
 	ToTokenAddress   string `json:"to_token_address"`                     // eth_pala token address，目前是写死，后面为了扩展会要求前端传
 	OperateAddress   string `json:"operate_address" binding:"required"`   // 操作地址
@@ -31,6 +32,16 @@ type FlashChange struct {
 }
 
 func (f *FlashChange) FlashChange() (string, error) {
+	// 0. 验证支付密码
+	user, err := new(models.User).GetUserByAddress(f.OperateAddress)
+	if err != nil {
+		log.Errorf("通过address从表中查询user失败， err: %v, address: %s", err, f.OperateAddress)
+		return "", err
+	}
+	if !user.CheckPassword(f.Password) {
+		log.Errorf("密码有误")
+		return "", errors.New("密码验证不通过")
+	}
 	// 1. 查看operateAddress 是否存在正在进行中的闪兑订单
 	exist := new(models.FlashChangeOrder).Exist(f.OperateAddress, f.FromTokenAddress, f.ToTokenAddress, 0)
 	if exist {
@@ -75,12 +86,8 @@ func (f *FlashChange) FlashChange() (string, error) {
 	}
 	// 3.2 发送交易闪兑的usdt到闪兑的中转账户
 	from := f.OperateAddress
-	u, err := new(models.User).GetUserByAddress(f.OperateAddress)
-	if err != nil {
-		log.Errorf("通过address从表中查询user失败， err: %v, address: %s", err, f.OperateAddress)
-		return "", err
-	}
-	fromPrivate, err := utils.DecryptPrivate(u.PrivateCrypted)
+	// 获取私钥
+	fromPrivate, err := utils.DecryptPrivate(user.PrivateCrypted)
 	if err != nil {
 		log.Errorf("aes 解码私钥失败。 err：%v", err)
 		return "", err

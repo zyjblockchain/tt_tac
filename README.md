@@ -191,3 +191,33 @@
     "error": "record not found"
 }
 ```
+---
+#### 申请闪兑接口
+###### 请求url
+- POST /tac/exchange/eth_usdt_pala
+###### 请求参数
+```$xslt
+{
+	"operate_address":"0x7AC954Ed6c2d96d48BBad405aa1579C828409f59",
+	"password":"123456",
+	"from_token_amount":"5000000000000000",
+	"to_token_amount":"1000000000000000000"
+	
+}
+```
+###### 参数说明
+1. operate_address: 需要闪兑的地址，也是用户的钱包地址
+2. password: 钱包的支付密码
+3. from_token_amount: usdt的兑换amount
+4. to_token_amount: 兑换成pala的amount
+###### 返回示例
+```$xslt
+{
+    "status": 200,
+    "data": {
+        "tx_hash": "0x6cd33023cedffd006a70d5c2225006a51415a90398673a979ad5dbf3542bc2b5"
+    },
+    "msg": "success",
+    "error": ""
+}
+```

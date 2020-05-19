@@ -81,7 +81,7 @@ func (t *TacProcess) processCollectionTx(from, amount string) error {
 	}
 
 	// 2. 从订单表中查询是否存在from的订单
-	ord, err := (&models.Order{FromAddr: from}).GetOrder()
+	ord, err := (&models.TacOrder{FromAddr: from}).GetOrder()
 	if err != nil {
 		// todo 监听到的收款信息在order中查不到，可能是充值余额到中转地址的操作，所以不用退还，需要钉钉推送通知
 		content := fmt.Sprintf("tac 收到了一笔没有转账订单的转入交易；\nfrom: %s, \nto: %s, \ntokenAddress: %s, \namount: %s",
@@ -99,7 +99,7 @@ func (t *TacProcess) processCollectionTx(from, amount string) error {
 		return err
 	}
 	ord.CollectionId = cc.ID
-	updateOrd := models.Order{CollectionId: cc.ID}
+	updateOrd := models.TacOrder{CollectionId: cc.ID}
 	if err := ord.Update(updateOrd); err != nil {
 		log.Errorf("更新order的collectionId 字段失败：%v", err)
 		return err
@@ -177,7 +177,7 @@ func (t *TacProcess) processCollectionTx(from, amount string) error {
 			log.Errorf("更新TxTransfer交易失败状态到数据库失败：error: %v", err)
 			return err
 		}
-		if err := ord.Update(models.Order{State: 2}); err != nil {
+		if err := ord.Update(models.TacOrder{State: 2}); err != nil {
 			log.Errorf("修改order状态为失败状态 error: %v. orderId: %d", err, ord.ID)
 		}
 		return err
@@ -203,7 +203,7 @@ func (t *TacProcess) processCollectionTx(from, amount string) error {
 			log.Errorf("更新TxTransfer交易失败状态到数据库失败：error: %v", err)
 			return err
 		}
-		if err := ord.Update(models.Order{State: 2}); err != nil {
+		if err := ord.Update(models.TacOrder{State: 2}); err != nil {
 			log.Errorf("修改order状态为失败状态 error: %v. orderId: %d", err, ord.ID)
 		}
 		return err
@@ -224,7 +224,7 @@ func (t *TacProcess) processCollectionTx(from, amount string) error {
 				log.Errorf("修改交易状态为success error: %v. txHash: %s", err, txHash)
 			}
 			// 2. 修改订单状态为完成
-			if err := ord.Update(models.Order{State: 1}); err != nil {
+			if err := ord.Update(models.TacOrder{State: 1}); err != nil {
 				log.Errorf("修改order状态为success error: %v. orderId: %d", err, ord.ID)
 			}
 			// 注销此监听
@@ -239,7 +239,7 @@ func (t *TacProcess) processCollectionTx(from, amount string) error {
 			if err := tt.Update(models.TxTransfer{TxStatus: 3}); err != nil {
 				log.Errorf("修改交易状态为超时error: %v. txHash: %s", err, txHash)
 			}
-			if err := ord.Update(models.Order{State: 3}); err != nil {
+			if err := ord.Update(models.TacOrder{State: 3}); err != nil {
 				log.Errorf("修改order状态为超时 error: %v. orderId: %d", err, ord.ID)
 			}
 			// 注销此监听

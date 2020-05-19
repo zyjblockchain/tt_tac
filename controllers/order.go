@@ -55,7 +55,7 @@ func GetOrder() gin.HandlerFunc {
 			return
 		}
 
-		o, err := (&models.Order{Model: gorm.Model{ID: uint(id)}}).GetOrder()
+		o, err := (&models.TacOrder{Model: gorm.Model{ID: uint(id)}}).GetOrder()
 		if err != nil {
 			log.Errorf("查询失败, err: %v", err)
 			serializer.ErrorResponse(c, utils.OrderFindErrCode, utils.OrderFindErrMsg, err.Error())

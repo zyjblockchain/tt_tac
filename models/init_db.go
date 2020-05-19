@@ -29,5 +29,5 @@ func InitDB(dsn string) {
 
 // autoCreateTable 自动建表
 func autoCreateTable() {
-	DB.AutoMigrate(&CollectionTx{}, &Kv{}, &Order{}, &TxTransfer{}, &User{}, &FlashChangeOrder{})
+	DB.AutoMigrate(&CollectionTx{}, &Kv{}, &TacOrder{}, &TxTransfer{}, &User{}, &FlashChangeOrder{})
 }

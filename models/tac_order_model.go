@@ -2,7 +2,7 @@ package models
 
 import "github.com/jinzhu/gorm"
 
-type Order struct {
+type TacOrder struct {
 	gorm.Model
 	FromAddr      string
 	RecipientAddr string
@@ -13,7 +13,7 @@ type Order struct {
 }
 
 // Create
-func (o *Order) Create() error {
+func (o *TacOrder) Create() error {
 	if err := DB.Create(o).Error; err != nil {
 		return err
 	}
@@ -21,12 +21,12 @@ func (o *Order) Create() error {
 }
 
 // GetOrder
-func (o *Order) GetOrder() (*Order, error) {
-	oo := Order{}
+func (o *TacOrder) GetOrder() (*TacOrder, error) {
+	oo := TacOrder{}
 	err := DB.Where(o).Last(&oo).Error
 	return &oo, err
 }
 
-func (o *Order) Update(oo Order) error {
+func (o *TacOrder) Update(oo TacOrder) error {
 	return DB.Model(o).Updates(oo).Error
 }

@@ -27,8 +27,8 @@ func main() {
 
 	// 3. 启动跨链转账服务
 	// ethChainApi := "https://mainnet.infura.io/v3/19d753b2600445e292d54b1ef58d4df4"
+	// 3.1 开启eth链的监听
 	ethChainApi := conf.EthChainNet
-	ttChainApi := conf.TTChainNet
 	ethChainWather := eth_watcher.NewHttpBasedEthWatcher(context.Background(), ethChainApi)
 	go func() {
 		err := ethChainWather.RunTillExit()
@@ -36,6 +36,8 @@ func main() {
 			panic(err)
 		}
 	}()
+	// 3.2 开启tt链上的监听
+	ttChainApi := conf.TTChainNet
 	ttChainWather := eth_watcher.NewHttpBasedEthWatcher(context.Background(), ttChainApi)
 	go func() {
 		err := ttChainWather.RunTillExit()
@@ -44,13 +46,17 @@ func main() {
 		}
 	}()
 
-	// new eth -> tt process
+	// 3.3 启动 eth -> tt 跨链process
 	ethToTtProcess := logics.NewTacProcess(ethChainApi, conf.EthPalaTokenAddress, conf.TtPalaTokenAddress, conf.TacMiddleAddress, ethChainWather, ttChainWather)
 	ethToTtProcess.ListenErc20CollectionAddress()
-	// new tt -> eth process
+	// 3.3 启动 tt -> eth 跨链process
 	ttToEthProcess := logics.NewTacProcess(ttChainApi, conf.TtPalaTokenAddress, conf.EthPalaTokenAddress, conf.TacMiddleAddress, ttChainWather, ethChainWather)
 	ttToEthProcess.ListenErc20CollectionAddress()
 
-	// 4. 启动服务
+	// 4. 启动闪兑服务
+	flashChangeSrv := logics.NewWatchFlashChange(conf.EthUSDTTokenAddress, conf.EthPalaTokenAddress, ethChainWather)
+	flashChangeSrv.ListenFlashChangeTx()
+
+	// 5. 启动gin服务
 	routers.NewRouter(":3000")
 }

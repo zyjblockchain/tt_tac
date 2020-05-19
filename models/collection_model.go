@@ -11,6 +11,7 @@ type CollectionTx struct {
 	ChainNetUrl  string // 所属链
 	TxId         uint   // tx表的外键
 	IsValid      int    // 是否有效订单的收集, 0: false; 1. true
+	ExtraInfo    string // 额外的信息
 }
 
 func (c *CollectionTx) Create() error {

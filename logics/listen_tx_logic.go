@@ -212,8 +212,8 @@ func (t *TacProcess) processCollectionTx(from, amount string) error {
 	// 5. 注册监听刚发送的交易状态
 	t.lock.Lock() // 保证注册交易监听的线程安全
 	defer t.lock.Unlock()
-	timeoutTimestamp := time.Now().Add(30 * time.Minute).Unix() // 监听超时时间设置为30分钟
-	pluginIndex := len(t.ToChainWatcher.TxPlugins)              // todo 线程不安全
+	timeoutTimestamp := time.Now().Add(24 * time.Hour).Unix() // 监听超时时间设置为24小时
+	pluginIndex := len(t.ToChainWatcher.TxPlugins)            // todo 线程不安全
 	t.ToChainWatcher.RegisterTxPlugin(plugin.NewTxHashPlugin(func(txHash string, isRemoved bool) {
 		if strings.ToLower(signedTx.Hash().String()) == strings.ToLower(txHash) {
 			// 监听到此交易

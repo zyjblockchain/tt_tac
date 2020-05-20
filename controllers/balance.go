@@ -6,6 +6,7 @@ import (
 	"github.com/zyjblockchain/tt_tac/logics"
 	"github.com/zyjblockchain/tt_tac/serializer"
 	"github.com/zyjblockchain/tt_tac/utils"
+	"github.com/zyjblockchain/tt_tac/utils/btc_max_api"
 )
 
 // GetBalance 获取tt链和eth链的address对应的主网币的余额
@@ -48,6 +49,52 @@ func GetTokenBalance() gin.HandlerFunc {
 			return
 		} else {
 			serializer.SuccessResponse(c, *respTokenBalance, "success")
+		}
+	}
+}
+
+// GetLatestPalaToUsdtPrice
+func GetLatestPalaToUsdtPrice() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		pair := "PALA_USDT"
+		var err error
+		var tt *btc_max_api.Ticker
+		tt, err = btc_max_api.GetSingleMarketTicker(pair)
+		if err != nil {
+			// 重新请求一次
+			tt, err = btc_max_api.GetSingleMarketTicker(pair)
+		}
+		if err != nil {
+			// 返回error给前端
+			log.Errorf("GetSingleMarketTicker should binding error: %v", err)
+			serializer.ErrorResponse(c, utils.GetLatestPriceErrCode, utils.GetLatestPriceErrMsg, err.Error())
+			return
+		} else {
+			// 返回结果
+			serializer.SuccessResponse(c, *tt, "success")
+		}
+	}
+}
+
+// GetLatestEthToUsdtPrice
+func GetLatestEthToUsdtPrice() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		pair := "ETH_USDT"
+		var err error
+		var tt *btc_max_api.Ticker
+		tt, err = btc_max_api.GetSingleMarketTicker(pair)
+		if err != nil {
+			// 重新请求一次
+			tt, err = btc_max_api.GetSingleMarketTicker(pair)
+		}
+		if err != nil {
+			// 返回error给前端
+			log.Errorf("GetSingleMarketTicker should binding error: %v", err)
+			serializer.ErrorResponse(c, utils.GetLatestPriceErrCode, utils.GetLatestPriceErrMsg, err.Error())
+			return
+		} else {
+			// 返回结果
+			serializer.SuccessResponse(c, *tt, "success")
 		}
 	}
 }

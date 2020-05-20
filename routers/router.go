@@ -37,11 +37,11 @@ func NewRouter(addr string) {
 		// 7. 获取地址的balance, tt链和eth上的balance
 		v1.POST("/get_balance", controllers.GetBalance())
 		// 8. 获取地址的token balance, tt链和eth上的token balance
-		v1.POST("get_token_balance", controllers.GetTokenBalance())
-		// 9. 获取bitMax交易所上的eth_pala价格
-		v1.POST("get_eth_pala_price")
-		// 10. 获取bitMax交易所上的eth_usdt价格
-		v1.POST("get_eth_usdt_price")
+		v1.POST("/get_token_balance", controllers.GetTokenBalance())
+		// 9. 获取btcMax交易所上的eth_pala价格
+		v1.GET("/get_eth_pala_price", controllers.GetLatestPalaToUsdtPrice())
+		// 10. 获取btcMax交易所上的eth_usdt价格
+		v1.GET("/get_eth_price", controllers.GetLatestEthToUsdtPrice())
 
 	}
 	if err := r.Run(addr); err != nil {

@@ -40,6 +40,9 @@ var (
 
 	GetTokenBalanceErrCode = 40010
 	GetTokenBalanceErrMsg  = "get token balance err"
+
+	GetLatestPriceErrCode = 40011
+	GetLatestPriceErrMsg  = "get latest price error"
 )
 
 // FormatHex 去除前置的0

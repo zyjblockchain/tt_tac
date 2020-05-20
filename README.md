@@ -277,4 +277,35 @@
 4. usdt_decimal: usdt小数位数
 5. pala_decimal: pala小数位数
 ---
-
+#### 获取eth链上的pala的实时价格
+###### 请求url
+- GET /tac/get_eth_pala_price
+###### 返回示例
+```$xslt
+{
+    "status": 200,
+    "data": {
+        "pair": "PALA_USDT",
+        "trade_price": "6.31400000"
+    },
+    "msg": "success",
+    "error": ""
+}
+```
+---
+#### 获取eth的实时价格
+###### 请求url
+- GET /tac/get_eth_price
+###### 返回示例
+```$xslt
+{
+    "status": 200,
+    "data": {
+        "pair": "ETH_USDT",
+        "trade_price": "213.69"
+    },
+    "msg": "success",
+    "error": ""
+}
+```
+---

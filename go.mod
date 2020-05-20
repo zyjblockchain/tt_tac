@@ -4,6 +4,7 @@ go 1.12
 
 require (
 	github.com/OneOfOne/xxhash v1.2.5 // indirect
+	github.com/bitly/go-simplejson v0.5.0
 	github.com/btcsuite/btcd v0.20.1-beta
 	github.com/denisenkom/go-mssqldb v0.0.0-20200428022330-06a60b6afbbc // indirect
 	github.com/ethereum/go-ethereum v1.9.14

@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/zyjblockchain/tt_tac/utils"
+
 	"math/big"
 	"testing"
 )
@@ -58,15 +59,16 @@ func TestChainClient_SuggestGasPrice(t *testing.T) {
 func TestChainClient_SendTokenTx(t *testing.T) {
 	client := NewChainClient(TTMainNet, big.NewInt(TTMainNetID))
 	defer client.Close()
-	prv := "61086E09073DCCF0A03D9D1BE953E161532A264A959C0608158B6C9ACA92D25B"
+	// prv := "61086E09073DCCF0A03D9D1BE953E161532A264A959C0608158B6C9ACA92D25B"
+	prv := "3E990B440C3FC1CCFF8B3339D41850C5B9A3D712F804FA3EE1CDD8F322B4A556"
 	addr, _ := utils.PrivateToAddress(prv)
 	nonce, _ := client.GetNonce(addr)
 
 	tokenAddress := "0x087cC4Aaa83aCA54bDCC89920483c8e2a30Bc47c" // tt 主网上的sandy代币
-	tokenAmount := big.NewInt(900000000)
+	tokenAmount, _ := new(big.Int).SetString("999999999999999999999900000000", 10)
 	recieve := "0x59375A522876aB96B0ed2953D0D3b92674701Cc2"
-	gasLimit, _ := client.EstimateTokenTxGas(tokenAmount, addr, common.HexToAddress(tokenAddress), common.HexToAddress(recieve))
-
+	// gasLimit, _ := client.EstimateTokenTxGas(tokenAmount, addr, common.HexToAddress(tokenAddress), common.HexToAddress(recieve))
+	gasLimit := uint64(60000)
 	gasPrice, _ := client.SuggestGasPrice()
 	tx, err := client.SendTokenTx(prv, nonce, gasLimit, gasPrice, common.HexToAddress(recieve), common.HexToAddress(tokenAddress), tokenAmount)
 	t.Log(err)
@@ -81,7 +83,7 @@ func TestChainClient_Close(t *testing.T) {
 	defer client.Close()
 	gasPrice, err := client.SuggestGasPrice()
 	txReceipt, _ := client.Client.TransactionReceipt(context.Background(), common.HexToHash("0x508f4e9b015ed31c7a9df470b9beb4c54a7940b932f0b7f41983583a3e4937ca"))
-	t.Log(txReceipt.GasUsed)
+	t.Log(txReceipt.Status)
 	t.Log(err)
 	t.Log(gasPrice.String())
 }

@@ -18,6 +18,7 @@ import (
 
 var stableNonceMap map[string]uint64
 var latestNonceMap map[string]uint64
+var failNonceMap map[string]uint64 // 使用nonce发送交易失败的nonce
 
 func init() {
 	// 初始化stableNonceMap 和 latestNonceMap
@@ -25,6 +26,7 @@ func init() {
 	once.Do(func() {
 		stableNonceMap = make(map[string]uint64)
 		latestNonceMap = make(map[string]uint64)
+		failNonceMap = make(map[string]uint64)
 	})
 }
 
@@ -48,10 +50,25 @@ func NewChainClient(chainNetUrl string, chainId *big.Int) *ChainClient {
 	}
 }
 
+//  SetFailNonce 设置使用发送交易失败的nonce
+func (c *ChainClient) SetFailNonce(address string, nonce uint64) {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+	failNonceMap[address] = nonce
+}
+
 // GetLatestNonce
 func (c *ChainClient) GetLatestNonce(address string) (uint64, error) {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
+	// 查看是否有之前使用失败的nonce可以再次使用
+	failNonce, ok := failNonceMap[address]
+	if ok {
+		// 使用该nonce
+		// 先把此地址的fail nonce记录删除掉
+		delete(failNonceMap, address)
+		return failNonce, nil
+	}
 
 	txNonce, err := c.GetNonce(common.HexToAddress(address))
 	if err != nil {

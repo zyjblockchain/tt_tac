@@ -12,6 +12,7 @@ type FlashChangeOrder struct {
 	ToTokenAddress   string // pala token address
 	FromTokenAmount  string // usdt token amount
 	ToTokenAmount    string // pala token amount
+	TradePrice       string // 闪兑的兑换价格
 	State            int    // 0. pending，1. success 2. failed 3. timeout
 	SendTxId         uint   // 闪兑usdt发送的交易表id
 	ReceiveTxId      uint   // 闪兑pala接收的交易表id

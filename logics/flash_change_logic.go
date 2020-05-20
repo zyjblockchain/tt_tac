@@ -29,6 +29,7 @@ type FlashChange struct {
 	OperateAddress   string `json:"operate_address" binding:"required"`   // 操作地址
 	FromTokenAmount  string `json:"from_token_amount" binding:"required"` // 需要兑换数量,usdt的数量
 	ToTokenAmount    string `json:"to_token_amount"`                      // 转换之后的数量, usdt按照实时价格转换pala的数量。todo 为收取手续费，所以实时价格需要提高1%进行兑换
+	TradePrice       string `json:"trade_price" binding:"required"`       // 兑换价格，目前是pala_usdt价格
 }
 
 func (f *FlashChange) FlashChange() (string, error) {
@@ -78,6 +79,7 @@ func (f *FlashChange) FlashChange() (string, error) {
 		ToTokenAddress:   f.ToTokenAddress,
 		FromTokenAmount:  f.FromTokenAmount,
 		ToTokenAmount:    f.ToTokenAmount,
+		TradePrice:       f.TradePrice,
 		State:            0,
 	}
 	if err := fo.Create(); err != nil {
@@ -242,16 +244,22 @@ func (w *WatchFlashChange) processCollectFlashChangeTx(from, amount string) erro
 	// 4.1 组装交易
 	sender := conf.EthFlashChangeMiddleAddress
 	senderPrivate := conf.EthFlashChangeMiddlePrivate
+	palaTokenAddress := fo.ToTokenAddress
 	receiver := fo.OperateAddress
-	nonce, err := client.GetLatestNonce(sender)
-	if err != nil {
-		log.Errorf("获取地址nonce失败; addr: %s, error: %v", sender, err)
-		return err
-	}
 	palaAmount, _ := new(big.Int).SetString(fo.ToTokenAmount, 10)
 	log.Infof("闪兑需要发送的pala amount: %s, receiver: %s", palaAmount, receiver)
-	palaTokenAddress := fo.ToTokenAddress
-	gasLimit := uint64(60000)
+
+	// 判断token余额是否足够
+	tokenBala, err := client.GetTokenBalance(common.HexToAddress(sender), common.HexToAddress(palaTokenAddress))
+	if err != nil {
+		log.Errorf("获取token balance error: %v, address: %s, tokenAddress: %s", err, conf.TacMiddleAddress, palaTokenAddress)
+		return err
+	}
+	if tokenBala.Cmp(palaAmount) < 0 {
+		return errors.New("闪兑中转地址上的token余额不足")
+	}
+
+	gasLimit := uint64(70000)
 	suggestGasPrice, err := client.SuggestGasPrice()
 	if err != nil {
 		log.Errorf("获取建议的gas price失败：%v", err)
@@ -285,9 +293,17 @@ func (w *WatchFlashChange) processCollectFlashChangeTx(from, amount string) erro
 		return err
 	}
 
+	// 获取nonce
+	nonce, err := client.GetLatestNonce(sender)
+	if err != nil {
+		log.Errorf("获取地址nonce失败; addr: %s, error: %v", sender, err)
+		return err
+	}
 	// 4.3 生成签名交易
 	signedTx, err := client.NewSignedTokenTx(senderPrivate, nonce, gasLimit, gasPrice, common.HexToAddress(receiver), common.HexToAddress(palaTokenAddress), palaAmount)
-	if err != nil || signedTx == nil {
+	if err != nil {
+		// 把获取的address nonce 置为 fail
+		client.SetFailNonce(sender, nonce)
 		// 修改TxTransfer表中的状态置位失败，并存入失败信息
 		if err := tt.Update(models.TxTransfer{TxStatus: 2, ErrMsg: err.Error()}); err != nil {
 			log.Errorf("更新TxTransfer交易失败状态到数据库失败：error: %v", err)
@@ -300,20 +316,28 @@ func (w *WatchFlashChange) processCollectFlashChangeTx(from, amount string) erro
 	}
 	// 4.4 把签名交易更新TxTransfer中的txHash,并存储在kv表中 todo 事务处理
 	if err := tt.Update(models.TxTransfer{TxHash: signedTx.Hash().String()}); err != nil {
+		// 把获取的address nonce 置为 fail
+		client.SetFailNonce(sender, nonce)
 		log.Errorf("更新TxTransfer交易hash到数据库失败：error: %v", err)
 		return err
 	}
 	byteTx, err := signedTx.MarshalJSON()
 	if err != nil {
+		// 把获取的address nonce 置为 fail
+		client.SetFailNonce(sender, nonce)
 		log.Errorf("marshal tx err: %v", err)
 		return err
 	}
 	if err := models.SetKv(signedTx.Hash().String(), byteTx); err != nil {
+		// 把获取的address nonce 置为 fail
+		client.SetFailNonce(sender, nonce)
 		log.Errorf("把交易保存到kv表中失败：%v", err)
 		return err
 	}
 	// 4.5 发送交易上链
 	if err := client.Client.SendTransaction(context.Background(), signedTx); err != nil {
+		// 把获取的address nonce 置为 fail
+		client.SetFailNonce(sender, nonce)
 		log.Errorf("发送签好名的交易上链失败；error: %v", err)
 		if err := tt.Update(models.TxTransfer{TxStatus: 2, ErrMsg: err.Error()}); err != nil {
 			log.Errorf("更新TxTransfer交易失败状态到数据库失败：error: %v", err)

@@ -2,6 +2,7 @@ package logics
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/shopspring/decimal"
@@ -143,35 +144,47 @@ func (t *TacProcess) processCollectionTx(from, amount string) error {
 		return err
 	}
 	// 4.2 发送交易
-	nonce, err := client.GetLatestNonce(tt.SenderAddress)
-	if err != nil {
-		log.Errorf("获取地址nonce失败; addr: %s, error: %v", tt.SenderAddress, err)
-		return err
-	}
 	tokenAmount, _ := new(big.Int).SetString(tt.Amount, 10)
 	log.Infof("需要发送交易的tokenAmount: %v", tokenAmount)
 	receiver := common.HexToAddress(tt.ReceiverAddress)
 	tokenAddress := common.HexToAddress(tt.TokenAddress)
 
+	// 查看from地址是否有足够的tokenAmount
+	tokenBala, err := client.GetTokenBalance(common.HexToAddress(conf.TacMiddleAddress), tokenAddress)
+	if err != nil {
+		log.Errorf("获取token balance error: %v, address: %s, tokenAddress: %s", err, conf.TacMiddleAddress, tt.TokenAddress)
+		return err
+	}
+	if tokenBala.Cmp(tokenAmount) < 0 {
+		return errors.New("跨链转账中转地址上的token余额不足")
+	}
 	// gasLimit, err := client.EstimateTokenTxGas(tokenAmount, common.HexToAddress(tt.SenderAddress), tokenAddress, receiver)
 	// log.Infof("预估gasLimit: %d", gasLimit)
 	// if err != nil {
 	// 	log.Errorf("调用预估交易gas接口失败：%v", err)
 	// 	return err
 	// }
-	gasLimit := uint64(60000)
+	gasLimit := uint64(70000)
 	suggestGasPrice, err := client.SuggestGasPrice()
 	if err != nil {
 		log.Errorf("获取建议的gas price失败：%v", err)
 		return err
 	}
 	log.Infof("建议gas price: %s", suggestGasPrice.String())
-	gasPrice := suggestGasPrice.Mul(suggestGasPrice, big.NewInt(2)) // 两倍的建议gas价格
+	gasPrice := suggestGasPrice.Mul(suggestGasPrice, big.NewInt(2)) // 2倍的建议gas价格
 	// 把 gasPrice更新到txTransfer中
 	_ = tt.Update(models.TxTransfer{GasPrice: gasPrice.String()})
+
+	nonce, err := client.GetLatestNonce(tt.SenderAddress)
+	if err != nil {
+		log.Errorf("获取地址nonce失败; addr: %s, error: %v", tt.SenderAddress, err)
+		return err
+	}
 	// 组装签名交易 -> 发送上链
 	signedTx, err := client.NewSignedTokenTx(conf.TacMiddleAddressPrivate, nonce, gasLimit, gasPrice, receiver, tokenAddress, tokenAmount)
-	if err != nil || signedTx == nil {
+	if err != nil {
+		// 把获取的address nonce 置为 fail
+		client.SetFailNonce(tt.SenderAddress, nonce)
 		// 修改TxTransfer表中的状态置位失败，并存入失败信息
 		if err := tt.Update(models.TxTransfer{TxStatus: 2, ErrMsg: err.Error()}); err != nil {
 			log.Errorf("更新TxTransfer交易失败状态到数据库失败：error: %v", err)
@@ -184,20 +197,29 @@ func (t *TacProcess) processCollectionTx(from, amount string) error {
 	}
 	// 4.3 把签名交易更新TxTransfer中的txHash,并存储在kv表中 todo 事务处理
 	if err := tt.Update(models.TxTransfer{TxHash: signedTx.Hash().String()}); err != nil {
+		// 把获取的address nonce 置为 fail
+		client.SetFailNonce(tt.SenderAddress, nonce)
+
 		log.Errorf("更新TxTransfer交易hash到数据库失败：error: %v", err)
 		return err
 	}
 	byteTx, err := signedTx.MarshalJSON()
 	if err != nil {
+		// 把获取的address nonce 置为 fail
+		client.SetFailNonce(tt.SenderAddress, nonce)
 		log.Errorf("marshal tx err: %v", err)
 		return err
 	}
 	if err := models.SetKv(signedTx.Hash().String(), byteTx); err != nil {
+		// 把获取的address nonce 置为 fail
+		client.SetFailNonce(tt.SenderAddress, nonce)
 		log.Errorf("把交易保存到kv表中失败：%v", err)
 		return err
 	}
 	// 4.4 发送交易上链
 	if err := client.Client.SendTransaction(context.Background(), signedTx); err != nil {
+		// 把获取的address nonce 置为 fail
+		client.SetFailNonce(tt.SenderAddress, nonce)
 		log.Errorf("发送签好名的交易上链失败；error: %v", err)
 		if err := tt.Update(models.TxTransfer{TxStatus: 2, ErrMsg: err.Error()}); err != nil {
 			log.Errorf("更新TxTransfer交易失败状态到数据库失败：error: %v", err)
@@ -213,7 +235,7 @@ func (t *TacProcess) processCollectionTx(from, amount string) error {
 	// 5. 注册监听刚发送的交易状态
 	t.lock.Lock() // 保证注册交易监听的线程安全
 	defer t.lock.Unlock()
-	timeoutTimestamp := time.Now().Add(24 * time.Hour).Unix() // 监听超时时间设置为24小时
+	timeoutTimestamp := time.Now().Add(48 * time.Hour).Unix() // 监听超时时间设置为48小时
 	pluginIndex := len(t.ToChainWatcher.TxPlugins)            // todo 线程不安全
 	t.ToChainWatcher.RegisterTxPlugin(plugin.NewTxHashPlugin(func(txHash string, isRemoved bool) {
 		if strings.ToLower(signedTx.Hash().String()) == strings.ToLower(txHash) {
@@ -234,6 +256,8 @@ func (t *TacProcess) processCollectionTx(from, amount string) error {
 		// 判断监听是否超时，超时则注销
 		now := time.Now().Unix()
 		if now > timeoutTimestamp {
+			// 把获取的address nonce 置为 fail
+			client.SetFailNonce(tt.SenderAddress, nonce)
 			log.Errorf("跨链转账交易监听超时； txHash: %s", txHash)
 			// 修改交易状态为超时 todo 事务更新
 			if err := tt.Update(models.TxTransfer{TxStatus: 3}); err != nil {

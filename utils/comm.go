@@ -34,6 +34,12 @@ var (
 
 	SendFlashChangeTxErrCode = 40008
 	SendFlashChangeTxErrMsg  = "发送闪兑交易失败"
+
+	GetBalanceErrCode = 40009
+	GetBalanceErrMsg  = "get balance err"
+
+	GetTokenBalanceErrCode = 40010
+	GetTokenBalanceErrMsg  = "get token balance err"
 )
 
 // FormatHex 去除前置的0

@@ -221,3 +221,60 @@
     "error": ""
 }
 ```
+----
+#### 拉取地址的tt和eth上的主网币余额
+###### 请求url
+- POST /tac/get_balance
+###### 请求参数
+```$xslt
+{
+	"address":"0x67Adf250F70F6100d346cF8FE3af6DC7A2C23213"
+}
+```
+###### 返回示例
+```$xslt
+{
+    "status": 200,
+    "data": {
+        "tt_balance": "747870339000000000",
+        "eth_balance": "19000000000000",
+        "decimal": 18
+    },
+    "msg": "success",
+    "error": ""
+}
+```
+
+----
+#### 拉取地址的tt和eth上token的余额
+###### 请求url
+- POST /tac/get_token_balance
+###### 请求参数
+```$xslt
+{
+	"address":"0x7AC954Ed6c2d96d48BBad405aa1579C828409f59"
+}
+```
+###### 返回示例
+```$xslt
+{
+    "status": 200,
+    "data": {
+        "tt_pala_balance": "100000000",
+        "eth_pala_balance": "101000008999990000000",
+        "eth_usdt_balance": "35000000000000000",
+        "usdt_decimal": 6,
+        "pala_decimal": 8
+    },
+    "msg": "success",
+    "error": ""
+}
+```
+###### 参数说明
+1. tt_pala_balance: tt链上pala的余额
+2. eth_pala_balance: eth链上pala的余额
+3. eth_usdt_balance: eth链上usdt的余额
+4. usdt_decimal: usdt小数位数
+5. pala_decimal: pala小数位数
+---
+

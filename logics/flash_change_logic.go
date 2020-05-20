@@ -32,23 +32,24 @@ type FlashChange struct {
 	TradePrice       string `json:"trade_price" binding:"required"`       // 兑换价格，目前是pala_usdt价格
 }
 
-func (f *FlashChange) FlashChange() (string, error) {
+// FlashChange 返回闪兑的订单号
+func (f *FlashChange) FlashChange() (uint, error) {
 	// 0. 验证支付密码
 	user, err := new(models.User).GetUserByAddress(f.OperateAddress)
 	if err != nil {
 		log.Errorf("通过address从表中查询user失败， err: %v, address: %s", err, f.OperateAddress)
-		return "", err
+		return 0, err
 	}
 	if !user.CheckPassword(f.Password) {
 		log.Errorf("密码有误")
-		return "", errors.New("密码验证不通过")
+		return 0, errors.New("密码验证不通过")
 	}
 	// 1. 查看operateAddress 是否存在正在进行中的闪兑订单
 	exist := new(models.FlashChangeOrder).Exist(f.OperateAddress, f.FromTokenAddress, f.ToTokenAddress, 0)
 	if exist {
 		// 存在则返回
 		log.Errorf("存在正在进行中的同类型的闪兑订单。operateAddress: %s, fromToken: %s, toToken: %s", f.OperateAddress, f.FromTokenAddress, f.ToTokenAddress)
-		return "", errors.New(fmt.Sprintf("存在正在进行中的同类型的闪兑订单。operateAddress: %s, fromToken: %s, toToken: %s", f.OperateAddress, f.FromTokenAddress, f.ToTokenAddress))
+		return 0, errors.New(fmt.Sprintf("存在正在进行中的同类型的闪兑订单。operateAddress: %s, fromToken: %s, toToken: %s", f.OperateAddress, f.FromTokenAddress, f.ToTokenAddress))
 	}
 
 	// 2. 查看operateAddress是否有足够多的FromTokenAmount
@@ -57,14 +58,14 @@ func (f *FlashChange) FlashChange() (string, error) {
 	fromTokenBalance, err := client.GetTokenBalance(common.HexToAddress(f.OperateAddress), common.HexToAddress(f.FromTokenAddress))
 	if err != nil {
 		log.Errorf("get token balance error: %v, address: %s, tokenAddress: %s", err, f.OperateAddress, f.FromTokenAddress)
-		return "", err
+		return 0, err
 	}
 	fromTokenAmount, _ := new(big.Int).SetString(f.FromTokenAmount, 10)
 	if fromTokenBalance.Cmp(fromTokenAmount) < 0 {
 		// 余额不足
 		log.Errorf("账户中闪兑的from token 余额不足。address: %s, tokenAddress: %s, fromTokenBalance：%s, fromTokenAmount: %s",
 			f.OperateAddress, f.FromTokenAddress, fromTokenBalance.String(), f.FromTokenAmount)
-		return "", errors.New(fmt.Sprintf("账户中闪兑的from token 余额不足。address: %s, tokenAddress: %s, fromTokenBalance：%s, fromTokenAmount: %s",
+		return 0, errors.New(fmt.Sprintf("账户中闪兑的from token 余额不足。address: %s, tokenAddress: %s, fromTokenBalance：%s, fromTokenAmount: %s",
 			f.OperateAddress, f.FromTokenAddress, fromTokenBalance.String(), f.FromTokenAmount))
 	}
 
@@ -84,7 +85,7 @@ func (f *FlashChange) FlashChange() (string, error) {
 	}
 	if err := fo.Create(); err != nil {
 		log.Errorf("保存flash change order error: %v", err)
-		return "", err
+		return 0, err
 	}
 	// 3.2 发送交易闪兑的usdt到闪兑的中转账户
 	from := f.OperateAddress
@@ -92,7 +93,7 @@ func (f *FlashChange) FlashChange() (string, error) {
 	fromPrivate, err := utils.DecryptPrivate(user.PrivateCrypted)
 	if err != nil {
 		log.Errorf("aes 解码私钥失败。 err：%v", err)
-		return "", err
+		return 0, err
 	}
 	to := common.HexToAddress(conf.EthFlashChangeMiddleAddress)
 	tokenAddress := common.HexToAddress(f.FromTokenAddress)
@@ -100,7 +101,7 @@ func (f *FlashChange) FlashChange() (string, error) {
 	suggestPrice, err := client.SuggestGasPrice()
 	if err != nil {
 		log.Errorf("get suggest gasPrice err : %v", err)
-		return "", err
+		return 0, err
 	}
 	gasPrice := suggestPrice.Mul(suggestPrice, big.NewInt(2)) // 两倍于suggest gasPrice
 	gasLimit := uint64(60000)
@@ -120,7 +121,7 @@ func (f *FlashChange) FlashChange() (string, error) {
 	}
 	if err := tt.Create(); err != nil {
 		log.Errorf("保存交易到TxTransfer失败。 error: %v", err)
-		return "", err
+		return 0, err
 	}
 	// 3.4 生成签名交易
 	signedTx, err := client.NewSignedTokenTx(fromPrivate, nonce, gasLimit, gasPrice, to, tokenAddress, tokenAmount)
@@ -128,35 +129,35 @@ func (f *FlashChange) FlashChange() (string, error) {
 		log.Errorf("发送交易前对交易组装签名失败。error: %v", err)
 		// 更新交易状态为失败
 		_ = tt.Update(models.TxTransfer{TxStatus: 2, ErrMsg: err.Error()})
-		return "", err
+		return 0, err
 	}
 	// 3.5 更新交易hash到txTransfer中
 	if err := tt.Update(models.TxTransfer{TxHash: signedTx.Hash().String()}); err != nil {
 		log.Errorf("更新交易hash 到TxTransfer失败。error: %v, tx: %v", err, *signedTx)
-		return "", err
+		return 0, err
 	}
 	// 3.6 把交易保存到kv表中
 	byteTx, err := signedTx.MarshalJSON()
 	if err != nil {
 		log.Errorf("marshal tx err: %v", err)
-		return "", err
+		return 0, err
 	}
 	if err := models.SetKv(signedTx.Hash().String(), byteTx); err != nil {
 		log.Errorf("把交易保存到kv表中失败：%v", err)
-		return "", err
+		return 0, err
 	}
 	// 3.7 发送交易上链
 	if err := client.Client.SendTransaction(context.Background(), signedTx); err != nil {
 		log.Errorf("发送签好名的交易上链失败。 error: %v, txHash: %s", err, signedTx.Hash().String())
 		_ = tt.Update(models.TxTransfer{TxStatus: 2, ErrMsg: err.Error()})
-		return "", err
+		return 0, err
 	}
 	// 3.8 更新FlashChangeOrder 上的sendTxId
 	if err := fo.Update(models.FlashChangeOrder{SendTxId: tt.ID}); err != nil {
 		log.Errorf("更新 FlashChangeOrder 上的sendTxId error: %v", err)
-		return "", err
+		return 0, err
 	}
-	return signedTx.Hash().String(), nil
+	return fo.ID, nil
 }
 
 // 开启一个wather来监听闪兑的交易

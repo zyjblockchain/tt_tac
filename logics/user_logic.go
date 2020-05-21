@@ -59,11 +59,22 @@ func (l *LeadUser) LeadUser() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	// 判断地址是否在数据库已经存在
-	_, err = new(models.User).GetUserByAddress(addr.String())
+	// 判断地址是否在数据库已经存在,如果已经存在则重载支付密码
+	u, err := new(models.User).GetUserByAddress(addr.String())
 	if err == nil {
-		// 证明数据库中已经存在该地址 todo
-		return "", errors.New("数据库中已经存在该地址")
+		// 证明数据库中已经存在该地址,则重载支付密码
+		err = u.SetPassword(l.Password)
+		if err != nil {
+			log.Errorf("对原始密码加密失败：%v", err)
+			return "", err
+		}
+		// update数据库
+		if err := u.Update(); err != nil {
+			log.Errorf(" update user 表失败：%v", err)
+			return "", err
+		}
+		// 返回address
+		return u.Address, nil
 	}
 
 	// 对私钥加密存储

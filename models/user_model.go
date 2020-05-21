@@ -48,6 +48,10 @@ func (u *User) AddUser(newUser *User) (*User, error) {
 	return newUser, err
 }
 
+func (u *User) Update() error {
+	return DB.Model(u).Updates(u).Error
+}
+
 func (u *User) UpdateUserLocalBalance(address, newBalance string) error {
 	return DB.Model(u).Updates(User{Address: address, LocalEthPalaBalance: newBalance}).Error
 }

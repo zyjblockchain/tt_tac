@@ -209,6 +209,47 @@
 }
 ```
 ---
+#### 修改支付密码
+###### 请求url
+- POST /tac/modify_password
+###### 请求参数
+```
+{
+	"address":"0x7AC954Ed6c2d96d48BBad405aa1579C828409f59",
+	"old_password":"12345678",
+	"new_password":"123456789"
+}
+```
+###### 参数说明
+1. address: 修改密码地址
+2. old_password: 旧密码
+3. new_password: 新密码
+###### 返回示例
+```$xslt
+// 成功情况
+{
+    "status": 200,
+    "data": null,
+    "msg": "success",
+    "error": ""
+}
+// 失败情况1. 旧密码不正确
+{
+    "status": 40014,
+    "data": null,
+    "msg": "modify password error",
+    "error": "旧的密码验证不通过"
+}
+// 失败情况2. address不存在
+{
+    "status": 40014,
+    "data": null,
+    "msg": "modify password error",
+    "error": "record not found"
+}
+```
+
+---
 #### 申请闪兑接口
 ###### 请求url
 - POST /tac/exchange/eth_usdt_pala

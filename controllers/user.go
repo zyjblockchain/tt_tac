@@ -82,3 +82,25 @@ func ExportPrivate() gin.HandlerFunc {
 		}
 	}
 }
+
+// 修改支付密码
+func ModifyPassword() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var logic logics.ModifyPassword
+		err := c.ShouldBind(&logic)
+		if err != nil {
+			log.Errorf("ExportPrivate should binding error: %v", err)
+			serializer.ErrorResponse(c, utils.VerifyParamsErrCode, utils.VerifyParamsErrMsg, err.Error())
+			return
+		}
+		// logic
+		err = logic.ModifyPwd()
+		if err != nil {
+			log.Errorf("ModifyPwd logic err: %v", err)
+			serializer.ErrorResponse(c, utils.ModifyPasswordErrCode, utils.ModifyPasswordErrMsg, err.Error())
+			return
+		} else {
+			serializer.SuccessResponse(c, nil, "success")
+		}
+	}
+}

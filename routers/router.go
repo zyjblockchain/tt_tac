@@ -27,7 +27,8 @@ func NewRouter(addr string) {
 		v1.POST("/lead_wallet", controllers.LeadUser())
 		// 6. 导出私钥
 		v1.POST("/export_private", controllers.ExportPrivate())
-
+		// 7. 修改支付密码
+		v1.POST("/modify_password", controllers.ModifyPassword())
 		// 闪兑
 		v2 := v1.Group("/exchange")
 		{
@@ -36,15 +37,15 @@ func NewRouter(addr string) {
 			// 2. 分页拉取地址下面闪兑订单列表
 			v2.POST("/get_flash_orders", controllers.GetBatchOrderByAddress())
 		}
-		// 7. 获取地址的balance, tt链和eth上的balance
+		// 8. 获取地址的balance, tt链和eth上的balance
 		v1.POST("/get_balance", controllers.GetBalance())
-		// 8. 获取地址的token balance, tt链和eth上的token balance
+		// 9. 获取地址的token balance, tt链和eth上的token balance
 		v1.POST("/get_token_balance", controllers.GetTokenBalance())
-		// 9. 获取btcMax交易所上的erc20 pala价格,锚定的usdt
+		// 10. 获取btcMax交易所上的erc20 pala价格,锚定的usdt
 		v1.GET("/get_eth_pala_price", controllers.GetLatestPalaToUsdtPrice())
-		// 10. 获取btcMax交易所上的eth价格,锚定的usdt
+		// 11. 获取btcMax交易所上的eth价格,锚定的usdt
 		v1.GET("/get_eth_price", controllers.GetLatestEthToUsdtPrice())
-		// 11. 分页拉取跨链转账的订单记录
+		// 12. 分页拉取跨链转账的订单记录
 		v1.POST("/get_tac_orders", controllers.BatchGetTacOrder())
 
 	}

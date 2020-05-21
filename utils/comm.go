@@ -49,6 +49,9 @@ var (
 
 	TacOrderGetBatchErrCode = 40013
 	TacOrderGetBatchErrMsg  = "tac order get batch error"
+
+	ModifyPasswordErrCode = 40014
+	ModifyPasswordErrMsg  = "modify password error"
 )
 
 // FormatHex 去除前置的0

@@ -130,3 +130,36 @@ func (e *Export) ExportPrivate() (string, error) {
 		return strings.ToUpper(private[2:]), nil // 去除0x并把转成大写形式：F234120DE07D7F5CE27EAA1D7B954F55BDC49E6C3B2B19FB78C5000A191CEE4F
 	}
 }
+
+// 修改支付密码
+type ModifyPassword struct {
+	Address     string `json:"address" binding:"required"`
+	OldPassword string `json:"old_password" binding:"required"`
+	NewPassword string `json:"new_password" binding:"required"`
+}
+
+func (m *ModifyPassword) ModifyPwd() error {
+	// 查看地址是否在数据库中存在
+	user, err := new(models.User).GetUserByAddress(m.Address)
+	if err != nil {
+		// 表示不存在或者查询失败则返回error
+		log.Errorf("通过address 查询user error: %v", err)
+		return err
+	}
+	// 存在则查看oldPassword对不对
+	if !user.CheckPassword(m.OldPassword) {
+		// 密码不正确
+		return errors.New("旧的密码验证不通过")
+	}
+	// 修改密码
+	if err := user.SetPassword(m.NewPassword); err != nil {
+		log.Errorf("对原始密码加密失败：%v", err)
+		return err
+	}
+	// update
+	if err := user.Update(); err != nil {
+		log.Errorf(" update user 表失败：%v", err)
+		return err
+	}
+	return nil
+}

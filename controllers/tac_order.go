@@ -9,6 +9,7 @@ import (
 	"github.com/zyjblockchain/tt_tac/serializer"
 	"github.com/zyjblockchain/tt_tac/utils"
 	"strconv"
+	"time"
 )
 
 type res struct {
@@ -69,5 +70,48 @@ func GetOrder() gin.HandlerFunc {
 			State:         o.State,
 		}
 		serializer.SuccessResponse(c, respOrder, "success")
+	}
+}
+
+type tacParams struct {
+	OrderType  int    `json:"order_type" binding:"required"` // orderType == 1 表示拉取以太坊转tt的订单，为2则相反
+	Address    string `json:"address" binding:"required"`
+	StartIndex uint   `json:"start_index"`
+	Limit      uint   `json:"limit" binding:"required"`
+}
+type tacResp struct {
+	CreatedAt time.Time `json:"created_at"`
+	Amount    string    `json:"amount"`
+	State     int       `json:"state"` // 订单状态, 0: pending; 1.完成；2.失败; 3. 超时
+}
+
+// BatchGetTacOrder
+func BatchGetTacOrder() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var params tacParams
+		err := c.ShouldBind(&params)
+		if err != nil {
+			log.Errorf("get batch tac order error: %v", err)
+			serializer.ErrorResponse(c, utils.VerifyParamsErrCode, utils.VerifyParamsErrMsg, err.Error())
+			return
+		}
+
+		orders, err := new(models.TacOrder).GetBatchTacOrder(params.OrderType, params.Address, params.StartIndex, params.Limit)
+		if err != nil {
+			log.Errorf("flashChange order get batch error: %v", err)
+			serializer.ErrorResponse(c, utils.TacOrderGetBatchErrCode, utils.TacOrderGetBatchErrMsg, err.Error())
+			return
+		} else {
+			var resp []tacResp
+			for _, o := range orders {
+				r := tacResp{
+					CreatedAt: o.CreatedAt,
+					Amount:    o.Amount,
+					State:     o.State,
+				}
+				resp = append(resp, r)
+			}
+			serializer.SuccessResponse(c, resp, "success")
+		}
 	}
 }

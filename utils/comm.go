@@ -43,6 +43,12 @@ var (
 
 	GetLatestPriceErrCode = 40011
 	GetLatestPriceErrMsg  = "get latest price error"
+
+	ExchangeOrderGetBatchErrCode = 40012
+	ExchangeOrderGetBatchErrMsg  = "exchange order get batch error"
+
+	TacOrderGetBatchErrCode = 40013
+	TacOrderGetBatchErrMsg  = "tac order get batch error"
 )
 
 // FormatHex 去除前置的0

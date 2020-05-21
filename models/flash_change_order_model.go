@@ -39,3 +39,13 @@ func (f *FlashChangeOrder) Exist(operateAddr, fromTokenAddr, toTokenAddr string,
 func (f *FlashChangeOrder) Update(ff FlashChangeOrder) error {
 	return DB.Model(f).Updates(ff).Error
 }
+
+func (f *FlashChangeOrder) GetBatchFlashOrder(operateAddress string, startId, limit uint) ([]*FlashChangeOrder, error) {
+	var orders []*FlashChangeOrder
+	err := DB.Where("operate_address = ?", operateAddress).Order("id desc").Limit(limit).Offset(startId).Find(&orders).Error
+	if err != nil {
+		log.Errorf("get batch by operate address err: %v", err)
+		return nil, err
+	}
+	return orders, nil
+}

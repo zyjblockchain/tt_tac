@@ -218,7 +218,8 @@
 	"operate_address":"0x7AC954Ed6c2d96d48BBad405aa1579C828409f59",
 	"password":"123456",
 	"from_token_amount":"5000000000000000",
-	"to_token_amount":"1000000000000000000"
+	"to_token_amount":"1000000000000000000",
+	"trade_price":"6.771"
 	
 }
 ```
@@ -227,6 +228,7 @@
 2. password: 钱包的支付密码
 3. from_token_amount: usdt的兑换amount
 4. to_token_amount: 兑换成pala的amount
+5. trade_price: 闪兑的价格
 ###### 返回示例
 ```$xslt
 {
@@ -326,3 +328,92 @@
 }
 ```
 ---
+#### 分页拉取地址下面闪兑订单列表
+###### 请求url
+- POST /tac/exchange/get_flash_orders
+###### 请求参数
+```$xslt
+{
+	"start_index":0,
+	"limit":5,
+	"address":"0x7AC954Ed6c2d96d48BBad405aa1579C828409f59"
+}
+```
+###### 参数说明
+1. start_index: 分页的起始位置
+2. limit: 每次拉取的数量
+3. address: 地址
+###### 返回示例
+```$xslt
+{
+    "status": 200,
+    "data": [
+        {
+            "created_at": "2020-05-21T15:15:04+08:00",
+            "amount": "77777",
+            "state": 1
+        },
+        {
+            "created_at": "2020-05-21T15:13:52+08:00",
+            "amount": "1000000000000000000",
+            "state": 1
+        },
+        {
+            "created_at": "2020-05-21T15:12:35+08:00",
+            "amount": "1000000000000000000",
+            "state": 0
+        }
+    ],
+    "msg": "success",
+    "error": ""
+}
+```
+###### 返回字段说明
+1. created_at: 订单创建时间
+2. amount: 闪兑的数量
+3. state: 订单状态，0. pending，1. success 2. failed
+---
+
+
+#### 分页拉取跨链转账的订单记录
+###### 请求url
+- POST /tac/get_tac_orders
+###### 请求参数
+```$xslt
+{
+	"order_type":1,
+	"address":"0x67adf250f70f6100d346cf8fe3af6dc7a2c23213",
+	"start_index":1,
+	"limit":5
+}
+```
+###### 参数说明
+1. order_type: 订单类型，orderType == 1 表示拉取以太坊跨链转账到tt链的订单，为2则相反
+2. address: 对应地址
+3. start_index：分页起始位置
+4. limit:每一次拉取的条数
+###### 返回示例
+```$xslt
+{
+    "status": 200,
+    "data": [
+        {
+            "created_at": "2020-05-21T15:04:56+08:00",
+            "amount": "777",
+            "state": 1
+        },
+        {
+            "created_at": "2020-05-21T15:04:49+08:00",
+            "amount": "666",
+            "state": 0
+        }
+    ],
+    "msg": "success",
+    "error": ""
+}
+```
+###### 返回字段说明
+1. created_at: 订单创建时间
+2. amount: 跨链pala的数量
+3. state: 订单状态，0. pending，1. success 2. failed
+----

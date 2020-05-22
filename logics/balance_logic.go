@@ -2,6 +2,8 @@ package logics
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/zyjblockchain/sandy_log/log"
 	"github.com/zyjblockchain/tt_tac/conf"
@@ -86,4 +88,39 @@ func (t *TokenBalance) GetTokenBalance() (*RespTokenBalance, error) {
 		UsdtDecimal:    6,
 		PalaDecimal:    8,
 	}, nil
+}
+
+type GetGasFee struct {
+	ChainTag int `json:"chain_tag" binding:"required"`
+}
+
+type Fee struct {
+	GasFee string `json:"gas_fee"`
+}
+
+func (g *GetGasFee) GetGasFee() (*Fee, error) {
+	var chainUrl string
+	var chainId *big.Int
+	switch g.ChainTag {
+	case conf.EthChainTag:
+		chainUrl = conf.EthChainNet
+		chainId = big.NewInt(conf.EthChainID)
+	case conf.TTChainTag:
+		chainUrl = conf.TTChainNet
+		chainId = big.NewInt(conf.TTChainID)
+	default:
+		return nil, errors.New(fmt.Sprintf("输入的chain_tag不存在。tt chain_tag = %d; ethereum chain_tag = %d", conf.TTChainTag, conf.EthChainTag))
+	}
+	client := transaction.NewChainClient(chainUrl, chainId)
+	defer client.Close()
+	suggestPrice, err := client.SuggestGasPrice()
+	if err != nil {
+		log.Errorf("get suggest gas price err: %v", err)
+		return nil, err
+	}
+	gasPrice := new(big.Int).Mul(suggestPrice, big.NewInt(2)) // 两倍于gasPrice
+	log.Infof("gasPrice: %s", gasPrice.String())
+	gasLimit := uint64(60000)
+	gasFee := new(big.Int).Mul(gasPrice, big.NewInt(int64(gasLimit))).String()
+	return &Fee{GasFee: gasFee}, nil
 }

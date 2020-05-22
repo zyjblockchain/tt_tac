@@ -498,3 +498,27 @@
 }
 ```
 ----
+#### 获取发送一笔以太坊token转账交易或者tt的token转账交易需要的gas fee
+###### 请求url
+- POST /tac/get_gas_fee
+###### 请求参数
+```$xslt
+{
+	"chain_tag": 17
+}
+```
+###### 参数说明
+1. chain_tag: 链的标识，17代表以太坊的链，77代表thundercore链
+###### 返回示例
+```$xslt
+{
+    "status": 200,
+    "data": {
+        "gas_fee": "120000000000000"
+    },
+    "msg": "success",
+    "error": ""
+}
+```
+---
+

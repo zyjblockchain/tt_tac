@@ -49,6 +49,8 @@ func NewRouter(addr string) {
 		v1.POST("/get_tac_orders", controllers.BatchGetTacOrder())
 		// 13. 获取用户地址下的eth主网上pala接收记录
 		v1.POST("/get_eth_pala_receive", controllers.GetPalaReceiveRecord())
+		// 14. 获取发送一笔以太坊token转账交易或者tt的token转账交易需要的gas fee
+		v1.POST("/get_gas_fee", controllers.GetGasFee())
 	}
 	if err := r.Run(addr); err != nil {
 		panic(err)

@@ -55,6 +55,9 @@ var (
 
 	GetPalaReceivTxRecordErrCode = 40015
 	GetPalaReceivTxRecordErrMsg  = "拉取 address pala token 收款记录 error"
+
+	GetGasFeeErrCode = 40016
+	GetGasFeeErrMsg  = "获取单笔交易的gas fee 失败"
 )
 
 // FormatHex 去除前置的0

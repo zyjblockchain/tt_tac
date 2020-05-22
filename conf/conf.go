@@ -8,6 +8,7 @@ const (
 	TTChainTag = 77
 
 	EthChainNet = "https://rinkeby.infura.io/v3/36b98a13557c4b8583d57934ede2f74d"
+	// EthChainNet = "https://mainnet.infura.io/v3/5d519236943c40f5a87621317a576060"
 	EthChainID  = 4
 	EthChainTag = 17
 )

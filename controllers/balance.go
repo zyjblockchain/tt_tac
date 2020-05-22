@@ -98,3 +98,25 @@ func GetLatestEthToUsdtPrice() gin.HandlerFunc {
 		}
 	}
 }
+
+// 拉取tx gas fee
+func GetGasFee() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var logic logics.GetGasFee
+		err := c.ShouldBind(&logic)
+		if err != nil {
+			log.Errorf("GetGasFee should binding error: %v", err)
+			serializer.ErrorResponse(c, utils.VerifyParamsErrCode, utils.VerifyParamsErrMsg, err.Error())
+			return
+		}
+		// logic
+		fee, err := logic.GetGasFee()
+		if err != nil {
+			log.Errorf("GetSingleMarketTicker should binding error: %v", err)
+			serializer.ErrorResponse(c, utils.GetGasFeeErrCode, utils.GetGasFeeErrMsg, err.Error())
+			return
+		} else {
+			serializer.SuccessResponse(c, *fee, "success")
+		}
+	}
+}

@@ -296,8 +296,8 @@
 {
     "status": 200,
     "data": {
-        "tt_balance": "747870339000000000",
-        "eth_balance": "19000000000000",
+        "tt_balance": "7478703.390000",
+        "eth_balance": "1900.000000",
         "decimal": 18
     },
     "msg": "success",
@@ -320,9 +320,9 @@
 {
     "status": 200,
     "data": {
-        "tt_pala_balance": "100000000",
-        "eth_pala_balance": "101000008999990000000",
-        "eth_usdt_balance": "35000000000000000",
+        "tt_pala_balance": "1000.00000",
+        "eth_pala_balance": "101000.00899",
+        "eth_usdt_balance": "35000.000000",
         "usdt_decimal": 6,
         "pala_decimal": 8
     },
@@ -391,17 +391,17 @@
     "data": [
         {
             "created_at": 1590104685,
-            "amount": "77777",
+            "amount": "0.777770",
             "state": 1
         },
         {
             "created_at": 1590104685,
-            "amount": "1000000000000000000",
+            "amount": "10000.000000",
             "state": 1
         },
         {
             "created_at": 1590104685,
-            "amount": "1000000000000000000",
+            "amount": "100.000000",
             "state": 0
         }
     ],
@@ -440,12 +440,12 @@
     "data": [
         {
             "created_at": 1590104685,
-            "amount": "777",
+            "amount": "0.000777",
             "state": 1
         },
         {
             "created_at": 1590104685,
-            "amount": "666",
+            "amount": "0.000666",
             "state": 0
         }
     ],
@@ -475,7 +475,7 @@
         {
             "from": "0x65b1c87aa01c82c1d15adcda7e21f3187594b2c9",
             "to": "0x9d7bc48d1c7a42b5fa9e070b4e301d2445bea926",
-            "amount": "4783690788000000",
+            "amount": "478388000000",
             "time_at": 1590104685
         },
         {
@@ -514,7 +514,7 @@
 {
     "status": 200,
     "data": {
-        "gas_fee": "120000000000000"
+        "gas_fee": "0.000120"
     },
     "msg": "success",
     "error": ""

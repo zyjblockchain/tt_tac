@@ -80,8 +80,8 @@ type tacParams struct {
 }
 type tacResp struct {
 	CreatedAt int64  `json:"created_at"`
-	Amount    string `json:"amount"`
-	State     int    `json:"state"` // 订单状态, 0: pending; 1.完成；2.失败; 3. 超时
+	Amount    string `json:"amount"` // pala
+	State     int    `json:"state"`  // 订单状态, 0: pending; 1.完成；2.失败; 3. 超时
 }
 
 // BatchGetTacOrder
@@ -105,7 +105,7 @@ func BatchGetTacOrder() gin.HandlerFunc {
 			for _, o := range orders {
 				r := tacResp{
 					CreatedAt: o.CreatedAt.Unix(),
-					Amount:    o.Amount,
+					Amount:    utils.UnitConversion(o.Amount, 8, 6),
 					State:     o.State,
 				}
 				resp = append(resp, r)

@@ -68,7 +68,7 @@ func GetBatchOrderByAddress() gin.HandlerFunc {
 			for _, order := range orders {
 				r := RespResult{
 					CreatedAt:     order.CreatedAt.Unix(),
-					ToTokenAmount: order.ToTokenAmount,
+					ToTokenAmount: utils.UnitConversion(order.ToTokenAmount, 8, 6),
 					State:         order.State,
 				}
 				resp = append(resp, r)

@@ -192,7 +192,7 @@ func (p *PalaReceiveRecord) GetPalaRecord() ([]ReceiveTxRecord, error) {
 			receiveTxs = append(receiveTxs, ReceiveTxRecord{
 				From:   tx.From,
 				To:     address,
-				Amount: tx.Value.Int().String(),
+				Amount: utils.UnitConversion(tx.Value.Int().String(), 8, 6),
 				TimeAt: tx.TimeStamp.Time().Unix(),
 			})
 		}

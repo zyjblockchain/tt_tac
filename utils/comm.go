@@ -117,3 +117,33 @@ func TransformAmount(oldAmount string, orderType int) string {
 	}
 	return newAmount
 }
+
+// UnitConversion 单位换算
+// decimal 为换算token小数位数
+// retainNum返回的最大截取小数位数
+func UnitConversion(input string, decimal, retainNum int) string {
+	inLen := len(input)
+	// 前面添加0
+	if inLen <= decimal {
+		input = "0." + strings.Repeat("0", decimal-inLen) + input
+	} else {
+		input = input[0:inLen-decimal] + "." + input[inLen-decimal:]
+	}
+
+	if decimal > retainNum {
+		// 截取小数位位数到保留位retainNum
+		arr := strings.Split(input, ".")
+		arr[1] = arr[1][:retainNum]
+		if len(arr[1]) == 0 {
+			input = arr[0]
+		} else {
+			input = arr[0] + "." + arr[1]
+		}
+	}
+	// 如果input变成0.0000这种形式，只返回0.00
+	ss := strings.Trim(input, "0")
+	if ss == "." {
+		return "0.00"
+	}
+	return input
+}

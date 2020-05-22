@@ -7,6 +7,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/zyjblockchain/sandy_log/log"
 	"github.com/zyjblockchain/tt_tac/conf"
+	"github.com/zyjblockchain/tt_tac/utils"
 	transaction "github.com/zyjblockchain/tt_tac/utils/tx_utils"
 	"math/big"
 )
@@ -39,8 +40,8 @@ func (g *GetBalance) GetBalance() (*RespBalance, error) {
 		return nil, err
 	}
 	return &RespBalance{
-		TtBalance:  ttBalance.String(),
-		EthBalance: EthBalance.String(),
+		TtBalance:  utils.UnitConversion(ttBalance.String(), 18, 6),
+		EthBalance: utils.UnitConversion(EthBalance.String(), 18, 6),
 		Decimal:    18, // 这两个币的小数位数都是18位
 	}, nil
 }
@@ -82,9 +83,9 @@ func (t *TokenBalance) GetTokenBalance() (*RespTokenBalance, error) {
 	}
 
 	return &RespTokenBalance{
-		TtPalaBalance:  ttPalaBalance.String(),
-		EthPalaBalance: EthPalaBalance.String(),
-		EthUsdtBalance: EthUsdtBalance.String(),
+		TtPalaBalance:  utils.UnitConversion(ttPalaBalance.String(), 8, 6),
+		EthPalaBalance: utils.UnitConversion(EthPalaBalance.String(), 8, 6),
+		EthUsdtBalance: utils.UnitConversion(EthUsdtBalance.String(), 6, 6),
 		UsdtDecimal:    6,
 		PalaDecimal:    8,
 	}, nil
@@ -122,5 +123,5 @@ func (g *GetGasFee) GetGasFee() (*Fee, error) {
 	log.Infof("gasPrice: %s", gasPrice.String())
 	gasLimit := uint64(60000)
 	gasFee := new(big.Int).Mul(gasPrice, big.NewInt(int64(gasLimit))).String()
-	return &Fee{GasFee: gasFee}, nil
+	return &Fee{GasFee: utils.UnitConversion(gasFee, 18, 6)}, nil
 }

@@ -33,5 +33,3 @@ func SendTacTx() gin.HandlerFunc {
 		}
 	}
 }
-
-// 发送闪兑交易

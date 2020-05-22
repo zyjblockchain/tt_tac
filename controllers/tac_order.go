@@ -9,7 +9,6 @@ import (
 	"github.com/zyjblockchain/tt_tac/serializer"
 	"github.com/zyjblockchain/tt_tac/utils"
 	"strconv"
-	"time"
 )
 
 type res struct {
@@ -80,9 +79,9 @@ type tacParams struct {
 	Limit      uint   `json:"limit" binding:"required"`
 }
 type tacResp struct {
-	CreatedAt time.Time `json:"created_at"`
-	Amount    string    `json:"amount"`
-	State     int       `json:"state"` // 订单状态, 0: pending; 1.完成；2.失败; 3. 超时
+	CreatedAt int64  `json:"created_at"`
+	Amount    string `json:"amount"`
+	State     int    `json:"state"` // 订单状态, 0: pending; 1.完成；2.失败; 3. 超时
 }
 
 // BatchGetTacOrder
@@ -105,7 +104,7 @@ func BatchGetTacOrder() gin.HandlerFunc {
 			var resp []tacResp
 			for _, o := range orders {
 				r := tacResp{
-					CreatedAt: o.CreatedAt,
+					CreatedAt: o.CreatedAt.Unix(),
 					Amount:    o.Amount,
 					State:     o.State,
 				}

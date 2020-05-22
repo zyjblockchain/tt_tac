@@ -47,7 +47,8 @@ func NewRouter(addr string) {
 		v1.GET("/get_eth_price", controllers.GetLatestEthToUsdtPrice())
 		// 12. 分页拉取跨链转账的订单记录
 		v1.POST("/get_tac_orders", controllers.BatchGetTacOrder())
-
+		// 13. 获取用户地址下的eth主网上pala接收记录
+		v1.POST("/get_eth_pala_receive", controllers.GetPalaReceiveRecord())
 	}
 	if err := r.Run(addr); err != nil {
 		panic(err)

@@ -163,3 +163,39 @@ func (m *ModifyPassword) ModifyPwd() error {
 	}
 	return nil
 }
+
+type PalaReceiveRecord struct {
+	Address string `json:"address" binding:"required"`
+}
+
+type ReceiveTxRecord struct {
+	From   string `json:"from"`
+	To     string `json:"to"`
+	Amount string `json:"amount"`
+	TimeAt int64  `json:"time_at"`
+}
+
+func (p *PalaReceiveRecord) GetPalaRecord() ([]ReceiveTxRecord, error) {
+	palaTokenAddress := "0xd20fb5cf926dc29c88f64725e6f911f40f7bf531" // 以太坊正式网上的pala合约地址
+	address := p.Address
+	limit := 100 // 拉取数量
+	// 拉取最近的Limit条pala token记录
+	txs, err := utils.GetAddressTokenTransfers(palaTokenAddress, address, 1, limit)
+	if err != nil {
+		log.Errorf("获取收款记录失败：err: %v, address: %s", err, address)
+		return nil, err
+	}
+	// 筛选出接收的record
+	var receiveTxs = make([]ReceiveTxRecord, 0, 5)
+	for _, tx := range txs {
+		if tx.To == address {
+			receiveTxs = append(receiveTxs, ReceiveTxRecord{
+				From:   tx.From,
+				To:     address,
+				Amount: tx.Value.Int().String(),
+				TimeAt: tx.TimeStamp.Time().Unix(),
+			})
+		}
+	}
+	return receiveTxs, nil
+}

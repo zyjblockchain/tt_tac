@@ -104,3 +104,25 @@ func ModifyPassword() gin.HandlerFunc {
 		}
 	}
 }
+
+// 拉取用户eth_pala的收款记录
+func GetPalaReceiveRecord() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var logic logics.PalaReceiveRecord
+		err := c.ShouldBind(&logic)
+		if err != nil {
+			log.Errorf("GetPalaReceiveRecord should binding error: %v", err)
+			serializer.ErrorResponse(c, utils.VerifyParamsErrCode, utils.VerifyParamsErrMsg, err.Error())
+			return
+		}
+		// logic
+		records, err := logic.GetPalaRecord()
+		if err != nil {
+			log.Errorf("GetPalaRecord logic err: %v", err)
+			serializer.ErrorResponse(c, utils.GetPalaReceivTxRecordErrCode, utils.GetPalaReceivTxRecordErrMsg, err.Error())
+			return
+		} else {
+			serializer.SuccessResponse(c, records, "success")
+		}
+	}
+}

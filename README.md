@@ -390,17 +390,17 @@
     "status": 200,
     "data": [
         {
-            "created_at": "2020-05-21T15:15:04+08:00",
+            "created_at": 1590104685,
             "amount": "77777",
             "state": 1
         },
         {
-            "created_at": "2020-05-21T15:13:52+08:00",
+            "created_at": 1590104685,
             "amount": "1000000000000000000",
             "state": 1
         },
         {
-            "created_at": "2020-05-21T15:12:35+08:00",
+            "created_at": 1590104685,
             "amount": "1000000000000000000",
             "state": 0
         }
@@ -439,12 +439,12 @@
     "status": 200,
     "data": [
         {
-            "created_at": "2020-05-21T15:04:56+08:00",
+            "created_at": 1590104685,
             "amount": "777",
             "state": 1
         },
         {
-            "created_at": "2020-05-21T15:04:49+08:00",
+            "created_at": 1590104685,
             "amount": "666",
             "state": 0
         }
@@ -457,4 +457,44 @@
 1. created_at: 订单创建时间
 2. amount: 跨链pala的数量
 3. state: 订单状态，0. pending，1. success 2. failed
+----
+#### 获取用户地址下的eth主网上pala接收记录
+###### 请求url
+- POST /tac/get_eth_pala_receive
+###### 请求参数
+```$xslt
+{
+	"address":"0x9d7bc48d1c7a42b5fa9e070b4e301d2445bea926"
+}
+```
+###### 返回示例
+```$xslt
+{
+    "status": 200,
+    "data": [
+        {
+            "from": "0x65b1c87aa01c82c1d15adcda7e21f3187594b2c9",
+            "to": "0x9d7bc48d1c7a42b5fa9e070b4e301d2445bea926",
+            "amount": "4783690788000000",
+            "time_at": 1590104685
+        },
+        {
+             "from": "0x65b1c87aa01c82c1d15adcda7e21f3187594b2c9",
+             "to": "0x9d7bc48d1c7a42b5fa9e070b4e301d2445bea926",
+             "amount": "88888888888",
+             "time_at": 1590104681
+         },
+    ],
+    "msg": "success",
+    "error": ""
+}
+
+// 记录为空的情况
+{
+    "status": 200,
+    "data": [],
+    "msg": "success",
+    "error": ""
+}
+```
 ----

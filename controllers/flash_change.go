@@ -8,7 +8,6 @@ import (
 	"github.com/zyjblockchain/tt_tac/models"
 	"github.com/zyjblockchain/tt_tac/serializer"
 	"github.com/zyjblockchain/tt_tac/utils"
-	"time"
 )
 
 // FlashChange 闪兑
@@ -43,9 +42,9 @@ type ResParams struct {
 }
 
 type RespResult struct {
-	CreatedAt     time.Time `json:"created_at"`
-	ToTokenAmount string    `json:"amount"` // pala token amount
-	State         int       `json:"state"`  // 0. pending，1. success 2. failed 3. timeout
+	CreatedAt     int64  `json:"created_at"`
+	ToTokenAmount string `json:"amount"` // pala token amount
+	State         int    `json:"state"`  // 0. pending，1. success 2. failed 3. timeout
 }
 
 // GetBatchOrderByAddress 分页拉取地址的闪兑记录
@@ -68,7 +67,7 @@ func GetBatchOrderByAddress() gin.HandlerFunc {
 			var resp []RespResult
 			for _, order := range orders {
 				r := RespResult{
-					CreatedAt:     order.CreatedAt,
+					CreatedAt:     order.CreatedAt.Unix(),
 					ToTokenAmount: order.ToTokenAmount,
 					State:         order.State,
 				}

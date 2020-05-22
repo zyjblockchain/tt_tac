@@ -52,6 +52,9 @@ var (
 
 	ModifyPasswordErrCode = 40014
 	ModifyPasswordErrMsg  = "modify password error"
+
+	GetPalaReceivTxRecordErrCode = 40015
+	GetPalaReceivTxRecordErrMsg  = "拉取 address pala token 收款记录 error"
 )
 
 // FormatHex 去除前置的0

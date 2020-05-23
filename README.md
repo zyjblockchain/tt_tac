@@ -36,7 +36,7 @@
 {
 	"fromAddr":"0x67Adf250F70F6100d346cF8FE3af6DC7A2C23213",
 	"recipientAddr":"0x7AC954Ed6c2d96d48BBad405aa1579C828409f59",
-	"amount":"5555000000000",
+	"amount":"55.555",
 	"orderType":2
 }
 ```
@@ -71,7 +71,7 @@
     "data": {
         "from_addr": "0x67adf250f70f6100d346cf8fe3af6dc7a2c23213",
         "recipient_addr": "0x7ac954ed6c2d96d48bbad405aa1579c828409f59",
-        "amount": "5555000000000",
+        "amount": "55.555",
         "order_type": 1,
         "state": 0
     },
@@ -95,7 +95,7 @@
 {
 	"address": "0x59375A522876aB96B0ed2953D0D3b92674701Cc2",
 	"password":"123456",
-	"amount":"911000000",
+	"amount":"911.00",
 	"order_type":2
 }
 ```
@@ -258,8 +258,8 @@
 {
 	"operate_address":"0x7AC954Ed6c2d96d48BBad405aa1579C828409f59",
 	"password":"123456",
-	"from_token_amount":"5000000000000000",
-	"to_token_amount":"1000000000000000000",
+	"from_token_amount":"500.00",
+	"to_token_amount":"100.00",
 	"trade_price":"6.771"
 	
 }

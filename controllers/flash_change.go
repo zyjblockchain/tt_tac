@@ -39,15 +39,20 @@ func FlashChange() gin.HandlerFunc {
 }
 
 type ResParams struct {
-	StartIndex uint   `json:"start_index"`
-	Limit      uint   `json:"limit" binding:"required"`
-	Address    string `json:"address" binding:"required"`
+	Page    uint   `json:"page"`
+	Limit   uint   `json:"limit"`
+	Address string `json:"address" binding:"required"`
 }
 
-type RespResult struct {
+type RespOrder struct {
 	CreatedAt     int64  `json:"created_at"`
 	ToTokenAmount string `json:"amount"` // pala token amount
 	State         int    `json:"state"`  // 0. pending，1. success 2. failed 3. timeout
+
+}
+type RespResult struct {
+	Total int         `json:"total"` // 总记录数
+	List  []RespOrder `json:"list"`
 }
 
 // GetBatchOrderByAddress 分页拉取地址的闪兑记录
@@ -61,22 +66,26 @@ func GetBatchOrderByAddress() gin.HandlerFunc {
 			return
 		}
 		// 拉取地址下的闪兑订单
-		orders, err := new(models.FlashChangeOrder).GetBatchFlashOrder(resParams.Address, resParams.StartIndex, resParams.Limit)
+		if resParams.Limit == 0 {
+			resParams.Limit = 5
+		}
+		orders, total, err := new(models.FlashChangeOrder).GetBatchFlashOrder(resParams.Address, resParams.Page, resParams.Limit)
 		if err != nil {
 			log.Errorf("flashChange order get batch error: %v", err)
 			serializer.ErrorResponse(c, utils.ExchangeOrderGetBatchErrCode, utils.ExchangeOrderGetBatchErrMsg, err.Error())
 			return
 		} else {
-			var resp []RespResult
+			var resp []RespOrder
 			for _, order := range orders {
-				r := RespResult{
+				r := RespOrder{
 					CreatedAt:     order.CreatedAt.Unix(),
 					ToTokenAmount: utils.UnitConversion(order.ToTokenAmount, 8, 6),
 					State:         order.State,
 				}
 				resp = append(resp, r)
 			}
-			serializer.SuccessResponse(c, resp, "success")
+
+			serializer.SuccessResponse(c, RespResult{Total: total, List: resp}, "success")
 		}
 	}
 }

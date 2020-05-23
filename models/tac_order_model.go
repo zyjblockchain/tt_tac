@@ -35,12 +35,20 @@ func (o *TacOrder) Update(oo TacOrder) error {
 }
 
 // GetBatchTacOrder orderType == 1 表示拉取以太坊转tt的订单，为2则相反
-func (o *TacOrder) GetBatchTacOrder(orderType int, fromAddress string, startId uint, limit uint) ([]*TacOrder, error) {
+func (o *TacOrder) GetBatchTacOrder(orderType int, fromAddress string, page uint, limit uint) ([]*TacOrder, int, error) {
+	// 获取总的记录
+	total := 0
+	err := DB.Model(TacOrder{}).Where("from_addr = ? and order_type = ?", fromAddress, orderType).Count(&total).Error
+	if err != nil {
+		return nil, 0, err
+	}
+	offset := (page - 1) * limit
+
 	var orders []*TacOrder
-	err := DB.Where("from_addr = ? and order_type = ?", fromAddress, orderType).Order("id desc").Limit(limit).Offset(startId).Find(&orders).Error
+	err = DB.Where("from_addr = ? and order_type = ?", fromAddress, orderType).Order("id desc").Limit(limit).Offset(offset).Find(&orders).Error
 	if err != nil {
 		log.Errorf("get batch by operate address err: %v", err)
-		return nil, err
+		return nil, 0, err
 	}
-	return orders, nil
+	return orders, total, nil
 }

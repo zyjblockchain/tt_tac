@@ -375,44 +375,48 @@
 ###### 请求参数
 ```$xslt
 {
-	"start_index":0,
+	"page":1,
 	"limit":5,
 	"address":"0x7AC954Ed6c2d96d48BBad405aa1579C828409f59"
 }
 ```
 ###### 参数说明
-1. start_index: 分页的起始位置
-2. limit: 每次拉取的数量
+1. page: 页数，从1开始
+2. limit: 每一页拉取数量
 3. address: 地址
 ###### 返回示例
 ```$xslt
 {
     "status": 200,
-    "data": [
-        {
-            "created_at": 1590104685,
-            "amount": "0.777770",
-            "state": 1
-        },
-        {
-            "created_at": 1590104685,
-            "amount": "10000.000000",
-            "state": 1
-        },
-        {
-            "created_at": 1590104685,
-            "amount": "100.000000",
-            "state": 0
-        }
-    ],
+    "data": {
+        "total": 3,
+        "list": [
+            {
+                "created_at": 1590045304,
+                "amount": "0.000777",
+                "state": 1
+            },
+            {
+                "created_at": 1590045232,
+                "amount": "10000000000.000000",
+                "state": 1
+            },
+            {
+                "created_at": 1590045155,
+                "amount": "10000000000.000000",
+                "state": 1
+            }
+        ]
+    },
     "msg": "success",
     "error": ""
 }
 ```
 ###### 返回字段说明
-1. created_at: 订单创建时间
-2. amount: 闪兑的数量
-3. state: 订单状态，0. pending，1. success 2. failed
+1. total: 总数
+2. created_at：创建时间
+3. amount: 闪兑的数量
+4. state: 订单状态，0. pending，1. success 2. failed
 ---
 
 
@@ -424,39 +428,44 @@
 {
 	"order_type":1,
 	"address":"0x67adf250f70f6100d346cf8fe3af6dc7a2c23213",
-	"start_index":1,
+	"page":1,
 	"limit":5
 }
 ```
 ###### 参数说明
 1. order_type: 订单类型，orderType == 1 表示拉取以太坊跨链转账到tt链的订单，为2则相反
 2. address: 对应地址
-3. start_index：分页起始位置
+3. page：分页数，从1开始
 4. limit:每一次拉取的条数
 ###### 返回示例
 ```$xslt
 {
     "status": 200,
-    "data": [
-        {
-            "created_at": 1590104685,
-            "amount": "0.000777",
-            "state": 1
-        },
-        {
-            "created_at": 1590104685,
-            "amount": "0.000666",
-            "state": 0
-        }
-    ],
+    "data": {
+        "total": 2,
+        "list": [
+            {
+                "created_at": 1590044696,
+                "amount": "0.000007",
+                "state": 1
+            },
+            {
+                "created_at": 1590044689,
+                "amount": "0.000006",
+                "state": 0
+            }
+        ]
+    },
     "msg": "success",
     "error": ""
 }
 ```
 ###### 返回字段说明
-1. created_at: 订单创建时间
-2. amount: 跨链pala的数量
-3. state: 订单状态，0. pending，1. success 2. failed
+1. total: 总数
+2. created_at: 订单创建时间
+3. amount: 跨链pala的数量
+4. state: 订单状态，0. pending，1. success 2. failed
+
 ----
 #### 获取用户地址下的eth主网上pala接收记录
 ###### 请求url

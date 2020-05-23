@@ -40,12 +40,20 @@ func (f *FlashChangeOrder) Update(ff FlashChangeOrder) error {
 	return DB.Model(f).Updates(ff).Error
 }
 
-func (f *FlashChangeOrder) GetBatchFlashOrder(operateAddress string, startId, limit uint) ([]*FlashChangeOrder, error) {
+// page 页数，从第一页开始，limit 每一页的数量
+func (f *FlashChangeOrder) GetBatchFlashOrder(operateAddress string, page, limit uint) ([]*FlashChangeOrder, int, error) {
+	// 获取总的记录
+	total := 0
+	err := DB.Model(FlashChangeOrder{}).Where("operate_address = ?", operateAddress).Count(&total).Error
+	if err != nil {
+		return nil, 0, err
+	}
+	offset := (page - 1) * limit
 	var orders []*FlashChangeOrder
-	err := DB.Where("operate_address = ?", operateAddress).Order("id desc").Limit(limit).Offset(startId).Find(&orders).Error
+	err = DB.Where("operate_address = ?", operateAddress).Order("id desc").Limit(limit).Offset(offset).Find(&orders).Error
 	if err != nil {
 		log.Errorf("get batch by operate address err: %v", err)
-		return nil, err
+		return nil, 0, err
 	}
-	return orders, nil
+	return orders, total, nil
 }

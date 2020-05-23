@@ -75,15 +75,20 @@ func GetOrder() gin.HandlerFunc {
 }
 
 type tacParams struct {
-	OrderType  int    `json:"order_type" binding:"required"` // orderType == 1 表示拉取以太坊转tt的订单，为2则相反
-	Address    string `json:"address" binding:"required"`
-	StartIndex uint   `json:"start_index"`
-	Limit      uint   `json:"limit" binding:"required"`
+	OrderType int    `json:"order_type" binding:"required"` // orderType == 1 表示拉取以太坊转tt的订单，为2则相反
+	Address   string `json:"address" binding:"required"`
+	Page      uint   `json:"page" binding:"required"`
+	Limit     uint   `json:"limit" binding:"required"`
 }
 type tacResp struct {
 	CreatedAt int64  `json:"created_at"`
 	Amount    string `json:"amount"` // pala
 	State     int    `json:"state"`  // 订单状态, 0: pending; 1.完成；2.失败; 3. 超时
+}
+
+type Result struct {
+	Total int       `json:"total"`
+	List  []tacResp `json:"list"`
 }
 
 // BatchGetTacOrder
@@ -96,8 +101,10 @@ func BatchGetTacOrder() gin.HandlerFunc {
 			serializer.ErrorResponse(c, utils.VerifyParamsErrCode, utils.VerifyParamsErrMsg, err.Error())
 			return
 		}
-
-		orders, err := new(models.TacOrder).GetBatchTacOrder(params.OrderType, params.Address, params.StartIndex, params.Limit)
+		if params.Limit == 0 {
+			params.Limit = 5
+		}
+		orders, total, err := new(models.TacOrder).GetBatchTacOrder(params.OrderType, params.Address, params.Page, params.Limit)
 		if err != nil {
 			log.Errorf("flashChange order get batch error: %v", err)
 			serializer.ErrorResponse(c, utils.TacOrderGetBatchErrCode, utils.TacOrderGetBatchErrMsg, err.Error())
@@ -112,7 +119,7 @@ func BatchGetTacOrder() gin.HandlerFunc {
 				}
 				resp = append(resp, r)
 			}
-			serializer.SuccessResponse(c, resp, "success")
+			serializer.SuccessResponse(c, Result{Total: total, List: resp}, "success")
 		}
 	}
 }

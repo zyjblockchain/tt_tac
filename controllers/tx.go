@@ -22,6 +22,8 @@ func SendTacTx() gin.HandlerFunc {
 			serializer.ErrorResponse(c, utils.VerifyParamsErrCode, utils.VerifyParamsErrMsg, err.Error())
 			return
 		}
+		// 把传入的amount换算成最小单位
+		logic.Amount = utils.FormatTokenAmount(logic.Amount, 8)
 		// logic
 		txHash, err := logic.SendTacTx()
 		if err != nil {

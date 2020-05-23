@@ -20,6 +20,9 @@ func FlashChange() gin.HandlerFunc {
 			serializer.ErrorResponse(c, utils.VerifyParamsErrCode, utils.VerifyParamsErrMsg, err.Error())
 			return
 		}
+		// 单位换算
+		logic.FromTokenAmount = utils.FormatTokenAmount(logic.FromTokenAmount, 6) // usdt的单位换算
+		logic.ToTokenAmount = utils.FormatTokenAmount(logic.ToTokenAmount, 8)     // pala单位换算
 		// logic
 		// 目前只有以太坊上的usdt闪兑pala，所以这里为了防止前端不传或者传错,重写token address
 		logic.FromTokenAddress = conf.EthUSDTTokenAddress

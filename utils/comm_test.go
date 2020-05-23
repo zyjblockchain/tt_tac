@@ -1,6 +1,8 @@
 package utils
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestUnitConversion(t *testing.T) {
 	input := "123460"
@@ -8,4 +10,11 @@ func TestUnitConversion(t *testing.T) {
 	retainNum := 6
 	r := UnitConversion(input, decimal, retainNum)
 	t.Log(r)
+}
+
+func TestFormatTokenAmount(t *testing.T) {
+	input := "1.001"
+	decimal := 8
+	res := FormatTokenAmount(input, decimal)
+	t.Log(res)
 }

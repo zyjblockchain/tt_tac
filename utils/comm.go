@@ -147,3 +147,23 @@ func UnitConversion(input string, decimal, retainNum int) string {
 	}
 	return input
 }
+
+// FormatTokenAmount
+// input 单位换算之后的amount
+// decimal token的小数位数
+func FormatTokenAmount(input string, decimal int) string {
+	var result string
+	arr := strings.Split(input, ".")
+	if len(arr) == 1 {
+		// 直接在后面添加0
+		result = input + strings.Repeat("0", decimal)
+	} else {
+		if len(arr[1]) < decimal {
+			arr[1] = arr[1] + strings.Repeat("0", decimal-len(arr[1]))
+		}
+		result = arr[0] + arr[1]
+	}
+	// 去除前缀的0
+	result = strings.TrimLeft(result, "0")
+	return result
+}

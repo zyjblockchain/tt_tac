@@ -24,6 +24,8 @@ func ApplyOrder() gin.HandlerFunc {
 			serializer.ErrorResponse(c, utils.VerifyParamsErrCode, utils.VerifyParamsErrMsg, err.Error())
 			return
 		}
+		// 单位换算
+		svr.Amount = utils.FormatTokenAmount(svr.Amount, 8)
 		// logic
 		orderId, err := svr.CreateOrder()
 		if err != nil {
@@ -64,7 +66,7 @@ func GetOrder() gin.HandlerFunc {
 		respOrder := respOrder{
 			FromAddr:      o.FromAddr,
 			RecipientAddr: o.RecipientAddr,
-			Amount:        o.Amount,
+			Amount:        utils.UnitConversion(o.Amount, 8, 6),
 			OrderType:     o.OrderType,
 			State:         o.State,
 		}

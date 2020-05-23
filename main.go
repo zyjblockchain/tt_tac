@@ -57,6 +57,12 @@ func main() {
 	flashChangeSrv := logics.NewWatchFlashChange(conf.EthUSDTTokenAddress, conf.EthPalaTokenAddress, ethChainWather)
 	flashChangeSrv.ListenFlashChangeTx()
 
-	// 5. 启动gin服务
+	// 5. 定时检查跨链转账和闪兑的中间地址的余额是否足够，如果不足，及时通知让其充值
+
+	go func() {
+		// logics.CheckMiddleAddressBalance()
+	}()
+
+	// 6. 启动gin服务
 	routers.NewRouter(":3000")
 }

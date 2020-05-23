@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/shopspring/decimal"
 	"github.com/zyjblockchain/sandy_log/log"
 	"github.com/zyjblockchain/tt_tac/logics"
 	"github.com/zyjblockchain/tt_tac/serializer"
@@ -71,6 +72,15 @@ func GetLatestPalaToUsdtPrice() gin.HandlerFunc {
 			return
 		} else {
 			// 返回结果
+			// 给前端展示的pala价格需要高于真实价格的1% todo 1%为暂定的涨幅，后面会调
+			inc := decimal.NewFromFloat(1.01) // 上浮1%
+			price, err := decimal.NewFromString(tt.TradePrice)
+			if err != nil {
+				log.Errorf(" decimal.NewFromString(tt.TradePrice)  error: %v", err)
+				serializer.ErrorResponse(c, utils.GetLatestPriceErrCode, utils.GetLatestPriceErrMsg, err.Error())
+				return
+			}
+			tt.TradePrice = price.Mul(inc).String()
 			serializer.SuccessResponse(c, *tt, "success")
 		}
 	}

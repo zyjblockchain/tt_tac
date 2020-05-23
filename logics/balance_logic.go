@@ -8,8 +8,10 @@ import (
 	"github.com/zyjblockchain/sandy_log/log"
 	"github.com/zyjblockchain/tt_tac/conf"
 	"github.com/zyjblockchain/tt_tac/utils"
+	"github.com/zyjblockchain/tt_tac/utils/ding_robot"
 	transaction "github.com/zyjblockchain/tt_tac/utils/tx_utils"
 	"math/big"
+	"time"
 )
 
 type RespBalance struct {
@@ -124,4 +126,102 @@ func (g *GetGasFee) GetGasFee() (*Fee, error) {
 	gasLimit := uint64(60000)
 	gasFee := new(big.Int).Mul(gasPrice, big.NewInt(int64(gasLimit))).String()
 	return &Fee{GasFee: utils.UnitConversion(gasFee, 18, 6)}, nil
+}
+
+// CheckMiddleAddressBalance 定时检查中间地址的各种资产的balance是否足够
+func CheckMiddleAddressBalance() {
+	dingRobot := ding_robot.NewRobot(utils.WebHook)
+	getBalanceTicker := time.NewTicker(10 * time.Second)
+	ethClient := transaction.NewChainClient(conf.EthChainNet, big.NewInt(int64(conf.EthChainID)))
+	ttClient := transaction.NewChainClient(conf.TTChainNet, big.NewInt(int64(conf.TTChainID)))
+	defer func() {
+		ethClient.Close()
+		ttClient.Close()
+	}()
+	for {
+		select {
+		case <-getBalanceTicker.C:
+			// 1. 查询tac中间地址的eth余额
+			getTacMiddleEthBalance, err := ethClient.Client.BalanceAt(context.Background(), common.HexToAddress(conf.TacMiddleAddress), nil)
+			if err != nil {
+				log.Errorf("查询tac中间地址的eth余额 error: %v", err)
+			} else {
+				// 最小余额限度0.5 eth
+				limitBalance, _ := new(big.Int).SetString("500000000000000000", 10)
+				if getTacMiddleEthBalance.Cmp(limitBalance) < 0 {
+					// 通知需要充eth了
+					content := fmt.Sprintf("1.跨链转账中转地址eth余额即将消耗完;\naddress: %s,\nbalance: %s eth", conf.TacMiddleAddress, utils.UnitConversion(getTacMiddleEthBalance.String(), 18, 6))
+					_ = dingRobot.SendText(content, nil, true)
+				}
+			}
+
+			// 2. 查询tac中间地址的eth上的pala
+			getTacMiddleEthPalaBalance, err := ethClient.GetTokenBalance(common.HexToAddress(conf.TacMiddleAddress), common.HexToAddress(conf.EthPalaTokenAddress))
+			if err != nil {
+				log.Errorf("查询tac中间地址的以太坊上的pala余额 error: %v", err)
+			} else {
+				// 最小余额限度 1000 pala
+				limitBalance, _ := new(big.Int).SetString("100000000000", 10)
+				if getTacMiddleEthPalaBalance.Cmp(limitBalance) < 0 {
+					content := fmt.Sprintf("2.跨链转账中转地址以太坊上的pala余额即将消耗完;\naddress: %s,\nbalance:  %s eth", conf.TacMiddleAddress, utils.UnitConversion(getTacMiddleEthPalaBalance.String(), 8, 6))
+					_ = dingRobot.SendText(content, nil, true)
+				}
+			}
+
+			// 3. 查询闪兑中间地址的eth余额
+			getFlashMiddleEthBalance, err := ethClient.Client.BalanceAt(context.Background(), common.HexToAddress(conf.EthFlashChangeMiddleAddress), nil)
+			if err != nil {
+				log.Errorf("查询闪兑中间地址的eth余额 error: %v", err)
+			} else {
+				// 最小余额限度0.5 eth
+				limitBalance, _ := new(big.Int).SetString("500000000000000000", 10)
+				if getFlashMiddleEthBalance.Cmp(limitBalance) < 0 {
+					// 通知需要充eth了
+					content := fmt.Sprintf("3.闪兑中转地址eth余额即将消耗完;\naddress: %s,\nbalance: %s eth", conf.EthFlashChangeMiddleAddress, utils.UnitConversion(getFlashMiddleEthBalance.String(), 18, 6))
+					_ = dingRobot.SendText(content, nil, true)
+				}
+			}
+
+			// 4. 查询闪兑中间地址的eth上的pala余额
+			getFlashMiddleEthPalaBalance, err := ethClient.GetTokenBalance(common.HexToAddress(conf.EthFlashChangeMiddleAddress), common.HexToAddress(conf.EthPalaTokenAddress))
+			if err != nil {
+				log.Errorf("查询闪兑中间地址的以太坊上的pala余额 error: %v", err)
+			} else {
+				// 最小余额限度 1000 pala
+				limitBalance, _ := new(big.Int).SetString("100000000000", 10)
+				if getFlashMiddleEthPalaBalance.Cmp(limitBalance) < 0 {
+					content := fmt.Sprintf("4.闪兑中转地址以太坊上的pala余额即将消耗完;\naddress: %s,\nbalance: %s eth", conf.EthFlashChangeMiddleAddress, utils.UnitConversion(getFlashMiddleEthPalaBalance.String(), 8, 6))
+					_ = dingRobot.SendText(content, nil, true)
+				}
+			}
+
+			// 5. 查询跨链转账中间地址的tt余额
+			getTacMiddleTTBalance, err := ttClient.Client.BalanceAt(context.Background(), common.HexToAddress(conf.TacMiddleAddress), nil)
+			if err != nil {
+				log.Errorf("查询跨链转账中间地址的tt余额 error: %v", err)
+			} else {
+				// 最小余额限度0.5 tt
+				limitBalance, _ := new(big.Int).SetString("500000000000000000", 10)
+				if getTacMiddleTTBalance.Cmp(limitBalance) < 0 {
+					// 通知需要充tt了
+					content := fmt.Sprintf("5.查询跨链转账中间地址的tt余额即将消耗完;\naddress: %s,\nbalance: %s eth", conf.TacMiddleAddress, utils.UnitConversion(getTacMiddleTTBalance.String(), 18, 6))
+					_ = dingRobot.SendText(content, nil, true)
+				}
+			}
+
+			// 6. 查询跨链转账中间地址的tt链上的pala余额
+			getTacMiddleTTPalaBalance, err := ttClient.GetTokenBalance(common.HexToAddress(conf.TacMiddleAddress), common.HexToAddress(conf.TtPalaTokenAddress))
+			if err != nil {
+				log.Errorf("查询跨链转账中间地址的tt链上的pala余额 error: %v", err)
+			} else {
+				// 最小余额限度 1000 pala
+				limitBalance, _ := new(big.Int).SetString("100000000000", 10)
+				if getTacMiddleTTPalaBalance.Cmp(limitBalance) < 0 {
+					// 通知需要充tt了
+					content := fmt.Sprintf("6.查询跨链转账中间地址的tt链上的pala余额即将消耗完;\naddress: %s,\nbalance: %s eth", conf.TacMiddleAddress, utils.UnitConversion(getTacMiddleTTPalaBalance.String(), 18, 6))
+					_ = dingRobot.SendText(content, nil, true)
+				}
+			}
+		}
+	}
 }

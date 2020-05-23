@@ -149,7 +149,7 @@ func UnitConversion(input string, decimal, retainNum int) string {
 }
 
 // FormatTokenAmount
-// input 单位换算之后的amount
+// input 单位换算之后的amount, "111.00111"
 // decimal token的小数位数
 func FormatTokenAmount(input string, decimal int) string {
 	var result string

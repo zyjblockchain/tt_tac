@@ -484,7 +484,7 @@ func (watcher *AbstractWatcher) popBlocksUntilReachMainChain() error {
 		}
 
 		if block.Hash() != lastSyncedBlock.Hash() {
-			fmt.Println("removing tail block:", watcher.SyncedBlocks.Back())
+			// fmt.Println("removing tail block:", watcher.SyncedBlocks.Back())
 			removedBlock := watcher.SyncedBlocks.Remove(watcher.SyncedBlocks.Back()).(blockchain.Block)
 
 			for watcher.SyncedTxAndReceipts.Back() != nil {
@@ -492,7 +492,7 @@ func (watcher *AbstractWatcher) popBlocksUntilReachMainChain() error {
 				tail := watcher.SyncedTxAndReceipts.Back()
 
 				if tail.Value.(*structs.TxAndReceipt).Tx.GetBlockNumber() >= removedBlock.Number() {
-					fmt.Printf("removing tail txAndReceipt: %+v", tail.Value)
+					// fmt.Printf("removing tail txAndReceipt: %+v", tail.Value)
 					tuple := watcher.SyncedTxAndReceipts.Remove(tail).(*structs.TxAndReceipt)
 
 					watcher.NewTxAndReceiptChan <- structs.NewRemovableTxAndReceipt(tuple.Tx, tuple.Receipt, true, block.Timestamp())
@@ -527,8 +527,8 @@ func (watcher *AbstractWatcher) FoundFork(newBlock blockchain.Block) bool {
 			notMatch := (syncedBlock).Hash() != newBlock.ParentHash()
 
 			if notMatch {
-				fmt.Printf("found fork, new block(%d): %s, new block's parent: %s, parent we synced: %s",
-					newBlock.Number(), newBlock.Hash(), newBlock.ParentHash(), syncedBlock.Hash())
+				// fmt.Printf("found fork, new block(%d): %s, new block's parent: %s, parent we synced: %s",
+				// 	newBlock.Number(), newBlock.Hash(), newBlock.ParentHash(), syncedBlock.Hash())
 
 				return true
 			}

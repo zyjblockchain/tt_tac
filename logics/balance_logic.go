@@ -131,7 +131,7 @@ func (g *GetGasFee) GetGasFee() (*Fee, error) {
 // CheckMiddleAddressBalance 定时检查中间地址的各种资产的balance是否足够
 func CheckMiddleAddressBalance() {
 	dingRobot := ding_robot.NewRobot(utils.WebHook)
-	getBalanceTicker := time.NewTicker(10 * time.Second)
+	getBalanceTicker := time.NewTicker(30 * time.Second)
 	ethClient := transaction.NewChainClient(conf.EthChainNet, big.NewInt(int64(conf.EthChainID)))
 	ttClient := transaction.NewChainClient(conf.TTChainNet, big.NewInt(int64(conf.TTChainID)))
 	defer func() {
@@ -190,7 +190,7 @@ func CheckMiddleAddressBalance() {
 				// 最小余额限度 1000 pala
 				limitBalance, _ := new(big.Int).SetString("100000000000", 10)
 				if getFlashMiddleEthPalaBalance.Cmp(limitBalance) < 0 {
-					content := fmt.Sprintf("4.闪兑中转地址以太坊上的pala余额即将消耗完;\naddress: %s,\nbalance: %s eth", conf.EthFlashChangeMiddleAddress, utils.UnitConversion(getFlashMiddleEthPalaBalance.String(), 8, 6))
+					content := fmt.Sprintf("4.闪兑中转地址以太坊上的pala余额即将消耗完;\naddress: %s,\neth_pala_balance: %s eth", conf.EthFlashChangeMiddleAddress, utils.UnitConversion(getFlashMiddleEthPalaBalance.String(), 8, 6))
 					_ = dingRobot.SendText(content, nil, true)
 				}
 			}
@@ -204,7 +204,7 @@ func CheckMiddleAddressBalance() {
 				limitBalance, _ := new(big.Int).SetString("500000000000000000", 10)
 				if getTacMiddleTTBalance.Cmp(limitBalance) < 0 {
 					// 通知需要充tt了
-					content := fmt.Sprintf("5.查询跨链转账中间地址的tt余额即将消耗完;\naddress: %s,\nbalance: %s eth", conf.TacMiddleAddress, utils.UnitConversion(getTacMiddleTTBalance.String(), 18, 6))
+					content := fmt.Sprintf("5.查询跨链转账中间地址的tt余额即将消耗完;\naddress: %s,\ntt_balance: %s tt", conf.TacMiddleAddress, utils.UnitConversion(getTacMiddleTTBalance.String(), 18, 6))
 					_ = dingRobot.SendText(content, nil, true)
 				}
 			}
@@ -218,7 +218,7 @@ func CheckMiddleAddressBalance() {
 				limitBalance, _ := new(big.Int).SetString("100000000000", 10)
 				if getTacMiddleTTPalaBalance.Cmp(limitBalance) < 0 {
 					// 通知需要充tt了
-					content := fmt.Sprintf("6.查询跨链转账中间地址的tt链上的pala余额即将消耗完;\naddress: %s,\nbalance: %s eth", conf.TacMiddleAddress, utils.UnitConversion(getTacMiddleTTPalaBalance.String(), 18, 6))
+					content := fmt.Sprintf("6.查询跨链转账中间地址的tt链上的pala余额即将消耗完;\naddress: %s,\ntt_pala_balance: %s eth", conf.TacMiddleAddress, utils.UnitConversion(getTacMiddleTTPalaBalance.String(), 18, 6))
 					_ = dingRobot.SendText(content, nil, true)
 				}
 			}

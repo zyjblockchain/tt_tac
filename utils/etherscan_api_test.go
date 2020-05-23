@@ -6,14 +6,14 @@ import (
 )
 
 func TestEtherscanApi(t *testing.T) {
-	contractAddress := "0x3f69636af46718cbd27002c65256226742309e1f"
-	address := "0x1EA6cef67DCc6A0a471b1AC2BaFb3e85dc6C6e18"
+	contractAddress := "0x3f69636Af46718cBd27002c65256226742309E1f"
+	address := "0xb378413ef8b086628d1f0f01fef785ab501970fa"
 	page := 1
-	offset := 1
-	for i := 0; i < 10; i++ {
-		txs, err := GetAddressTokenTransfers(contractAddress, address, page, offset)
-		t.Log(err)
-		t.Log(txs[0].Hash)
+	offset := 5
+	txs, err := GetAddressTokenTransfers(contractAddress, address, page, offset)
+	t.Log(err)
+	for _, tx := range txs {
+		t.Log(tx.Hash)
 	}
 
 }

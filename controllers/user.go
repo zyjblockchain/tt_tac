@@ -6,6 +6,7 @@ import (
 	"github.com/zyjblockchain/tt_tac/logics"
 	"github.com/zyjblockchain/tt_tac/serializer"
 	"github.com/zyjblockchain/tt_tac/utils"
+	"strings"
 )
 
 type addr struct {
@@ -105,21 +106,31 @@ func ModifyPassword() gin.HandlerFunc {
 	}
 }
 
-// 拉取用户eth_pala的收款记录
-func GetPalaReceiveRecord() gin.HandlerFunc {
+// 拉取用户eth_Token 的收款记录
+func GetEthTokenTxRecords(tokenSymbol string) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var logic logics.PalaReceiveRecord
+		var logic logics.TokenTxsReceiveRecord
 		err := c.ShouldBind(&logic)
 		if err != nil {
-			log.Errorf("GetPalaReceiveRecord should binding error: %v", err)
+			log.Errorf("GetEthTokenTxRecords should binding error: %v", err)
 			serializer.ErrorResponse(c, utils.VerifyParamsErrCode, utils.VerifyParamsErrMsg, err.Error())
 			return
 		}
 		// logic
-		records, err := logic.GetPalaRecord()
+		tokenAddress := ""
+		decimal := 0
+		if strings.ToUpper(tokenSymbol) == "PALA" {
+			tokenAddress = "0xd20fb5cf926dc29c88f64725e6f911f40f7bf531" // 以太坊正式网上的pala合约地址
+			decimal = 8
+		} else if strings.ToUpper(tokenSymbol) == "USDT" {
+			tokenAddress = "0xdac17f958d2ee523a2206206994597c13d831ec7" // 以太坊正式网上的usdt合约地址
+			decimal = 6
+		}
+
+		records, err := logic.GetEthTokenTxRecord(tokenAddress, decimal)
 		if err != nil {
-			log.Errorf("GetPalaRecord logic err: %v", err)
-			serializer.ErrorResponse(c, utils.GetPalaReceivTxRecordErrCode, utils.GetPalaReceivTxRecordErrMsg, err.Error())
+			log.Errorf("GetEthTokenTxRecord logic err: %v", err)
+			serializer.ErrorResponse(c, utils.GetEthTokenTxRecordErrCode, utils.GetEthTokenTxRecordErrMsg, err.Error())
 			return
 		} else {
 			serializer.SuccessResponse(c, records, "success")

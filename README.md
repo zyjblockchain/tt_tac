@@ -473,7 +473,9 @@
 ###### 请求参数
 ```$xslt
 {
-	"address":"0x9d7bc48d1c7a42b5fa9e070b4e301d2445bea926"
+	"address":"0x9d7bc48d1c7a42b5fa9e070b4e301d2445bea926",
+	"page":1,
+	"limit":3
 }
 ```
 ###### 返回示例
@@ -484,13 +486,13 @@
         {
             "from": "0x65b1c87aa01c82c1d15adcda7e21f3187594b2c9",
             "to": "0x9d7bc48d1c7a42b5fa9e070b4e301d2445bea926",
-            "amount": "478388000000",
+            "amount": "4783.880000",
             "time_at": 1590104685
         },
         {
              "from": "0x65b1c87aa01c82c1d15adcda7e21f3187594b2c9",
              "to": "0x9d7bc48d1c7a42b5fa9e070b4e301d2445bea926",
-             "amount": "88888888888",
+             "amount": "88888.888888",
              "time_at": 1590104681
          },
     ],
@@ -506,6 +508,47 @@
     "error": ""
 }
 ```
+
+#### 获取用户地址下的eth主网上usdt接收记录
+###### 请求url
+- POST /tac/get_eth_usdt_receive
+###### 请求参数
+```$xslt
+{
+	"address":"0xa416d8034811e944ac9ddf759c6d6dcf0a985d5a",
+	"page":1,
+	"limit":3
+}
+```
+###### 返回示例
+```
+{
+    "status": 200,
+    "data": [
+        {
+            "from": "0x629155a6f95a91ce6eb3548768fa37441f83d26d",
+            "to": "0xa416d8034811e944ac9ddf759c6d6dcf0a985d5a",
+            "amount": "18.658000",
+            "time_at": 1590230722
+        },
+        {
+            "from": "0x629155a6f95a91ce6eb3548768fa37441f83d26d",
+            "to": "0xa416d8034811e944ac9ddf759c6d6dcf0a985d5a",
+            "amount": "18.658000",
+            "time_at": 1590153899
+        },
+        {
+            "from": "0x629155a6f95a91ce6eb3548768fa37441f83d26d",
+            "to": "0xa416d8034811e944ac9ddf759c6d6dcf0a985d5a",
+            "amount": "18.658000",
+            "time_at": 1590091627
+        }
+    ],
+    "msg": "success",
+    "error": ""
+}
+```
+
 ----
 #### 获取发送一笔以太坊token转账交易或者tt的token转账交易需要的gas fee
 ###### 请求url

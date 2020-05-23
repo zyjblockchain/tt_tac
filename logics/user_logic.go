@@ -164,8 +164,10 @@ func (m *ModifyPassword) ModifyPwd() error {
 	return nil
 }
 
-type PalaReceiveRecord struct {
+type TokenTxsReceiveRecord struct {
 	Address string `json:"address" binding:"required"`
+	Page    int    `json:"page" binding:"required"`
+	Limit   int    `json:"limit"`
 }
 
 type ReceiveTxRecord struct {
@@ -175,12 +177,14 @@ type ReceiveTxRecord struct {
 	TimeAt int64  `json:"time_at"`
 }
 
-func (p *PalaReceiveRecord) GetPalaRecord() ([]ReceiveTxRecord, error) {
-	palaTokenAddress := "0xd20fb5cf926dc29c88f64725e6f911f40f7bf531" // 以太坊正式网上的pala合约地址
+func (p *TokenTxsReceiveRecord) GetEthTokenTxRecord(tokenAddress string, decimal int) ([]ReceiveTxRecord, error) {
+
 	address := p.Address
-	limit := 100 // 拉取数量
+	if p.Limit == 0 {
+		p.Limit = 5
+	}
 	// 拉取最近的Limit条pala token记录
-	txs, err := utils.GetAddressTokenTransfers(palaTokenAddress, address, 1, limit)
+	txs, err := utils.GetAddressTokenTransfers(tokenAddress, address, p.Page, p.Limit)
 	if err != nil {
 		log.Errorf("获取收款记录失败：err: %v, address: %s", err, address)
 		return nil, err
@@ -192,7 +196,7 @@ func (p *PalaReceiveRecord) GetPalaRecord() ([]ReceiveTxRecord, error) {
 			receiveTxs = append(receiveTxs, ReceiveTxRecord{
 				From:   tx.From,
 				To:     address,
-				Amount: utils.UnitConversion(tx.Value.Int().String(), 8, 6),
+				Amount: utils.UnitConversion(tx.Value.Int().String(), decimal, 6),
 				TimeAt: tx.TimeStamp.Time().Unix(),
 			})
 		}

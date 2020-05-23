@@ -53,8 +53,8 @@ var (
 	ModifyPasswordErrCode = 40014
 	ModifyPasswordErrMsg  = "modify password error"
 
-	GetPalaReceivTxRecordErrCode = 40015
-	GetPalaReceivTxRecordErrMsg  = "拉取 address pala token 收款记录 error"
+	GetEthTokenTxRecordErrCode = 40015
+	GetEthTokenTxRecordErrMsg  = "拉取 address pala token 收款记录 error"
 
 	GetGasFeeErrCode = 40016
 	GetGasFeeErrMsg  = "获取单笔交易的gas fee 失败"

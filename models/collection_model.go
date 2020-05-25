@@ -14,6 +14,10 @@ type CollectionTx struct {
 	ExtraInfo    string // 额外的信息
 }
 
+func (CollectionTx) TableName() string {
+	return "collection_tx"
+}
+
 func (c *CollectionTx) Create() error {
 	return DB.Create(c).Error
 }

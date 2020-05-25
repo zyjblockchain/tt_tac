@@ -15,6 +15,10 @@ type TacOrder struct {
 	CollectionId  uint // collection 表的外键
 }
 
+func (TacOrder) TableName() string {
+	return "tac_order"
+}
+
 // Create
 func (o *TacOrder) Create() error {
 	if err := DB.Create(o).Error; err != nil {

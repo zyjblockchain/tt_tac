@@ -15,6 +15,9 @@ type TxTransfer struct {
 	ErrMsg          string `gorm:"type:text(0)"` // 如果交易失败，则记录失败信息
 }
 
+func (TxTransfer) TableName() string {
+	return "tx_transfer"
+}
 func (t *TxTransfer) Create() error {
 	return DB.Create(t).Error
 }

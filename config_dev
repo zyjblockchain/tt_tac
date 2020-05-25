@@ -1,5 +1,6 @@
 # 数据库链接地址
-MYSQL_DSN="tac_user:NwHJhkcTKHmDr2RZ@tcp(223.27.39.183:3306)/tac_db?charset=utf8mb4&parseTime=True&loc=Local"
+# MYSQL_DSN="tac_user:NwHJhkcTKHmDr2RZ@tcp(223.27.39.183:3306)/tac_db?charset=utf8mb4&parseTime=True&loc=Local"
+MYSQL_DSN="wallet_user_dev:NwHJhkcTKHmDr2RZ@tcp(rm-j6c49n23e4d07l8ijmo.mysql.rds.aliyuncs.com:3306)/kross_wallet_dev?charset=utf8mb4&parseTime=True&loc=Local"
 
 # gin运行mode
 GIN_MODE="debug"

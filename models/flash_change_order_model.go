@@ -19,6 +19,10 @@ type FlashChangeOrder struct {
 	CollectionId     uint   // collection 表的外键
 }
 
+func (FlashChangeOrder) TableName() string {
+	return "flash_change_order"
+}
+
 func (f *FlashChangeOrder) Create() error {
 	return DB.Create(f).Error
 }

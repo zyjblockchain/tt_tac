@@ -10,6 +10,10 @@ type Kv struct {
 	Val []byte `gorm:"type:text(0)"`
 }
 
+func (Kv) TableName() string {
+	return "kv"
+}
+
 func SetKv(k string, v []byte) error {
 	kv := Kv{
 		Key: k,

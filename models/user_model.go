@@ -18,6 +18,10 @@ type User struct {
 	LocalEthPalaBalance string // 用户的平台eth_pala余额
 }
 
+func (User) TableName() string {
+	return "user"
+}
+
 // SetPassword 设置或者修改user在数据库中保存的密码
 func (user *User) SetPassword(rawPassword string) error {
 	// 对原始密码进行加密

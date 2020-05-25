@@ -64,5 +64,5 @@ func main() {
 	}()
 
 	// 6. 启动gin服务
-	routers.NewRouter(":3000")
+	routers.NewRouter(":3030")
 }

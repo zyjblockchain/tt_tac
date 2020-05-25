@@ -12,10 +12,9 @@ const (
 
 type User struct {
 	gorm.Model
-	Address             string // 用户地址
-	PrivateCrypted      string // 通过aes加密过后的私钥
-	PasswordDigest      string // 用户的加密之后的支付密码
-	LocalEthPalaBalance string // 用户的平台eth_pala余额
+	Address        string // 用户地址
+	PrivateCrypted string // 通过aes加密过后的私钥
+	PasswordDigest string // 用户的加密之后的支付密码
 }
 
 func (User) TableName() string {
@@ -54,8 +53,4 @@ func (u *User) AddUser(newUser *User) (*User, error) {
 
 func (u *User) Update() error {
 	return DB.Model(u).Updates(u).Error
-}
-
-func (u *User) UpdateUserLocalBalance(address, newBalance string) error {
-	return DB.Model(u).Updates(User{Address: address, LocalEthPalaBalance: newBalance}).Error
 }

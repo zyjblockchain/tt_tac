@@ -1,6 +1,9 @@
 package conf
 
-import "os"
+import (
+	"math/big"
+	"os"
+)
 
 const (
 	TTChainNet = "https://mainnet-rpc.thundercore.com"
@@ -22,6 +25,12 @@ const (
 const (
 	EthToTtOrderType = 1 // 以太坊转tt链
 	TtToEthOrderType = 2 // tt链转以太坊
+)
+
+// 跨链转账扣除pala手续费数量
+var (
+	EthToTtPalaCharge = big.NewInt(1 * 100000000) // 以太坊转tt链中间扣除的pala默认手续费
+	TtToEthPalaCharge = big.NewInt(3 * 100000000) // tt链转以太坊中间扣除的pala默认手续费
 )
 
 var (

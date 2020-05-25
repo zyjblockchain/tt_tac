@@ -55,6 +55,15 @@ func NewRouter(addr string) {
 		v1.POST("/get_eth_receive", controllers.GetEthReceiveRecords())
 		// 16. 获取发送一笔以太坊token转账交易或者tt的token转账交易需要的gas fee
 		v1.POST("/get_gas_fee", controllers.GetGasFee())
+
+		// 内部管理接口
+		// 1. 对私钥进行对称加密，用于配置中间地址的私钥加密
+		v1.POST("/encrypto_private", controllers.EncryptoPrivate())
+		// 2. 获取跨链转账扣除pala手续费
+		v1.GET("/get_tac_charge", controllers.GetTacPalaServiceCharge())
+		// 3. 修改跨链转账扣除pala手续费数量接口
+		v1.POST("/modify_tac_charge", controllers.ModifyTacPalaServiceCharge())
+
 	}
 	if err := r.Run(addr); err != nil {
 		panic(err)

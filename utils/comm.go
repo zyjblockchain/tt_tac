@@ -61,6 +61,12 @@ var (
 
 	GetEthTxRecordErrCode = 40017
 	GetEthTxRecordErrMsg  = "拉取 address eth 收款记录 error"
+
+	EncryptoPrivErrCode = 40018
+	EncryptoPrivErrMsg  = "对私钥进行对称加密失败"
+
+	ModifyTacPalaServiceChargeErrCode = 40019
+	ModifyTacPalaServiceChargeErrMsg  = "对私钥进行对称加密失败"
 )
 
 // FormatHex 去除前置的0
@@ -102,9 +108,9 @@ func TransformAmount(oldAmount string, orderType int) string {
 	var fee *big.Int
 	var newAmount string
 	if orderType == conf.EthToTtOrderType { // 以太坊转入tt链
-		fee = big.NewInt(1 * 100000000) // 1 pala
+		fee = conf.EthToTtPalaCharge
 	} else if orderType == conf.TtToEthOrderType { // tt 链转到以太坊
-		fee = big.NewInt(3 * 100000000) // 3 pala
+		fee = conf.TtToEthPalaCharge
 	}
 	amount, ok := new(big.Int).SetString(oldAmount, 10)
 	if !ok {

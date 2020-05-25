@@ -607,4 +607,68 @@
 }
 ```
 ---
+---
+#### 内部接口：对私钥进行加密
+###### 请求url
+- POST /tac/encrypto_private
+###### 请求参数
+```$xslt
+{
+	"private":"11110B440C3FC1CCFF8B3339D41850C5B9A3D712F804FA3EE1CDD8F311111111"
+}
+```
+###### 返回示例
+```$xslt
+{
+    "status": 200,
+    "data": "0x144ce7cafee21e556ade38e8a9f011ac3fa231cf83f798417c0c85de795ddc10494914d66877d1bda6fcbd190c7f3f9b",
+    "msg": "success",
+    "error": ""
+}
+```
+###### 参数说明
+1. data: 返回aes对称加密之后的私钥。用于配置在正式环境的跨链转账和闪兑的中间地址的私钥上，避免了服务器上有明文私钥
+----
+#### 获取跨链转账扣除的pala作为手续费
+###### 请求url
+- GET /tac/get_tac_charge
+###### 返回示例
+```$xslt
+{
+    "status": 200,
+    "data": {
+        "to_tt_charge": "1.00000000",
+        "to_eth_charge": "3.00000000"
+    },
+    "msg": "success",
+    "error": ""
+}
+```
+###### 参数说明
+1. to_tt_charge: 以太坊上的pala跨链转到tt链上的pala需要的手续费
+2. to_eth_charge: tt链上的pala跨链转到以太坊上的pala需要的手续费
 
+---
+#### 修改跨链转账扣除pala手续费数量接口
+###### 请求url
+- POST /tac/modify_tac_charge
+###### 返回示例
+```$xslt
+{
+	"to_tt_charge": "1.1",
+	"to_eth_charge": "0.5"
+}
+```
+###### 参数说明
+1. to_tt_charge: 以太坊上的pala跨链转到tt链上的pala需要的手续费
+2. to_eth_charge: tt链上的pala跨链转到以太坊上的pala需要的手续费
+###### 返回示例
+```$xslt
+{
+    "status": 200,
+    "data": null,
+    "msg": "success",
+    "error": ""
+}
+```
+---

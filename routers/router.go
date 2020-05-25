@@ -51,7 +51,9 @@ func NewRouter(addr string) {
 		v1.POST("/get_eth_pala_receive", controllers.GetEthTokenTxRecords("PALA"))
 		// 14. 获取用户地址下的eth主网上usdt接收记录
 		v1.POST("/get_eth_usdt_receive", controllers.GetEthTokenTxRecords("USDT"))
-		// 14. 获取发送一笔以太坊token转账交易或者tt的token转账交易需要的gas fee
+		// 15. 拉取地址下的eth的收款记录
+		v1.POST("/get_eth_receive", controllers.GetEthReceiveRecords())
+		// 16. 获取发送一笔以太坊token转账交易或者tt的token转账交易需要的gas fee
 		v1.POST("/get_gas_fee", controllers.GetGasFee())
 	}
 	if err := r.Run(addr); err != nil {

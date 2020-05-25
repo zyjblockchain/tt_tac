@@ -203,3 +203,35 @@ func (p *TokenTxsReceiveRecord) GetEthTokenTxRecord(tokenAddress string, decimal
 	}
 	return receiveTxs, nil
 }
+
+type EthTxsRecord struct {
+	Address string `json:"address" binding:"required"`
+	Page    int    `json:"page" binding:"required"`
+	Limit   int    `json:"limit"`
+}
+
+func (e *EthTxsRecord) GetEthTxsRecord() ([]ReceiveTxRecord, error) {
+	address := e.Address
+	if e.Limit == 0 {
+		e.Limit = 5
+	}
+	// 拉取最近的Limit条pala token记录
+	txs, err := utils.GetAddressEthTransfers(address, e.Page, e.Limit)
+	if err != nil {
+		log.Errorf("获取收款记录失败：err: %v, address: %s", err, address)
+		return nil, err
+	}
+	// 筛选出接收的record
+	var receiveTxs = make([]ReceiveTxRecord, 0, 5)
+	for _, tx := range txs {
+		if tx.To == address {
+			receiveTxs = append(receiveTxs, ReceiveTxRecord{
+				From:   tx.From,
+				To:     address,
+				Amount: utils.UnitConversion(tx.Value.Int().String(), 18, 6),
+				TimeAt: tx.TimeStamp.Time().Unix(),
+			})
+		}
+	}
+	return receiveTxs, nil
+}

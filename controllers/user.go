@@ -137,3 +137,26 @@ func GetEthTokenTxRecords(tokenSymbol string) gin.HandlerFunc {
 		}
 	}
 }
+
+// GetEthReceiveRecords 拉取地址的eth收款记录
+func GetEthReceiveRecords() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var logic logics.EthTxsRecord
+		err := c.ShouldBind(&logic)
+		if err != nil {
+			log.Errorf("GetEthReceiveRecords should binding error: %v", err)
+			serializer.ErrorResponse(c, utils.VerifyParamsErrCode, utils.VerifyParamsErrMsg, err.Error())
+			return
+		}
+
+		// logic
+		records, err := logic.GetEthTxsRecord()
+		if err != nil {
+			log.Errorf("GetEthTxsRecord logic err: %v", err)
+			serializer.ErrorResponse(c, utils.GetEthTxRecordErrCode, utils.GetEthTxRecordErrMsg, err.Error())
+			return
+		} else {
+			serializer.SuccessResponse(c, records, "success")
+		}
+	}
+}

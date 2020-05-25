@@ -58,6 +58,9 @@ var (
 
 	GetGasFeeErrCode = 40016
 	GetGasFeeErrMsg  = "获取单笔交易的gas fee 失败"
+
+	GetEthTxRecordErrCode = 40017
+	GetEthTxRecordErrMsg  = "拉取 address eth 收款记录 error"
 )
 
 // FormatHex 去除前置的0

@@ -2,7 +2,6 @@ package utils
 
 import (
 	"testing"
-	"time"
 )
 
 func TestEtherscanApi(t *testing.T) {
@@ -19,6 +18,9 @@ func TestEtherscanApi(t *testing.T) {
 }
 
 func TestGetAddressTokenTransfers(t *testing.T) {
-	tt := time.Now().Unix()
-	t.Log(tt)
+	txs, err := GetAddressEthTransfers("0xb378413ef8b086628d1f0f01fef785ab501970fa", 0, 0)
+	t.Log(err)
+	for _, tx := range txs {
+		t.Log(tx.Hash)
+	}
 }

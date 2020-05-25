@@ -548,6 +548,40 @@
     "error": ""
 }
 ```
+----
+#### 拉取地址下的eth的收款记录
+###### 请求url
+- POST /tac/get_eth_receive
+###### 请求参数
+```$xslt
+{
+	"address":"0x49228289b27dbe2b0d42e63ca14693ddebe86910",
+	"page":1,
+	"limit":100
+}
+```
+###### 返回示例
+```$xslt
+{
+    "status": 200,
+    "data": [
+        {
+            "from": "0x58a886deed780a38a9ffbbf26fb4dcc7cb77b7c9",
+            "to": "0x49228289b27dbe2b0d42e63ca14693ddebe86910",
+            "amount": "0.300000",
+            "time_at": 1589181727
+        },
+        {
+            "from": "0x5b82936039e25e02d9278bb9d3e5b5573823bc32",
+            "to": "0x49228289b27dbe2b0d42e63ca14693ddebe86910",
+            "amount": "0.048000",
+            "time_at": 1589003238
+        }
+    ],
+    "msg": "success",
+    "error": ""
+}
+```
 
 ----
 #### 获取发送一笔以太坊token转账交易或者tt的token转账交易需要的gas fee

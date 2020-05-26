@@ -66,7 +66,13 @@ func NewRouter(addr string) {
 		// 4. 获取闪兑中的pala价格的上浮比例
 		v1.GET("/get_pala_price_change_rate", controllers.GetPalaPriceComeUpRate())
 		// 5. 修改闪兑中的pala价格的上浮比例
-		v1.POST("modify_pala_price_change_rate", controllers.ModifyPalaPriceComeUpRate())
+		v1.POST("/modify_pala_price_change_rate", controllers.ModifyPalaPriceComeUpRate())
+		// 6. 获取闪兑的交易gas消耗总量
+		v1.GET("/get_flash_total_gas_fee", controllers.GetFlashTotalGasFee())
+		// 7. 获取跨链转账的交易gas消耗总量
+		v1.GET("/get_tac_total_gas_fee", controllers.GetTacTotalGasFee())
+		// 8. 获取闪兑的usdt接收总量和pala发送总量
+		v1.GET("/get_flash_pala_usdt_total", controllers.GetFlashUsdtAndPalaTotalAmount())
 	}
 	if err := r.Run(addr); err != nil {
 		panic(err)

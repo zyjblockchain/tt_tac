@@ -5,6 +5,7 @@ import (
 	"github.com/shopspring/decimal"
 	"github.com/zyjblockchain/sandy_log/log"
 	"github.com/zyjblockchain/tt_tac/conf"
+	"github.com/zyjblockchain/tt_tac/models"
 	"github.com/zyjblockchain/tt_tac/serializer"
 	"github.com/zyjblockchain/tt_tac/utils"
 	"math/big"
@@ -132,5 +133,84 @@ func ModifyPalaPriceComeUpRate() gin.HandlerFunc {
 		serializer.SuccessResponse(c, nil, "success")
 		conf.FlashPalaToUsdtPriceChange = newVal
 		return
+	}
+}
+
+// 获取闪兑的交易gas消耗总量
+func GetFlashTotalGasFee() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// 查询出闪兑订单表中的所有完成的订单记录的sendTxId
+		var sendTxIds []uint
+		if err := models.DB.Model(models.FlashChangeOrder{}).Where("state = ?", 1).Pluck("receive_tx_id", &sendTxIds).Error; err != nil {
+			log.Errorf("从flashChangeOrder 表中拉取所有的完成的订单sendTxId失败： %v", err)
+			serializer.SuccessResponse(c, nil, "")
+			return
+		}
+		// 通过sendTxId查询出对应的交易的gasPrice
+		var totalPrice = decimal.NewFromInt(0)
+		for _, v := range sendTxIds {
+			var tx = models.TxTransfer{}
+			tx.ID = v
+			models.DB.Select("gas_price").Take(&tx)
+			// add
+			d, _ := decimal.NewFromString(tx.GasPrice)
+			totalPrice = d.Add(totalPrice)
+		}
+		// gas fee = gasPrice * gasLimit todo 这里默认gasLimit为60000，可能会有一点点误差，但可以忽略
+		gasFee := totalPrice.Mul(decimal.NewFromInt(60000)).String()
+		serializer.SuccessResponse(c, utils.UnitConversion(gasFee, 18, 6), "")
+	}
+}
+
+// 获取跨链转账的交易gas消耗总量
+func GetTacTotalGasFee() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// 查询跨链转账成功订单的collectionId
+		var cIds []uint
+		models.DB.Model(models.TacOrder{}).Where("state = ?", 1).Pluck("collection_id", &cIds)
+
+		// collectionId查到对应的txId,然后通过txId查询到gasPrice
+		var totalPrice = decimal.NewFromInt(0)
+		for _, cId := range cIds {
+			var coll = models.CollectionTx{}
+			coll.ID = cId
+			models.DB.Select("tx_id").Take(&coll)
+			// 通过tx_id查询txTransfer中的gasPrice
+			var tx = models.TxTransfer{}
+			tx.ID = coll.TxId
+			models.DB.Select("gas_price").Take(&tx)
+			// add
+			d, _ := decimal.NewFromString(tx.GasPrice)
+			totalPrice = d.Add(totalPrice)
+		}
+		gasFee := totalPrice.Mul(decimal.NewFromInt(60000)).String()
+		serializer.SuccessResponse(c, utils.UnitConversion(gasFee, 18, 6), "success")
+	}
+}
+
+type resp struct {
+	PalaTotal string `json:"pala_total"`
+	UsdtTotal string `json:"usdt_total"`
+}
+
+// GetFlashUsdtAndPalaTotalAmount
+func GetFlashUsdtAndPalaTotalAmount() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		// 查询出闪兑订单表中的所有完成的订单记录的sendTxId
+		var ords []models.FlashChangeOrder
+		models.DB.Select("from_token_amount, to_token_amount").Where("state = ?", 1).Find(&ords)
+		var fromTokenAmount = decimal.NewFromInt(0)
+		var toTokenAmount = decimal.NewFromInt(0)
+		for _, o := range ords {
+			f, _ := decimal.NewFromString(o.FromTokenAmount) // 不重要的接口，忽略error
+			t, _ := decimal.NewFromString(o.ToTokenAmount)
+			fromTokenAmount = fromTokenAmount.Add(f)
+			toTokenAmount = toTokenAmount.Add(t)
+		}
+		resp := resp{
+			PalaTotal: utils.UnitConversion(fromTokenAmount.String(), 8, 6),
+			UsdtTotal: utils.UnitConversion(toTokenAmount.String(), 6, 6),
+		}
+		serializer.SuccessResponse(c, resp, "success")
 	}
 }

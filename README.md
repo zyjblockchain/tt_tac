@@ -706,3 +706,45 @@
 }
 ```
 ----
+#### 获取闪兑的交易gas消耗总量
+###### 请求url
+- GET /tac/get_flash_total_gas_fee
+###### 返回示例
+```$xslt
+{
+    "status": 200,
+    "data": "0.000360",
+    "msg": "",
+    "error": ""
+}
+```
+----
+#### 获取跨链转账的交易gas消耗总量
+###### 请求url
+- GET /tac/get_tac_total_gas_fee
+###### 返回示例
+```$xslt
+{
+    "status": 200,
+    "data": "0.000360",
+    "msg": "",
+    "error": ""
+}
+```
+----
+#### 获取闪兑的usdt接收总量和pala发送总量
+###### 请求url
+- GET /tac/get_flash_pala_usdt_total
+###### 返回示例
+```$xslt
+{
+    "status": 200,
+    "data": {
+        "pala_total": "24.000000",
+        "usdt_total": "2400.000000"
+    },
+    "msg": "success",
+    "error": ""
+}
+```
+----

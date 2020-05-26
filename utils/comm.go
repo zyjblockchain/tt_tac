@@ -67,6 +67,9 @@ var (
 
 	ModifyTacPalaServiceChargeErrCode = 40019
 	ModifyTacPalaServiceChargeErrMsg  = "对私钥进行对称加密失败"
+
+	ModifyPalaPriceComeUpRateErrCode = 40020
+	ModifyPalaPriceComeUpRateErrMsg  = "ModifyPalaPriceComeUpRate error"
 )
 
 // FormatHex 去除前置的0

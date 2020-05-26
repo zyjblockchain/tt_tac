@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/shopspring/decimal"
 	"github.com/zyjblockchain/sandy_log/log"
+	"github.com/zyjblockchain/tt_tac/conf"
 	"github.com/zyjblockchain/tt_tac/logics"
 	"github.com/zyjblockchain/tt_tac/serializer"
 	"github.com/zyjblockchain/tt_tac/utils"
@@ -72,8 +73,8 @@ func GetLatestPalaToUsdtPrice() gin.HandlerFunc {
 			return
 		} else {
 			// 返回结果
-			// 给前端展示的pala价格需要高于真实价格的1% todo 1%为暂定的涨幅，后面会调
-			inc := decimal.NewFromFloat(1.01) // 上浮1%
+			// 给前端展示的pala价格需要高于真实价格
+			inc := decimal.NewFromFloat(conf.FlashPalaToUsdtPriceChange) // 配置文件中默认上浮1%
 			price, err := decimal.NewFromString(tt.TradePrice)
 			if err != nil {
 				log.Errorf(" decimal.NewFromString(tt.TradePrice)  error: %v", err)

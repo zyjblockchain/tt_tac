@@ -652,7 +652,7 @@
 #### 修改跨链转账扣除pala手续费数量接口
 ###### 请求url
 - POST /tac/modify_tac_charge
-###### 返回示例
+###### 请求参数
 ```$xslt
 {
 	"to_tt_charge": "1.1",
@@ -672,3 +672,37 @@
 }
 ```
 ---
+#### 获取闪兑中的pala价格的上浮比例
+###### 请求url
+- GET /tac/get_pala_price_change_rate
+###### 返回示例
+```$xslt
+{
+    "status": 200,
+    "data": 1.01,
+    "msg": "success",
+    "error": ""
+}
+```
+----
+#### 修改跨链转账扣除pala手续费数量接口
+###### 请求url
+- POST /tac/modify_pala_price_change_rate
+###### 请求参数
+```$xslt
+{
+	"rate": "1.1"
+}
+```
+###### 参数说明
+1. rate: 倍数表示法；1.01表示上浮1%, 1.1表示上浮10%
+###### 返回示例
+```$xslt
+{
+    "status": 200,
+    "data": null,
+    "msg": "success",
+    "error": ""
+}
+```
+----

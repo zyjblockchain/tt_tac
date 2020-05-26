@@ -63,6 +63,10 @@ func NewRouter(addr string) {
 		v1.GET("/get_tac_charge", controllers.GetTacPalaServiceCharge())
 		// 3. 修改跨链转账扣除pala手续费数量接口
 		v1.POST("/modify_tac_charge", controllers.ModifyTacPalaServiceCharge())
+		// 4. 获取闪兑中的pala价格的上浮比例
+		v1.GET("/get_pala_price_change_rate", controllers.GetPalaPriceComeUpRate())
+		// 5. 修改闪兑中的pala价格的上浮比例
+		v1.POST("modify_pala_price_change_rate", controllers.ModifyPalaPriceComeUpRate())
 
 	}
 	if err := r.Run(addr); err != nil {

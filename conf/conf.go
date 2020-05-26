@@ -12,7 +12,7 @@ const (
 
 	EthChainNet = "https://rinkeby.infura.io/v3/36b98a13557c4b8583d57934ede2f74d"
 	// EthChainNet = "https://mainnet.infura.io/v3/5d519236943c40f5a87621317a576060"
-	EthChainID  = 4
+	EthChainID  = 4 // 以太坊的主网chainId == 1
 	EthChainTag = 17
 )
 
@@ -29,27 +29,39 @@ const (
 
 // 跨链转账扣除pala手续费数量
 var (
-	EthToTtPalaCharge = big.NewInt(1 * 100000000) // 以太坊转tt链中间扣除的pala默认手续费
-	TtToEthPalaCharge = big.NewInt(3 * 100000000) // tt链转以太坊中间扣除的pala默认手续费
+	EthToTtPalaCharge          = big.NewInt(1 * 100000000) // 以太坊转tt链中间扣除的pala默认手续费，有接口可以随时修改
+	TtToEthPalaCharge          = big.NewInt(3 * 100000000) // tt链转以太坊中间扣除的pala默认手续费，有接口可以随时修改
+	FlashPalaToUsdtPriceChange = float64(1.01)             // 在闪兑中pala的价格需要增大来展示给用户，通过这种方式变相收取闪兑的手续费。默认上浮1%，有接口可以随时修改
 )
 
+// 需要配置文件读取
 var (
 	// 跨链转账中转地址，tt链和以太坊链共用一个地址，方便管理
 	TacMiddleAddress        = ""
 	TacMiddleAddressPrivate = ""
 	Dsn                     = ""
-)
 
-var (
 	// eth usdt -> pala闪兑中转地址
 	EthFlashChangeMiddleAddress = ""
 	EthFlashChangeMiddlePrivate = ""
 )
 
 func InitConf() {
-	TacMiddleAddress = os.Getenv("TacMiddleAddress")
+	// var err error
 	TacMiddleAddressPrivate = os.Getenv("TacMiddleAddressPrivate")
+	TacMiddleAddress = os.Getenv("TacMiddleAddress")
+	// todo 正式环境配置文件中的private是aes加密之后的，所以这里需要解密
+	// TacMiddleAddressPrivate , err = utils.DecryptPrivate(os.Getenv("TacMiddleAddressPrivate"))
+	// if err != nil {
+	// 	panic(err)
+	// }
+
 	Dsn = os.Getenv("MYSQL_DSN")
+
 	EthFlashChangeMiddleAddress = os.Getenv("EthFlashChangeMiddleAddress")
 	EthFlashChangeMiddlePrivate = os.Getenv("EthFlashChangeMiddlePrivate")
+	// EthFlashChangeMiddlePrivate, err  = utils.DecryptPrivate(os.Getenv("EthFlashChangeMiddlePrivate"))
+	// if err != nil {
+	// 	panic(err)
+	// }
 }

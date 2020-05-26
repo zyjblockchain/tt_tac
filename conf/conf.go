@@ -2,7 +2,6 @@ package conf
 
 import (
 	"math/big"
-	"os"
 )
 
 const (
@@ -45,23 +44,3 @@ var (
 	EthFlashChangeMiddleAddress = ""
 	EthFlashChangeMiddlePrivate = ""
 )
-
-func InitConf() {
-	// var err error
-	TacMiddleAddressPrivate = os.Getenv("TacMiddleAddressPrivate")
-	TacMiddleAddress = os.Getenv("TacMiddleAddress")
-	// todo 正式环境配置文件中的private是aes加密之后的，所以这里需要解密
-	// TacMiddleAddressPrivate , err = utils.DecryptPrivate(os.Getenv("TacMiddleAddressPrivate"))
-	// if err != nil {
-	// 	panic(err)
-	// }
-
-	Dsn = os.Getenv("MYSQL_DSN")
-
-	EthFlashChangeMiddleAddress = os.Getenv("EthFlashChangeMiddleAddress")
-	EthFlashChangeMiddlePrivate = os.Getenv("EthFlashChangeMiddlePrivate")
-	// EthFlashChangeMiddlePrivate, err  = utils.DecryptPrivate(os.Getenv("EthFlashChangeMiddlePrivate"))
-	// if err != nil {
-	// 	panic(err)
-	// }
-}

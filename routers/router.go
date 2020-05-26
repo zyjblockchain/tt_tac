@@ -67,7 +67,6 @@ func NewRouter(addr string) {
 		v1.GET("/get_pala_price_change_rate", controllers.GetPalaPriceComeUpRate())
 		// 5. 修改闪兑中的pala价格的上浮比例
 		v1.POST("modify_pala_price_change_rate", controllers.ModifyPalaPriceComeUpRate())
-
 	}
 	if err := r.Run(addr); err != nil {
 		panic(err)

@@ -37,6 +37,7 @@
 	"fromAddr":"0x67Adf250F70F6100d346cF8FE3af6DC7A2C23213",
 	"recipientAddr":"0x7AC954Ed6c2d96d48BBad405aa1579C828409f59",
 	"amount":"55.555",
+	"password":"123456",
 	"orderType":2
 }
 ```
@@ -44,7 +45,8 @@
 1. `fromAddress`: pala代币转出地址
 2. `recipientAddr`: pala代币接收地址
 3. `amount`: 跨链转账数量，后面必须加上8个0
-4. `orderType`: 跨链转账的类型，为1表示从以太坊的pala转到tt链的pala, 为2表示从tt链的pala转到以太坊上的pala
+4. `password`: 地址对应的支付密码
+5. `orderType`: 跨链转账的类型，为1表示从以太坊的pala转到tt链的pala, 为2表示从tt链的pala转到以太坊上的pala
 ###### 返回示例
 ```$xslt
 // 成功返回示例，会返回订单号给前端

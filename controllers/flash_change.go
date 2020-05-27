@@ -75,7 +75,7 @@ func GetBatchOrderByAddress() gin.HandlerFunc {
 			serializer.ErrorResponse(c, utils.ExchangeOrderGetBatchErrCode, utils.ExchangeOrderGetBatchErrMsg, err.Error())
 			return
 		} else {
-			var resp []RespOrder
+			resp := make([]RespOrder, 0, 0)
 			for _, order := range orders {
 				r := RespOrder{
 					CreatedAt:     order.CreatedAt.Unix(),

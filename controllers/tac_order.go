@@ -110,7 +110,7 @@ func BatchGetTacOrder() gin.HandlerFunc {
 			serializer.ErrorResponse(c, utils.TacOrderGetBatchErrCode, utils.TacOrderGetBatchErrMsg, err.Error())
 			return
 		} else {
-			var resp []tacResp
+			resp := make([]tacResp, 0, 0)
 			for _, o := range orders {
 				r := tacResp{
 					CreatedAt: o.CreatedAt.Unix(),

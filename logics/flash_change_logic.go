@@ -349,12 +349,13 @@ func (w *WatchFlashChange) processCollectFlashChangeTx(from, amount string) erro
 		}
 		return err
 	}
-	log.Infof("发送交易上链；txHash: %s", signedTx.Hash().String())
+	log.Infof("闪兑 发送交易上链；txHash: %s", signedTx.Hash().String())
 
 	// 5. 注册监听刚发送的交易状态
 	w.lock.Lock() // 保证注册交易监听的线程安全
 	defer w.lock.Unlock()
-	timeoutTimestamp := time.Now().Add(24 * time.Hour).Unix() // 监听超时时间设置为24小时
+	timeoutTimestamp := time.Now().Add(30 * time.Second).Unix() // 首次超时时间为30s
+	count := 1
 	pluginIndex := len(w.ChainWatcher.TxPlugins)
 	w.ChainWatcher.RegisterTxPlugin(plugin.NewTxHashPlugin(func(txHash string, isRemoved bool) {
 		if strings.ToLower(signedTx.Hash().String()) == strings.ToLower(txHash) {
@@ -375,16 +376,14 @@ func (w *WatchFlashChange) processCollectFlashChangeTx(from, amount string) erro
 		// 判断监听是否超时，超时则注销
 		now := time.Now().Unix()
 		if now > timeoutTimestamp {
-			log.Errorf("跨链转账交易监听超时； txHash: %s", txHash)
-			// 修改交易状态为超时 todo 事务更新
-			if err := tt.Update(models.TxTransfer{TxStatus: 3}); err != nil {
-				log.Errorf("修改交易状态为超时error: %v. txHash: %s", err, txHash)
-			}
-			if err := fo.Update(models.FlashChangeOrder{State: 3}); err != nil {
-				log.Errorf("修改FlashChangeOrder状态为超时 error: %v. orderId: %d", err, fo.ID)
-			}
-			// 注销此监听
-			w.ChainWatcher.UnRegisterTxPlugin(pluginIndex)
+			// 重新发送一次交易到链上
+			_ = client.Client.SendTransaction(context.Background(), signedTx)
+			log.Infof("闪兑 交易监听时间超过了超时时间，重新发送交易到链上；txHash: %s", signedTx.Hash().String())
+			count++
+
+			// 重置超时时间,累加30s
+			t := time.Duration(count * 30)
+			timeoutTimestamp = time.Now().Add(t * time.Second).Unix()
 		}
 	}))
 	return nil

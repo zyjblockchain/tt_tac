@@ -230,13 +230,14 @@ func (t *TacProcess) processCollectionTx(from, amount string) error {
 		}
 		return err
 	}
-	log.Infof("发送交易上链；txHash: %s", signedTx.Hash().String())
+	log.Infof("tac 发送交易上链；txHash: %s", signedTx.Hash().String())
 
 	// 5. 注册监听刚发送的交易状态
 	t.lock.Lock() // 保证注册交易监听的线程安全
 	defer t.lock.Unlock()
-	timeoutTimestamp := time.Now().Add(48 * time.Hour).Unix() // 监听超时时间设置为48小时
-	pluginIndex := len(t.ToChainWatcher.TxPlugins)            // todo 线程不安全
+	timeoutTimestamp := time.Now().Add(10 * time.Second).Unix() // 首次超时时间为10s
+	count := 1
+	pluginIndex := len(t.ToChainWatcher.TxPlugins) // todo 线程不安全
 	t.ToChainWatcher.RegisterTxPlugin(plugin.NewTxHashPlugin(func(txHash string, isRemoved bool) {
 		if strings.ToLower(signedTx.Hash().String()) == strings.ToLower(txHash) {
 			// 监听到此交易
@@ -253,21 +254,16 @@ func (t *TacProcess) processCollectionTx(from, amount string) error {
 			t.ToChainWatcher.UnRegisterTxPlugin(pluginIndex)
 			return
 		}
-		// 判断监听是否超时，超时则注销
+		// 判断监听是否超时，超时则重新发送交易到链上(因为tt链存在分叉把交易丢失的情况)
 		now := time.Now().Unix()
 		if now > timeoutTimestamp {
-			// 把获取的address nonce 置为 fail
-			client.SetFailNonce(tt.SenderAddress, nonce)
-			log.Errorf("跨链转账交易监听超时； txHash: %s", txHash)
-			// 修改交易状态为超时 todo 事务更新
-			if err := tt.Update(models.TxTransfer{TxStatus: 3}); err != nil {
-				log.Errorf("修改交易状态为超时error: %v. txHash: %s", err, txHash)
-			}
-			if err := ord.Update(models.TacOrder{State: 3}); err != nil {
-				log.Errorf("修改order状态为超时 error: %v. orderId: %d", err, ord.ID)
-			}
-			// 注销此监听
-			t.ToChainWatcher.UnRegisterTxPlugin(pluginIndex)
+			// 重新发送一次交易到链上
+			_ = client.Client.SendTransaction(context.Background(), signedTx)
+			log.Infof("tac 交易监听时间超过了超时时间，重新发送交易到链上；txHash: %s", signedTx.Hash().String())
+			count++
+			// 重置超时时间,累加10s
+			t := time.Duration(count * 20)
+			timeoutTimestamp = time.Now().Add(t * time.Second).Unix()
 		}
 	}))
 	return nil

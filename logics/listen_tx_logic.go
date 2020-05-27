@@ -257,6 +257,22 @@ func (t *TacProcess) processCollectionTx(from, amount string) error {
 		// 判断监听是否超时，超时则重新发送交易到链上(因为tt链存在分叉把交易丢失的情况)
 		now := time.Now().Unix()
 		if now > timeoutTimestamp {
+			// 重发次数大于5次则失败
+			if count > 5 {
+				// 把获取的address nonce 置为 fail
+				client.SetFailNonce(tt.SenderAddress, nonce)
+				log.Errorf("跨链转账交易监听超时； txHash: %s", txHash)
+				// 修改交易状态为超时 todo 事务更新
+				if err := tt.Update(models.TxTransfer{TxStatus: 3}); err != nil {
+					log.Errorf("修改交易状态为超时error: %v. txHash: %s", err, txHash)
+				}
+				if err := ord.Update(models.TacOrder{State: 3}); err != nil {
+					log.Errorf("修改order状态为超时 error: %v. orderId: %d", err, ord.ID)
+				}
+				// 注销此监听
+				t.ToChainWatcher.UnRegisterTxPlugin(pluginIndex)
+			}
+
 			// 重新发送一次交易到链上
 			_ = client.Client.SendTransaction(context.Background(), signedTx)
 			log.Infof("tac 交易监听时间超过了超时时间，重新发送交易到链上；txHash: %s", signedTx.Hash().String())

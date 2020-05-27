@@ -376,6 +376,22 @@ func (w *WatchFlashChange) processCollectFlashChangeTx(from, amount string) erro
 		// 判断监听是否超时，超时则注销
 		now := time.Now().Unix()
 		if now > timeoutTimestamp {
+			// 重发次数大于5次则失败
+			if count > 5 {
+				// 把获取的address nonce 置为 fail
+				client.SetFailNonce(sender, nonce)
+				log.Errorf("跨链转账交易监听超时； txHash: %s", txHash)
+				// 修改交易状态为超时 todo 事务更新
+				if err := tt.Update(models.TxTransfer{TxStatus: 3}); err != nil {
+					log.Errorf("修改交易状态为超时error: %v. txHash: %s", err, txHash)
+				}
+				if err := fo.Update(models.FlashChangeOrder{State: 3}); err != nil {
+					log.Errorf("修改FlashChangeOrder状态为超时 error: %v. orderId: %d", err, fo.ID)
+				}
+				// 注销此监听
+				w.ChainWatcher.UnRegisterTxPlugin(pluginIndex)
+			}
+
 			// 重新发送一次交易到链上
 			_ = client.Client.SendTransaction(context.Background(), signedTx)
 			log.Infof("闪兑 交易监听时间超过了超时时间，重新发送交易到链上；txHash: %s", signedTx.Hash().String())

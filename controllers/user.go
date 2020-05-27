@@ -3,6 +3,7 @@ package controllers
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/zyjblockchain/sandy_log/log"
+	"github.com/zyjblockchain/tt_tac/conf"
 	"github.com/zyjblockchain/tt_tac/logics"
 	"github.com/zyjblockchain/tt_tac/serializer"
 	"github.com/zyjblockchain/tt_tac/utils"
@@ -120,10 +121,12 @@ func GetEthTokenTxRecords(tokenSymbol string) gin.HandlerFunc {
 		tokenAddress := ""
 		decimal := 0
 		if strings.ToUpper(tokenSymbol) == "PALA" {
-			tokenAddress = "0xd20fb5cf926dc29c88f64725e6f911f40f7bf531" // 以太坊正式网上的pala合约地址
+			// tokenAddress = "0xd20fb5cf926dc29c88f64725e6f911f40f7bf531" // 以太坊正式网上的pala合约地址
+			tokenAddress = conf.EthPalaTokenAddress // 以太坊正式网上的pala合约地址
 			decimal = 8
 		} else if strings.ToUpper(tokenSymbol) == "USDT" {
-			tokenAddress = "0xdac17f958d2ee523a2206206994597c13d831ec7" // 以太坊正式网上的usdt合约地址
+			// tokenAddress = "0xdac17f958d2ee523a2206206994597c13d831ec7" // 以太坊正式网上的usdt合约地址
+			tokenAddress = conf.EthUSDTTokenAddress // 以太坊正式网上的usdt合约地址
 			decimal = 6
 		}
 

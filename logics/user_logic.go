@@ -183,7 +183,7 @@ func (p *TokenTxsReceiveRecord) GetEthTokenTxRecord(tokenAddress string, decimal
 	if p.Limit == 0 {
 		p.Limit = 5
 	}
-	// 拉取最近的Limit条pala token记录
+	// 拉取最近的Limit条 token记录
 	txs, err := utils.GetAddressTokenTransfers(tokenAddress, address, p.Page, p.Limit)
 	if err != nil {
 		log.Errorf("获取收款记录失败：err: %v, address: %s", err, address)

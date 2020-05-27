@@ -25,8 +25,8 @@ func GetAddressTokenTransfers(contractaddress, address string, page, offset int)
 	}
 	apiKey := apiKeyPool[index]
 
-	// todo url := fmt.Sprintf("https://api-cn.etherscan.com/api?module=account&action=tokentx&contractaddress=%s&address=%s&page=%d&offset=%d&sort=desc&apikey=%s", contractaddress, address, page, offset, apiKey)
-	url := fmt.Sprintf("https://api-rinkeby.etherscan.io/api?module=account&action=tokentx&contractaddress=%s&address=%s&page=%d&offset=%d&sort=desc&apikey=%s", contractaddress, address, page, offset, apiKey)
+	url := fmt.Sprintf("https://api-cn.etherscan.com/api?module=account&action=tokentx&contractaddress=%s&address=%s&page=%d&offset=%d&sort=desc&apikey=%s", contractaddress, address, page, offset, apiKey)
+	// url := fmt.Sprintf("https://api-rinkeby.etherscan.io/api?module=account&action=tokentx&contractaddress=%s&address=%s&page=%d&offset=%d&sort=desc&apikey=%s", contractaddress, address, page, offset, apiKey) // for test
 	resp, err := http.Get(url)
 	if err != nil {
 		log.Errorf("get etherscan err: %v", err)

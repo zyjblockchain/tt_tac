@@ -13,7 +13,7 @@ import (
 )
 
 type SendTacTx struct {
-	TacOrderId uint   `json:"tac_order_id"`
+	TacOrderId uint   `json:"tac_order_id" binding:"required,min=1"`
 	Address    string `json:"address" binding:"required"`
 	Password   string `json:"password" binding:"required"`
 	Amount     string `json:"amount" binding:"required"`

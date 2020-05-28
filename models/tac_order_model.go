@@ -11,8 +11,10 @@ type TacOrder struct {
 	RecipientAddr string
 	Amount        string
 	OrderType     int
-	State         int  // 订单状态, 0: pending; 1.完成；2.失败; 3. 超时
-	CollectionId  uint // collection 表的外键
+	State         int    // 订单状态, 0: pending; 1.完成；2.失败; 3. 超时
+	SendTxHash    string // 跨链转账申请者发送给中间地址的交易hash
+	ReceiveTxHash string // 中间地址发送给申请者的交易hash
+	CollectionId  uint   // collection 表的外键
 }
 
 func (TacOrder) TableName() string {
@@ -69,4 +71,15 @@ func (o *TacOrder) GetBatchTacOrder(orderType int, fromAddress string, page uint
 		return nil, 0, err
 	}
 	return orders, total, nil
+}
+
+// GetTacOrdersByState 获取所有的state状态的order,只返回collection_id
+func (o *TacOrder) GetTacOrdersByState(state int) ([]*TacOrder, error) {
+	var orders []*TacOrder
+	err := DB.Select("collection_id, id").Where("state = ?", state).Find(&orders).Error
+	if err != nil {
+		log.Errorf("get batch by operate address err: %v", err)
+		return nil, err
+	}
+	return orders, nil
 }

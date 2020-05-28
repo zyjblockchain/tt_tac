@@ -250,6 +250,8 @@ func (t *TacProcess) processCollectionTx(from, amount string) error {
 		}
 		return err
 	}
+	// 更新发送交易的hash到tacOrder的ReceiveTxHash上
+	_ = ord.Update(models.TacOrder{ReceiveTxHash: signedTx.Hash().String()}) // todo 不是很重要的更新字段  忽略error
 	log.Infof("tac 发送交易上链；txHash: %s", signedTx.Hash().String())
 
 	// 5. 注册监听刚发送的交易状态

@@ -36,7 +36,6 @@ func (f *FlashChangeOrder) Get() (*FlashChangeOrder, error) {
 func (f *FlashChangeOrder) Exist(operateAddr, fromTokenAddr, toTokenAddr string, state int) bool {
 	var ff FlashChangeOrder
 	err := DB.Where("operate_address = ? AND from_token_address = ? AND	to_token_address = ? AND state = ?", operateAddr, fromTokenAddr, toTokenAddr, state).First(&ff).Error
-	log.Errorf("////: %v", err)
 	return !(err == gorm.ErrRecordNotFound)
 }
 

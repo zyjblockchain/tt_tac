@@ -13,10 +13,11 @@ import (
 )
 
 type SendTacTx struct {
-	Address   string `json:"address" binding:"required"`
-	Password  string `json:"password" binding:"required"`
-	Amount    string `json:"amount" binding:"required"`
-	OrderType int    `json:"order_type" binding:"required"`
+	TacOrderId uint   `json:"tac_order_id"`
+	Address    string `json:"address" binding:"required"`
+	Password   string `json:"password" binding:"required"`
+	Amount     string `json:"amount" binding:"required"`
+	OrderType  int    `json:"order_type" binding:"required"`
 }
 
 func (s *SendTacTx) SendTacTx() (string, error) {
@@ -90,6 +91,7 @@ func (s *SendTacTx) send(chainNetUrl string, chainId int64, private string, toke
 		log.Errorf("获取nonce失败, error: %v", err)
 		return "", err
 	}
+	log.Infof("申请者跨链转账发送交易到中转地址的tx nonce: %d", nonce)
 	// 3. 获取suggest gasPrice
 	suggestPrice, err := client.Client.SuggestGasPrice(context.Background())
 	if err != nil {

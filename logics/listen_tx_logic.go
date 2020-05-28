@@ -80,9 +80,16 @@ func (t *TacProcess) processCollectionTx(from, amount string) error {
 		log.Errorf("保存collection失败：error: %v", err)
 		return err
 	}
-
+	var ordType int
+	if t.ChainNetUrl == conf.EthChainNet {
+		ordType = conf.EthToTtOrderType
+	} else if t.ChainNetUrl == conf.TTChainNet {
+		ordType = conf.TtToEthOrderType
+	} else {
+		return errors.New("判断不了watcher监听到的orderType")
+	}
 	// 2. 从订单表中查询是否存在from的订单
-	ord, err := (&models.TacOrder{FromAddr: from}).GetOrder()
+	ord, err := (&models.TacOrder{FromAddr: from, Amount: amount, OrderType: ordType, State: 0}).GetOrder()
 	if err != nil {
 		// todo 监听到的收款信息在order中查不到，可能是充值余额到中转地址的操作，所以不用退还，需要钉钉推送通知
 		content := fmt.Sprintf("tac 收到了一笔没有转账订单的转入交易；\nfrom: %s, \nto: %s, \ntokenAddress: %s, \namount: %s",

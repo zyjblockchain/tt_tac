@@ -25,7 +25,7 @@ func SendTacTx() gin.HandlerFunc {
 		}
 		// 把传入的amount换算成最小单位
 		logic.Amount = utils.FormatTokenAmount(logic.Amount, 8)
-		log.Infof("发送跨链转账交易前端传入参数：Address：%s, amount: %s, orderType: %d", logic.Address, logic.Amount, logic.OrderType)
+		log.Infof("发送跨链转账交易前端传入参数：Address：%s, amount: %s, orderType: %d, tacOrderId: %d", logic.Address, logic.Amount, logic.OrderType, logic.TacOrderId)
 		// logic
 		txHash, err := logic.SendTacTx()
 		if err != nil {

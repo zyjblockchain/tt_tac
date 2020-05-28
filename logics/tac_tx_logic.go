@@ -44,7 +44,7 @@ func (s *SendTacTx) SendTacTx() (string, error) {
 		}
 		tokenAddress := common.HexToAddress(conf.EthPalaTokenAddress)
 		toAddress := common.HexToAddress(conf.TacMiddleAddress)
-		log.Infof("申请eth到tt的跨链转账用户开始发送eth_pala交易到中转地址, address: %s, palaAmount: %s", s.Amount, s.Address)
+		log.Infof("申请eth到tt的跨链转账用户开始发送eth_pala交易到中转地址, palaAmount: %s, address: %s", s.Amount, s.Address)
 		txHash, err := s.send(chainNetUrl, int64(chainId), private, tokenAddress, toAddress)
 		return txHash, err
 
@@ -59,7 +59,7 @@ func (s *SendTacTx) SendTacTx() (string, error) {
 		}
 		tokenAddress := common.HexToAddress(conf.TtPalaTokenAddress)
 		toAddress := common.HexToAddress(conf.TacMiddleAddress)
-		log.Infof("申请tt到eth的跨链转账用户开始发送tt_pala交易到中转地址, address: %s, palaAmount: %s", s.Amount, s.Address)
+		log.Infof("申请tt到eth的跨链转账用户开始发送tt_pala交易到中转地址, palaAmount: %s, address: %s", s.Amount, s.Address)
 		txHash, err := s.send(chainNetUrl, int64(chainId), private, tokenAddress, toAddress)
 		return txHash, err
 

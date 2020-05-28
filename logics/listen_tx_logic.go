@@ -89,13 +89,13 @@ func (t *TacProcess) processCollectionTx(from, amount string) error {
 		return errors.New("判断不了watcher监听到的orderType")
 	}
 	// 2. 从订单表中查询是否存在from的订单
-	ord, err := (&models.TacOrder{FromAddr: from, Amount: amount, OrderType: ordType, State: 0}).GetOrder()
-	if err != nil {
+	// ord, err := (&models.TacOrder{FromAddr: from, Amount: amount, OrderType: ordType, State: 0}).GetOrder()
+	ord, exist := new(models.TacOrder).Exist(from, amount, ordType, 0)
+	if !exist {
 		// todo 监听到的收款信息在order中查不到，可能是充值余额到中转地址的操作，所以不用退还，需要钉钉推送通知
 		content := fmt.Sprintf("tac 收到了一笔没有转账订单的转入交易；\nfrom: %s, \nto: %s, \ntokenAddress: %s, \namount: %s",
 			utils.FormatAddressHex(from), utils.FormatAddressHex(t.TransferMiddleAddress), utils.FormatAddressHex(t.TransferTokenAddress), amount)
 		_ = ding_robot.NewRobot(utils.WebHook).SendText(content, nil, false)
-		log.Errorf("通过fromAddr查询订单表失败：from: %s, err: %v", from, err)
 		return nil
 	}
 

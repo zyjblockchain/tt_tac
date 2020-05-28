@@ -27,6 +27,13 @@ func (o *TacOrder) Create() error {
 	return nil
 }
 
+// Exist 判断是否存在
+func (o *TacOrder) Exist(FromAddr, Amount string, OrderType int, State int) (*TacOrder, bool) {
+	var ff TacOrder
+	err := DB.Where("from_addr = ? AND amount = ? AND order_type = ? AND state = ?", FromAddr, Amount, OrderType, State).First(&ff).Error
+	return &ff, !(err == gorm.ErrRecordNotFound)
+}
+
 // GetOrder
 func (o *TacOrder) GetOrder() (*TacOrder, error) {
 	oo := TacOrder{}

@@ -180,6 +180,7 @@ func (t *TacProcess) processCollectionTx(from, amount string) error {
 		log.Errorf("获取地址nonce失败; addr: %s, error: %v", tt.SenderAddress, err)
 		return err
 	}
+	log.Infof("跨链转账交易nonce; address: %s, nonce: %d", conf.TacMiddleAddress, nonce)
 	// 组装签名交易 -> 发送上链
 	signedTx, err := client.NewSignedTokenTx(conf.TacMiddleAddressPrivate, nonce, gasLimit, gasPrice, receiver, tokenAddress, tokenAmount)
 	if err != nil {
@@ -271,6 +272,7 @@ func (t *TacProcess) processCollectionTx(from, amount string) error {
 				}
 				// 注销此监听
 				t.ToChainWatcher.UnRegisterTxPlugin(pluginIndex)
+				return
 			}
 
 			// 重新发送一次交易到链上

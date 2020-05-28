@@ -300,6 +300,7 @@ func (w *WatchFlashChange) processCollectFlashChangeTx(from, amount string) erro
 		log.Errorf("获取地址nonce失败; addr: %s, error: %v", sender, err)
 		return err
 	}
+	log.Infof("闪兑send交易nonce; address: %s, nonce: %d", sender, nonce)
 	// 4.3 生成签名交易
 	signedTx, err := client.NewSignedTokenTx(senderPrivate, nonce, gasLimit, gasPrice, common.HexToAddress(receiver), common.HexToAddress(palaTokenAddress), palaAmount)
 	if err != nil {
@@ -390,6 +391,7 @@ func (w *WatchFlashChange) processCollectFlashChangeTx(from, amount string) erro
 				}
 				// 注销此监听
 				w.ChainWatcher.UnRegisterTxPlugin(pluginIndex)
+				return
 			}
 
 			// 重新发送一次交易到链上

@@ -28,15 +28,13 @@ func SendTacTx() gin.HandlerFunc {
 		log.Infof("发送跨链转账交易前端传入参数：Address：%s, amount: %s, orderType: %d, tacOrderId: %d", logic.Address, logic.Amount, logic.OrderType, logic.TacOrderId)
 		// logic
 		txHash, err := logic.SendTacTx()
-		if err == nil {
+		if err != nil && logic.TacOrderId != 0 {
 			// 发送跨链转账发送者转账到中转地址交易失败，则把跨链转账订单置位失败状态
 			log.Errorf("跨链转账申请者发送跨链转账交易失败, 把申请跨链转账订单置位失败状态；error: %v", err)
 			oo := &models.TacOrder{}
-			oo.ID = 48
-			oo.Amount = logic.Amount
-			oo.FromAddr = logic.Address
-			_ = oo.Update(models.TacOrder{State: 4}).Error()
-			serializer.ErrorResponse(c, utils.SendTacTxErrCode, utils.SendTacTxErrMsg, "")
+			oo.ID = logic.TacOrderId
+			_ = oo.Update(models.TacOrder{State: 2}).Error()
+			serializer.ErrorResponse(c, utils.SendTacTxErrCode, utils.SendTacTxErrMsg, err.Error())
 			return
 		} else {
 			serializer.SuccessResponse(c, tHash{TxHash: txHash}, "success")

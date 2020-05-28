@@ -172,6 +172,9 @@ func FormatTokenAmount(input string, decimal int) string {
 	} else {
 		if len(arr[1]) < decimal {
 			arr[1] = arr[1] + strings.Repeat("0", decimal-len(arr[1]))
+		} else if len(arr[1]) > decimal {
+			// input的小数部分长度已经大于decimal则截取长度
+			arr[1] = arr[1][:decimal]
 		}
 		result = arr[0] + arr[1]
 	}

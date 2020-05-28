@@ -360,7 +360,7 @@ func (w *WatchFlashChange) processCollectFlashChangeTx(from, amount string) erro
 	w.ChainWatcher.RegisterTxPlugin(plugin.NewTxHashPlugin(func(txHash string, isRemoved bool) {
 		if strings.ToLower(signedTx.Hash().String()) == strings.ToLower(txHash) {
 			// 监听到此交易
-			log.Infof("链上监听到成功发送的跨链转账交易；txHash: %s", txHash)
+			log.Infof("链上监听到成功发送的闪兑发送交易；txHash: %s", txHash)
 			// 1. 修改交易状态为成功 todo 事务更新
 			if err := tt.Update(models.TxTransfer{TxStatus: 1}); err != nil {
 				log.Errorf("修改交易状态为success error: %v. txHash: %s", err, txHash)

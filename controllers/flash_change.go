@@ -21,6 +21,7 @@ func FlashChange() gin.HandlerFunc {
 			return
 		}
 		// 单位换算
+		log.Infof("闪兑的usdt数量：%s; 接收的pala数量： %s", logic.FromTokenAmount, logic.ToTokenAmount)
 		logic.FromTokenAmount = utils.FormatTokenAmount(logic.FromTokenAmount, 6) // usdt的单位换算
 		logic.ToTokenAmount = utils.FormatTokenAmount(logic.ToTokenAmount, 8)     // pala单位换算
 		// logic

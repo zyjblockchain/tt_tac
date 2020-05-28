@@ -36,7 +36,7 @@ func SendTacTx() gin.HandlerFunc {
 			oo.Amount = logic.Amount
 			oo.FromAddr = logic.Address
 			_ = oo.Update(models.TacOrder{State: 4}).Error()
-			serializer.ErrorResponse(c, utils.SendTacTxErrCode, utils.SendTacTxErrMsg, err.Error())
+			serializer.ErrorResponse(c, utils.SendTacTxErrCode, utils.SendTacTxErrMsg, "")
 			return
 		} else {
 			serializer.SuccessResponse(c, tHash{TxHash: txHash}, "success")

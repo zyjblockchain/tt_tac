@@ -38,11 +38,11 @@ func (ord *Order) CreateOrder() (uint, error) {
 		State:         0,
 	}
 	// 查看数据库中是否存在相同的订单
-	_, exist := order.Exist(order.FromAddr, order.Amount, order.OrderType, order.State)
+	exist := order.HasPendingOrder(order.FromAddr, order.OrderType, 0)
 	if exist {
 		// 数据库中存在
-		log.Errorf("数据库中存在相同的跨链转账订单；FromAddr：%s, Amount: %s, OrderType: %d, State: %d", order.FromAddr, order.Amount, order.OrderType, order.State)
-		return 0, errors.New("数据库中存在相同的跨链转账订单，请修改转账金额或者等待上一个订单完成之后再重试")
+		log.Errorf("数据库中存在相同地址下的相同类型正在pending的跨链转账订单；FromAddr：%s, Amount: %s, OrderType: %d, State: %d", order.FromAddr, order.Amount, order.OrderType, order.State)
+		return 0, errors.New("数据库中存在相同地址下的相同类型正在pending的跨链转账订单，请等待上一个跨链转账订单完成之后再重试")
 	}
 	// 保存到数据库
 	err = order.Create()

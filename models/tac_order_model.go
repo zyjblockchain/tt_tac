@@ -27,11 +27,18 @@ func (o *TacOrder) Create() error {
 	return nil
 }
 
-// Exist 判断是否存在
+// Exist 判断是否存在相同的订单
 func (o *TacOrder) Exist(FromAddr, Amount string, OrderType int, State int) (*TacOrder, bool) {
 	var ff TacOrder
 	err := DB.Where("from_addr = ? AND amount = ? AND order_type = ? AND state = ?", FromAddr, Amount, OrderType, State).First(&ff).Error
 	return &ff, !(err == gorm.ErrRecordNotFound)
+}
+
+// HasPendingOrder 存在pending中的同类型的订单
+func (o *TacOrder) HasPendingOrder(FromAddr string, OrderType int, State int) bool {
+	var ff TacOrder
+	err := DB.Where("from_addr = ? AND order_type = ? AND state = ?", FromAddr, OrderType, State).First(&ff).Error
+	return !(err == gorm.ErrRecordNotFound)
 }
 
 // GetOrder

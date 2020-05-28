@@ -26,6 +26,7 @@ func ApplyOrder() gin.HandlerFunc {
 		}
 		// 单位换算
 		svr.Amount = utils.FormatTokenAmount(svr.Amount, 8)
+		log.Infof("创建跨链转账订单前端传入参数: address: %s, amount: %s, orderType: %d", svr.FromAddr, svr.Amount, svr.OrderType)
 		// logic
 		orderId, err := svr.CreateOrder()
 		if err != nil {

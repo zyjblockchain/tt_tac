@@ -33,7 +33,9 @@ func SendTacTx() gin.HandlerFunc {
 			log.Errorf("跨链转账申请者发送跨链转账交易失败, 把申请跨链转账订单置位失败状态；error: %v", err)
 			oo := &models.TacOrder{}
 			oo.ID = logic.TacOrderId
-			_ = oo.Update(models.TacOrder{State: 2})
+			oo.Amount = logic.Amount
+			oo.FromAddr = logic.Address
+			_ = oo.Update(models.TacOrder{State: 4}).Error()
 			serializer.ErrorResponse(c, utils.SendTacTxErrCode, utils.SendTacTxErrMsg, err.Error())
 			return
 		} else {

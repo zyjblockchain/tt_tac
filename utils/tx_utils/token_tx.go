@@ -54,19 +54,22 @@ func NewChainClient(chainNetUrl string, chainId *big.Int) *ChainClient {
 func (c *ChainClient) SetFailNonce(address string, nonce uint64) {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
-	failNonceMap[address] = nonce
+	key := address + c.ChainId.String()
+	failNonceMap[key] = nonce
 }
 
 // GetLatestNonce
 func (c *ChainClient) GetLatestNonce(address string) (uint64, error) {
 	c.mutex.Lock()
 	defer c.mutex.Unlock()
+	key := address + c.ChainId.String()
+
 	// 查看是否有之前使用失败的nonce可以再次使用
-	failNonce, ok := failNonceMap[address]
+	failNonce, ok := failNonceMap[key]
 	if ok {
 		// 使用该nonce
 		// 先把此地址的fail nonce记录删除掉
-		delete(failNonceMap, address)
+		delete(failNonceMap, key)
 		return failNonce, nil
 	}
 
@@ -75,27 +78,27 @@ func (c *ChainClient) GetLatestNonce(address string) (uint64, error) {
 		log.Errorf("从链上获取nonce失败：%v", err)
 		return 0, err
 	}
-	stable, ok := stableNonceMap[address]
+	stable, ok := stableNonceMap[key]
 	if ok { // 存在
 		if txNonce == stable {
-			latest := latestNonceMap[address]
+			latest := latestNonceMap[key]
 			txNonce = latest + 1
-			latestNonceMap[address] = txNonce
+			latestNonceMap[key] = txNonce
 		} else {
 			// 最新的链上nonce已经大于stable
-			stableNonceMap[address] = txNonce
+			stableNonceMap[key] = txNonce
 			// txNonce和latestNonce比较
-			latest := latestNonceMap[address]
+			latest := latestNonceMap[key]
 			if txNonce <= latest {
 				txNonce = latest + 1
 			}
 			// 更新latestNonce
-			latestNonceMap[address] = txNonce
+			latestNonceMap[key] = txNonce
 		}
 	} else {
 		// 记录新地址
-		stableNonceMap[address] = txNonce
-		latestNonceMap[address] = txNonce
+		stableNonceMap[key] = txNonce
+		latestNonceMap[key] = txNonce
 	}
 	return txNonce, nil
 }

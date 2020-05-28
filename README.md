@@ -95,9 +95,10 @@
 ###### 请求参数
 ```$xslt
 {
-	"address": "0x59375A522876aB96B0ed2953D0D3b92674701Cc2",
+	"address": "0x67Adf250F70F6100d346cF8FE3af6DC7A2C23213",
 	"password":"123456",
-	"amount":"911.00",
+	"amount":"55.555",
+	"tac_order_id": 11,
 	"order_type":2
 }
 ```
@@ -106,6 +107,7 @@
 2. password: 钱包支付密钥
 3. amount: 跨链金额
 4. order_type: 跨链类型。1表示从eth_pala转到tt_pala，2则相反
+5. tac_order_id：跨链转账订单返回来的订单id
 ###### 返回示例
 ```$xslt
 // 返回交易hash

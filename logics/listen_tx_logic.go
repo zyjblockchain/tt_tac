@@ -53,7 +53,7 @@ func (t *TacProcess) ListenErc20CollectionAddress() {
 				err := t.processCollectionTx(from, amount.String())
 				if err != nil {
 					// 钉钉群推送
-					content := fmt.Sprintf("tac 跨链转账失败；\nfrom：%s, \ntokenAddress: %s, \namount: %s", utils.FormatAddressHex(from), tokenAddress, amount.String())
+					content := fmt.Sprintf("tac 跨链转账失败；\nfrom：%s, \ntokenAddress: %s, \namount: %s. \nerror: %s", utils.FormatAddressHex(from), tokenAddress, amount.String(), err.Error())
 					_ = ding_robot.NewRobot(utils.WebHook).SendText(content, nil, false)
 					log.Errorf("执行跨链转账逻辑失败，error: %v；from: %s; to: %s; amount: %s; tokenAddress: %s", err, utils.FormatAddressHex(from), utils.FormatAddressHex(to), amount.String(), tokenAddress)
 				}
@@ -143,11 +143,17 @@ func (t *TacProcess) processCollectionTx(from, amount string) error {
 	}
 	if err := tt.Create(); err != nil {
 		log.Errorf("保存txTransfer error: %v", err)
+		if err := ord.Update(models.TacOrder{State: 2}); err != nil {
+			log.Errorf("修改order状态为失败状态 error: %v. orderId: %d", err, ord.ID)
+		}
 		return err
 	}
 	// 更新collection表中的TxId
 	if err := cc.Update(models.CollectionTx{TxId: tt.ID}); err != nil {
 		log.Errorf("更新collectionTx中的TxId失败：%v", err)
+		if err := ord.Update(models.TacOrder{State: 2}); err != nil {
+			log.Errorf("修改order状态为失败状态 error: %v. orderId: %d", err, ord.ID)
+		}
 		return err
 	}
 	// 4.2 发送交易
@@ -160,9 +166,15 @@ func (t *TacProcess) processCollectionTx(from, amount string) error {
 	tokenBala, err := client.GetTokenBalance(common.HexToAddress(conf.TacMiddleAddress), tokenAddress)
 	if err != nil {
 		log.Errorf("获取token balance error: %v, address: %s, tokenAddress: %s", err, conf.TacMiddleAddress, tt.TokenAddress)
+		if err := ord.Update(models.TacOrder{State: 2}); err != nil {
+			log.Errorf("修改order状态为失败状态 error: %v. orderId: %d", err, ord.ID)
+		}
 		return err
 	}
 	if tokenBala.Cmp(tokenAmount) < 0 {
+		if err := ord.Update(models.TacOrder{State: 2}); err != nil {
+			log.Errorf("修改order状态为失败状态 error: %v. orderId: %d", err, ord.ID)
+		}
 		return errors.New("跨链转账中转地址上的token余额不足")
 	}
 	// gasLimit, err := client.EstimateTokenTxGas(tokenAmount, common.HexToAddress(tt.SenderAddress), tokenAddress, receiver)

@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
 	"github.com/joho/godotenv"
 	"github.com/zyjblockchain/sandy_log/log"
@@ -10,6 +11,7 @@ import (
 	"github.com/zyjblockchain/tt_tac/models"
 	"github.com/zyjblockchain/tt_tac/routers"
 	"github.com/zyjblockchain/tt_tac/utils"
+	"github.com/zyjblockchain/tt_tac/utils/ding_robot"
 	eth_watcher "github.com/zyjblockchain/tt_tac/utils/eth-watcher"
 	"os"
 )
@@ -26,6 +28,10 @@ func main() {
 	go func() {
 		err := ethChainWather.RunTillExit()
 		if err != nil {
+			log.Errorf("以太坊上的block watcher error: %v", err)
+			// 钉钉推送
+			content := fmt.Sprintf("以太坊上的block watcher返回error,服务已经停止，请重启服务")
+			_ = ding_robot.NewRobot(utils.WebHook).SendText(content, nil, true)
 			panic(err)
 		}
 	}()
@@ -35,6 +41,10 @@ func main() {
 	go func() {
 		err := ttChainWather.RunTillExit()
 		if err != nil {
+			log.Errorf("thundercore上的block watcher error: %v", err)
+			// 钉钉推送
+			content := fmt.Sprintf("thundercore上的block watcher返回error,服务已经停止，请重启服务")
+			_ = ding_robot.NewRobot(utils.WebHook).SendText(content, nil, true)
 			panic(err)
 		}
 	}()

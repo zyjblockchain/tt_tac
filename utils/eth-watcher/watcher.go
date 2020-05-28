@@ -497,7 +497,7 @@ func (watcher *AbstractWatcher) popBlocksUntilReachMainChain() error {
 
 					watcher.NewTxAndReceiptChan <- structs.NewRemovableTxAndReceipt(tuple.Tx, tuple.Receipt, true, block.Timestamp())
 				} else {
-					fmt.Printf("all txAndReceipts removed for block: %+v", removedBlock)
+					fmt.Printf("all txAndReceipts removed for block: %d", removedBlock.Number())
 					break
 				}
 			}

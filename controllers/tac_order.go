@@ -31,6 +31,11 @@ func ApplyOrder() gin.HandlerFunc {
 		orderId, err := svr.CreateOrder()
 		if err != nil {
 			log.Errorf("create order logic err: %v", err)
+			if err == utils.VerifyPasswordErr {
+				serializer.ErrorResponse(c, utils.CheckPasswordErrCode, utils.CheckPasswordErrMsg, "密码错误")
+				return
+			}
+
 			serializer.ErrorResponse(c, utils.OrderLogicErrCode, utils.OrderLogicErrMsg, err.Error())
 			return
 		} else {

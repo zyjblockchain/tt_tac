@@ -30,7 +30,7 @@ func (s *SendTacTx) SendTacTx() (string, error) {
 	// 验证password是否正确
 	if !u.CheckPassword(s.Password) {
 		log.Errorf("密码有误")
-		return "", errors.New("密码验证不通过")
+		return "", utils.VerifyPasswordErr
 	}
 	// 查看是那种跨链类型
 	switch s.OrderType {

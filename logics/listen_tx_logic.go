@@ -50,7 +50,7 @@ func (t *TacProcess) ListenErc20CollectionAddress() {
 			// 监听到转入的交易
 			// 开启一个协程来执行处理此交易
 			go func() {
-				err := t.processCollectionTx(from, amount.String())
+				err := t.ProcessCollectionTx(from, amount.String())
 				if err != nil {
 					// 钉钉群推送
 					content := fmt.Sprintf("tac 跨链转账失败；\nfrom：%s, \ntokenAddress: %s, \namount: %s. \nerror: %s", utils.FormatAddressHex(from), tokenAddress, amount.String(), err.Error())
@@ -62,8 +62,8 @@ func (t *TacProcess) ListenErc20CollectionAddress() {
 	}))
 }
 
-// processCollectionTx 处理接收token逻辑
-func (t *TacProcess) processCollectionTx(from, amount string) error {
+// ProcessCollectionTx 处理接收token逻辑
+func (t *TacProcess) ProcessCollectionTx(from, amount string) error {
 	if len(from) != 42 {
 		from = utils.FormatAddressHex(from)
 	}

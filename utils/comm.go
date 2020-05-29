@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"errors"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/zyjblockchain/tt_tac/conf"
@@ -9,6 +10,9 @@ import (
 )
 
 var WebHook = "https://oapi.dingtalk.com/robot/send?access_token=b4ff4c39e202803e650886c6a93003e5423796525d9ff1f777c13a2a03762da8"
+var (
+	VerifyPasswordErr = errors.New("支付密码验证不通过")
+)
 
 var (
 	VerifyParamsErrCode = 40001

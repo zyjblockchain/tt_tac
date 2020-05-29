@@ -30,6 +30,10 @@ func FlashChange() gin.HandlerFunc {
 		logic.ToTokenAddress = conf.EthPalaTokenAddress
 		orderId, err := logic.FlashChange()
 		if err != nil {
+			if err == utils.VerifyPasswordErr {
+				serializer.ErrorResponse(c, utils.CheckPasswordErrCode, utils.CheckPasswordErrMsg, "密码错误")
+				return
+			}
 			log.Errorf("FlashChange logic err: %v", err)
 			serializer.ErrorResponse(c, utils.SendFlashChangeTxErrCode, utils.SendFlashChangeTxErrMsg, err.Error())
 			return

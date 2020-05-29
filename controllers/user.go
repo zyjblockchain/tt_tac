@@ -119,7 +119,7 @@ func CheckPassword() gin.HandlerFunc {
 		// logic
 		err, check := logic.CheckPwd()
 		if err != nil {
-			serializer.ErrorResponse(c, utils.CheckPasswordErrCode, utils.CheckPasswordErrMsg, "地址不存在")
+			serializer.ErrorResponse(c, utils.CheckPasswordErrCode, utils.CheckPasswordErrMsg, "密码校验失败")
 			return
 		} else {
 			serializer.SuccessResponse(c, check, "success")

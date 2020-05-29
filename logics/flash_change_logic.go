@@ -42,7 +42,7 @@ func (f *FlashChange) FlashChange() (uint, error) {
 	}
 	if !user.CheckPassword(f.Password) {
 		log.Errorf("密码有误")
-		return 0, errors.New("密码验证不通过")
+		return 0, utils.VerifyPasswordErr
 	}
 	// 1. 查看operateAddress 是否存在正在进行中的闪兑订单
 	exist := new(models.FlashChangeOrder).Exist(f.OperateAddress, f.FromTokenAddress, f.ToTokenAddress, 0)

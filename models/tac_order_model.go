@@ -54,6 +54,11 @@ func (o *TacOrder) Update(oo TacOrder) error {
 	return DB.Model(o).Updates(oo).Error
 }
 
+// 删除记录
+func (o *TacOrder) Delete(orderId uint) error {
+	return DB.Where("id = ?", orderId).Delete(&TacOrder{}).Error
+}
+
 // GetBatchTacOrder orderType == 1 表示拉取以太坊转tt的订单，为2则相反
 func (o *TacOrder) GetBatchTacOrder(orderType int, fromAddress string, page uint, limit uint) ([]*TacOrder, int, error) {
 	// 获取总的记录
@@ -73,10 +78,10 @@ func (o *TacOrder) GetBatchTacOrder(orderType int, fromAddress string, page uint
 	return orders, total, nil
 }
 
-// GetTacOrdersByState 获取所有的state状态的order,返回collection_id, id, send_tx_hash, receive_tx_hash
+// GetTacOrdersByState 获取所有的state状态的order
 func (o *TacOrder) GetTacOrdersByState(state int) ([]*TacOrder, error) {
 	var orders []*TacOrder
-	err := DB.Select("collection_id, id, send_tx_hash, receive_tx_hash").Where("state = ?", state).Find(&orders).Error
+	err := DB.Where("state = ?", state).Find(&orders).Error
 	if err != nil {
 		log.Errorf("get batch by operate address err: %v", err)
 		return nil, err

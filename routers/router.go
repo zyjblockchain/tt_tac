@@ -29,7 +29,7 @@ func NewRouter(addr string) {
 		v1.POST("/export_private", controllers.ExportPrivate())
 		// 7. 修改支付密码
 		v1.POST("/modify_password", controllers.ModifyPassword())
-		// 17. 判断支付密钥是否正确
+		// 17. 校验支付密钥是否正确
 		v1.POST("/check_password", controllers.CheckPassword())
 		// 闪兑
 		v2 := v1.Group("/exchange")

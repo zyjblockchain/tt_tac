@@ -27,7 +27,7 @@ func (ord *Order) CreateOrder() (uint, error) {
 	// 验证password是否正确
 	if !u.CheckPassword(ord.Password) {
 		log.Errorf("密码有误")
-		return 0, errors.New("密码验证不通过")
+		return 0, utils.VerifyPasswordErr
 	}
 
 	order := &models.TacOrder{

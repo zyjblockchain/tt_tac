@@ -45,6 +45,11 @@ func SendTacTx() gin.HandlerFunc {
 			oo := &models.TacOrder{}
 			oo.ID = logic.TacOrderId
 			_ = oo.Update(models.TacOrder{State: 2}).Error()
+			if err == utils.VerifyPasswordErr {
+				// 返回密码校验失败的状态码给前端
+				serializer.ErrorResponse(c, utils.CheckPasswordErrCode, utils.CheckPasswordErrMsg, "密码错误")
+				return
+			}
 			serializer.ErrorResponse(c, utils.SendTacTxErrCode, utils.SendTacTxErrMsg, err.Error())
 			return
 		} else {

@@ -65,6 +65,11 @@ func main() {
 		// logics.CheckMiddleAddressBalance()
 	}()
 
+	// 对跨链转账的订单表中pending状态的订单处理
+	logics.InitTacOrderState(ethToTtProcess, ttToEthProcess)
+	// 对闪兑的订单表中pending状态的订单处理
+	logics.InitFlashOrderState(flashChangeSrv)
+
 	// 6. 启动gin服务
 	routers.NewRouter(":3030")
 }

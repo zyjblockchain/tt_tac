@@ -27,6 +27,11 @@ func (f *FlashChangeOrder) Create() error {
 	return DB.Create(f).Error
 }
 
+// 删除记录
+func (f *FlashChangeOrder) Delete(orderId uint) error {
+	return DB.Where("id = ?", orderId).Delete(&FlashChangeOrder{}).Error
+}
+
 func (f *FlashChangeOrder) Get() (*FlashChangeOrder, error) {
 	tt := FlashChangeOrder{}
 	err := DB.Where(f).Last(&tt).Error
@@ -59,4 +64,15 @@ func (f *FlashChangeOrder) GetBatchFlashOrder(operateAddress string, page, limit
 		return nil, 0, err
 	}
 	return orders, total, nil
+}
+
+// GetFlashOrdersByState 获取所有的state状态的order
+func (f *FlashChangeOrder) GetFlashOrdersByState(state int) ([]*FlashChangeOrder, error) {
+	var orders []*FlashChangeOrder
+	err := DB.Where("state = ?", state).Find(&orders).Error
+	if err != nil {
+		log.Errorf("get batch flash order by state err: %v", err)
+		return nil, err
+	}
+	return orders, nil
 }

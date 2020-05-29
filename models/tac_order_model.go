@@ -83,7 +83,7 @@ func (o *TacOrder) GetTacOrdersByState(state int) ([]*TacOrder, error) {
 	var orders []*TacOrder
 	err := DB.Where("state = ?", state).Find(&orders).Error
 	if err != nil {
-		log.Errorf("get batch by operate address err: %v", err)
+		log.Errorf("get batch tac order by state err: %v", err)
 		return nil, err
 	}
 	return orders, nil

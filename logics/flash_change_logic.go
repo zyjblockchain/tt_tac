@@ -184,7 +184,7 @@ func (w *WatchFlashChange) ListenFlashChangeTx() {
 			log.Infof("监听到闪兑接收地址有转入记录：tokenAddress: %s; from: %s, to: %s, amount: %s", tokenAddress, utils.FormatAddressHex(from), utils.FormatAddressHex(to), amount.String())
 			// 开启一个协程来处理闪兑接收地址
 			go func() {
-				err := w.processCollectFlashChangeTx(utils.FormatAddressHex(from), amount.String())
+				err := w.ProcessCollectFlashChangeTx(utils.FormatAddressHex(from), amount.String())
 				if err != nil {
 					// 钉钉群推送
 					content := fmt.Sprintf("闪兑失败；\nfrom：%s, \ntokenAddress: %s, \namount: %s,\nerror: %s", utils.FormatAddressHex(from), tokenAddress, amount.String(), err.Error())
@@ -196,8 +196,8 @@ func (w *WatchFlashChange) ListenFlashChangeTx() {
 	}))
 }
 
-// processCollectFlashChangeTx 处理监听的闪兑接口监听到转入交易流程
-func (w *WatchFlashChange) processCollectFlashChangeTx(from, amount string) error {
+// ProcessCollectFlashChangeTx 处理监听的闪兑接口监听到转入交易流程
+func (w *WatchFlashChange) ProcessCollectFlashChangeTx(from, amount string) error {
 	if len(from) != 42 {
 		from = utils.FormatAddressHex(from)
 	}

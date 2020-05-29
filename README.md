@@ -253,6 +253,45 @@
 }
 ```
 
+#### 支付密码校验接口
+###### 请求url
+- POST /tac/check_password
+###### 请求参数
+```
+{
+	"address":"0x9F500F1BB530BAA6BBB280998d15b8FBdDaCDA15",
+	"password":"123456"
+}
+```
+###### 参数说明
+1. address: 地址
+2. password: 密码
+###### 返回示例
+```
+// 校验成功请款，data返回布尔值的true
+{
+    "status": 200,
+    "data": true,
+    "msg": "success",
+    "error": ""
+}
+
+// 校验失败情况，返回false
+{
+    "status": 200,
+    "data": false,
+    "msg": "success",
+    "error": ""
+}
+
+// 输入的地址有误的情况
+{
+    "status": 40021,
+    "data": null,
+    "msg": "check password error",
+    "error": "地址不存在"
+}
+```
 ---
 #### 申请闪兑接口
 ###### 请求url

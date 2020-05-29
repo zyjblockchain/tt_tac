@@ -106,6 +106,27 @@ func ModifyPassword() gin.HandlerFunc {
 	}
 }
 
+// CheckPassword 密码校验接口
+func CheckPassword() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var logic logics.CheckPassword
+		err := c.ShouldBind(&logic)
+		if err != nil {
+			log.Errorf("CheckPassword should binding error: %v", err)
+			serializer.ErrorResponse(c, utils.VerifyParamsErrCode, utils.VerifyParamsErrMsg, err.Error())
+			return
+		}
+		// logic
+		err, check := logic.CheckPwd()
+		if err != nil {
+			serializer.ErrorResponse(c, utils.CheckPasswordErrCode, utils.CheckPasswordErrMsg, "地址不存在")
+			return
+		} else {
+			serializer.SuccessResponse(c, check, "success")
+		}
+	}
+}
+
 // 拉取用户eth_Token 的收款记录
 func GetEthTokenTxRecords(tokenSymbol string) gin.HandlerFunc {
 	return func(c *gin.Context) {

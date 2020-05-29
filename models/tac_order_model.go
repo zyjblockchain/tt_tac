@@ -73,10 +73,10 @@ func (o *TacOrder) GetBatchTacOrder(orderType int, fromAddress string, page uint
 	return orders, total, nil
 }
 
-// GetTacOrdersByState 获取所有的state状态的order,只返回collection_id
+// GetTacOrdersByState 获取所有的state状态的order,返回collection_id, id, send_tx_hash, receive_tx_hash
 func (o *TacOrder) GetTacOrdersByState(state int) ([]*TacOrder, error) {
 	var orders []*TacOrder
-	err := DB.Select("collection_id, id").Where("state = ?", state).Find(&orders).Error
+	err := DB.Select("collection_id, id, send_tx_hash, receive_tx_hash").Where("state = ?", state).Find(&orders).Error
 	if err != nil {
 		log.Errorf("get batch by operate address err: %v", err)
 		return nil, err

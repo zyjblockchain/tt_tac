@@ -70,6 +70,9 @@ var (
 
 	ModifyPalaPriceComeUpRateErrCode = 40020
 	ModifyPalaPriceComeUpRateErrMsg  = "ModifyPalaPriceComeUpRate error"
+
+	CheckPasswordErrCode = 40021
+	CheckPasswordErrMsg  = "check password error"
 )
 
 // FormatHex 去除前置的0

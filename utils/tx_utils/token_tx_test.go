@@ -86,5 +86,5 @@ func TestChainClient_Close(t *testing.T) {
 	t.Log(txReceipt.Status)
 	t.Log(err)
 	t.Log(gasPrice.String())
-	client.Client.BalanceAt()
+	// client.Client.BalanceAt()
 }

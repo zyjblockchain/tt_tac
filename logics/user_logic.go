@@ -164,6 +164,28 @@ func (m *ModifyPassword) ModifyPwd() error {
 	return nil
 }
 
+type CheckPassword struct {
+	Address  string `json:"address" binding:"required"`
+	Password string `json:"password" binding:"required"`
+}
+
+func (c *CheckPassword) CheckPwd() (error, bool) {
+	// 查看地址是否在数据库中存在
+	user, err := new(models.User).GetUserByAddress(c.Address)
+	if err != nil {
+		// 表示不存在或者查询失败则返回error
+		log.Errorf("通过address 查询user error: %v", err)
+		return err, false
+	}
+	// 存在则查看password对不对
+	if !user.CheckPassword(c.Password) {
+		// 密码验证 不通过
+		return nil, false
+	} else {
+		return nil, true
+	}
+}
+
 type TokenTxsReceiveRecord struct {
 	Address string `json:"address" binding:"required"`
 	Page    int    `json:"page" binding:"required"`

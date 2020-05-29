@@ -127,6 +127,7 @@ func GetGasFee() gin.HandlerFunc {
 			serializer.ErrorResponse(c, utils.GetGasFeeErrCode, utils.GetGasFeeErrMsg, err.Error())
 			return
 		} else {
+			log.Infof("获取chainTag: %d 的一笔交易的建议gas fee: %s", logic.ChainTag, fee.GasFee)
 			serializer.SuccessResponse(c, *fee, "success")
 		}
 	}

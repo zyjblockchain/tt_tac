@@ -47,14 +47,14 @@ func (p *PalaTransfer) SendPalaTx(chainTag int) (string, error) {
 	// 1. 检查from的pala余额是否足够
 	palaBalance, err := client.GetTokenBalance(common.HexToAddress(p.FromAddress), common.HexToAddress(conf.EthPalaTokenAddress))
 	if err != nil {
-		log.Errorf("获取eth pala余额error: %v", err)
+		log.Errorf("获取pala余额error: %v", err)
 		return "", err
 	}
 	// 2. 比较pala余额
 	amount, _ := new(big.Int).SetString(p.Amount, 10)
 	if palaBalance.Cmp(amount) < 0 {
-		log.Errorf("eth pala转账余额不足；转账amount: %s, pala余额：%s, address: %s", p.Amount, palaBalance.String(), p.FromAddress)
-		return "", errors.New(fmt.Sprintf("eth pala转账余额不足；转账amount: %s, pala余额：%s, address: %s", p.Amount, palaBalance.String(), p.FromAddress))
+		log.Errorf(" pala转账余额不足；转账amount: %s, pala余额：%s, address: %s", p.Amount, palaBalance.String(), p.FromAddress)
+		return "", errors.New(fmt.Sprintf("pala转账余额不足；转账amount: %s, pala余额：%s, address: %s", p.Amount, palaBalance.String(), p.FromAddress))
 	}
 
 	// 3. 发送交易

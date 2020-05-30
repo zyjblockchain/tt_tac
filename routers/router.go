@@ -67,7 +67,7 @@ func NewRouter(addr string) {
 		v1.POST("/send_eth_transfer", controllers.SendMainCoin(conf.EthChainTag))
 		// 20. 发送tt币转账交易
 		v1.POST("/send_tt_transfer", controllers.SendMainCoin(conf.TTChainTag))
-		// 21. 发送usdt币转账交易
+		// 21. 发送eth上的usdt币转账交易
 		v1.POST("/send_eth_usdt_transfer", controllers.SendEthUsdtTransfer())
 
 		// 内部管理接口

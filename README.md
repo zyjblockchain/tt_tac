@@ -791,3 +791,186 @@
 }
 ```
 ----
+#### 发送eth上的pala转账交易
+###### 请求url
+- POST /tac/send_eth_pala_transfer
+###### 请求参数
+```$xslt
+{
+	"from_address":"0x59375A522876aB96B0ed2953D0D3b92674701Cc2",
+	"password":"123456",
+	"to_address":"0x415979DC0266fd94A3CB90a04EC28853FCeB1A34",
+	"amount":"200.78"
+}
+```
+###### 参数说明
+1. from_address: 发送地址
+2. password: 发送地址的支付密码
+3. to_address：接收地址
+4. amount：发送数量
+###### 返回示例
+```$xslt
+{
+    "status": 200,
+    "data": {
+        "tx_hash": "0xf78d3c16106214a88e670656bfe8aa7bf95113238a04747ccc3f0ece55c570ae"
+    },
+    "msg": "success",
+    "error": ""
+}
+// 返回错误
+{
+    "status": 40022,
+    "data": null,
+    "msg": "send pala transfer failed",
+    "error": "pala转账余额不足；转账amount: 20000000000000, pala余额：0, address: 0x59375A522876aB96B0ed2953D0D3b92674701Cc2"
+}
+```
+
+----
+#### 发送tt上的pala转账交易
+###### 请求url
+- POST /tac/send_tt_pala_transfer
+###### 请求参数
+```$xslt
+{
+	"from_address":"0x59375A522876aB96B0ed2953D0D3b92674701Cc2",
+	"password":"123456",
+	"to_address":"0x415979DC0266fd94A3CB90a04EC28853FCeB1A34",
+	"amount":"200.78"
+}
+```
+###### 参数说明
+1. from_address: 发送地址
+2. password: 发送地址的支付密码
+3. to_address：接收地址
+4. amount：发送数量
+###### 返回示例
+```$xslt
+{
+    "status": 200,
+    "data": {
+        "tx_hash": "0xf78d3c16106214a88e670656bfe8aa7bf95113238a04747ccc3f0ece55c570ae"
+    },
+    "msg": "success",
+    "error": ""
+}
+// 返回错误
+{
+    "status": 40022,
+    "data": null,
+    "msg": "send pala transfer failed",
+    "error": "pala转账余额不足；转账amount: 20000000000000, pala余额：0, address: 0x59375A522876aB96B0ed2953D0D3b92674701Cc2"
+}
+```
+
+----
+#### 发送eth币转账交易
+###### 请求url
+- POST /tac/send_eth_transfer
+###### 请求参数
+```$xslt
+{
+	"from_address":"0x59375A522876aB96B0ed2953D0D3b92674701Cc2",
+	"password":"123456",
+	"to_address":"0x415979DC0266fd94A3CB90a04EC28853FCeB1A34",
+	"amount":"0.11"
+}
+```
+###### 参数说明
+1. from_address: 发送地址
+2. password: 发送地址的支付密码
+3. to_address：接收地址
+4. amount：发送数量
+###### 返回示例
+```$xslt
+{
+    "status": 200,
+    "data": {
+        "tx_hash": "0xf78d3c16106214a88e670656bfe8aa7bf95113238a04747ccc3f0ece55c570ae"
+    },
+    "msg": "success",
+    "error": ""
+}
+// 返回错误
+{
+    "status": 40023,
+    "data": null,
+    "msg": "send main coin transfer failed",
+    "error": "主网币 转账余额不足；转账amount: 22222222000000000000000000, 余额：701071686600000000, address: 0x59375A522876aB96B0ed2953D0D3b92674701Cc2"
+}
+```
+----
+#### 发送tt币转账交易
+###### 请求url
+- POST /tac/send_tt_transfer
+###### 请求参数
+```$xslt
+{
+	"from_address":"0x59375A522876aB96B0ed2953D0D3b92674701Cc2",
+	"password":"123456",
+	"to_address":"0x415979DC0266fd94A3CB90a04EC28853FCeB1A34",
+	"amount":"0.0001"
+}
+```
+###### 参数说明
+1. from_address: 发送地址
+2. password: 发送地址的支付密码
+3. to_address：接收地址
+4. amount：发送数量
+###### 返回示例
+```$xslt
+{
+    "status": 200,
+    "data": {
+        "tx_hash": "0xaddc1fd42966cd918e6e5fc512a21e7a5620ff2e565b7ab453dd4356cdd3eccb"
+    },
+    "msg": "success",
+    "error": ""
+}
+// 返回错误
+{
+    "status": 40023,
+    "data": null,
+    "msg": "send main coin transfer failed",
+    "error": "主网币 转账余额不足；转账amount: 22222222000000000000000000, 余额：701071686600000000, address: 0x59375A522876aB96B0ed2953D0D3b92674701Cc2"
+}
+```
+----
+
+#### 发送eth上的usdt币转账交易
+###### 请求url
+- POST /tac/send_eth_usdt_transfer
+###### 请求参数
+```$xslt
+{
+	"from_address":"0x59375A522876aB96B0ed2953D0D3b92674701Cc2",
+	"password":"123456",
+	"to_address":"0x415979DC0266fd94A3CB90a04EC28853FCeB1A34",
+	"amount":"100"
+}
+```
+###### 参数说明
+1. from_address: 发送地址
+2. password: 发送地址的支付密码
+3. to_address：接收地址
+4. amount：发送数量
+###### 返回示例
+```$xslt
+{
+    "status": 200,
+    "data": {
+        "tx_hash": "0xe25b07f0b2df30deb2a698ba926e3818aa87a1eeb8eb8085c1dd87ebdd70c30d"
+    },
+    "msg": "success",
+    "error": ""
+}
+// 返回错误
+{
+    "status": 40024,
+    "data": null,
+    "msg": "send main coin transfer failed",
+    "error": "主网币 转账余额不足；转账amount: 22222222000000000000000000, 余额：701071686600000000, address: 0x59375A522876aB96B0ed2953D0D3b92674701Cc2"
+}
+```
+----

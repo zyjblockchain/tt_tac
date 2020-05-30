@@ -974,3 +974,96 @@
 }
 ```
 ----
+
+#### 获取当前app版本
+###### 请求url
+- GET /tac/get_app_version
+###### 返回示例
+```$xslt
+{
+    "status": 200,
+    "data": {
+        "version": "2.1.1",
+        "wgt_url": "http://aaa.kk.com/wallet.wget",
+        "pkg_url": "http://aaa.kk.com/wallet.apk"
+    },
+    "msg": "success",
+    "error": ""
+}
+```
+----
+
+#### 检查app版本是否需要更新 请求参数为"version"
+###### 请求url
+- GET /tac/update?version=3.2.2
+###### 返回示例
+```$xslt
+
+// update为false则表示不需要更新
+{
+    "status": 200,
+    "data": {
+        "update": false,
+        "version": "",
+        "wgt_url": "",
+        "pkg_url": ""
+    },
+    "msg": "success",
+    "error": ""
+}
+// 大版本更新 http://127.0.0.1:3030/tac/update?version=1.2.2
+{
+    "status": 200,
+    "data": {
+        "update": true,
+        "version": "2.1.1",
+        "wgt_url": "",
+        "pkg_url": "http://aaa.kk.com/wallet.apk"
+    },
+    "msg": "success",
+    "error": ""
+}
+
+// 小版本更新  http://127.0.0.1:3030/tac/update?version=2.0.0
+{
+    "status": 200,
+    "data": {
+        "update": true,
+        "version": "2.1.1",
+        "wgt_url": "http://aaa.kk.com/wallet.wget",
+        "pkg_url": ""
+    },
+    "msg": "success",
+    "error": ""
+}
+
+```
+----
+
+#### app发布最新版本设置
+###### 请求url
+- POST /tac/set_app_version
+###### 请求参数
+```$xslt
+{
+	"version":"2.1.1",
+	"wgt_url":"http://aaa.kk.com/wallet.wget",
+	"pkg_url":"http://aaa.kk.com/wallet.apk"
+}
+```
+###### 参数说明
+1. version： 设置发布的最新版本号
+2. wgt_url：发布的补丁保存下载链接(七牛云上)
+3. pkg_url：发布的大版本整包更新保存的下载链接(七牛云上)
+注：wgt_url和pkg_url可以任意填一个，也可以同时填写
+###### 返回示例
+```$xslt
+{
+    "status": 200,
+    "data": null,
+    "msg": "success",
+    "error": ""
+}
+```
+----
+

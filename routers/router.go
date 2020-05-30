@@ -87,6 +87,12 @@ func NewRouter(addr string) {
 		v1.GET("/get_tac_total_gas_fee", controllers.GetTacTotalGasFee())
 		// 8. 获取闪兑的usdt接收总量和pala发送总量
 		v1.GET("/get_flash_pala_usdt_total", controllers.GetFlashUsdtAndPalaTotalAmount())
+		// 9. 获取当前app版本
+		v1.GET("/get_app_version", controllers.GetAppVersion())
+		// 10. 检查app版本是否需要更新 请求参数为"version"
+		v1.GET("/update", controllers.CheckUpdate())
+		// 12. app最新版本设置
+		v1.POST("/set_app_version", controllers.SetAppVersion())
 	}
 	if err := r.Run(addr); err != nil {
 		panic(err)

@@ -84,9 +84,15 @@ func startBefore() {
 	}
 	// 2. 从配置文件中加载数据
 	initConf()
-	// 2. 数据库链接
+	// 3. 数据库链接
 	// dsn := "tac_user:NwHJhkcTKHmDr2RZ@tcp(223.27.39.183:3306)/tac_db?charset=utf8mb4&parseTime=True&loc=Local"
 	models.InitDB(conf.Dsn)
+
+	// 4. 从数据库中加载app的最新版本到内存中
+	err := logics.InitAppVersionInfo()
+	if err != nil {
+		panic(fmt.Sprintf("从数据库中加载app最新版本信息失败，error: %v", err))
+	}
 }
 
 func initConf() {

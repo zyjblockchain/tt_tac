@@ -30,3 +30,7 @@ func GetKv(k string) ([]byte, error) {
 	}
 	return vv.Val, nil
 }
+
+func Update(key string, newVal []byte) error {
+	return DB.Model(&Kv{}).Updates(Kv{Key: key, Val: newVal}).Error
+}

@@ -35,17 +35,20 @@ func (p *PalaTransfer) SendPalaTx(chainTag int) (string, error) {
 	}
 
 	// new client
+	var palaTokenAddress string
 	var client *transaction.ChainClient
 	if chainTag == conf.EthChainTag {
 		client = transaction.NewChainClient(conf.EthChainNet, big.NewInt(int64(conf.EthChainID)))
+		palaTokenAddress = conf.EthPalaTokenAddress
 	} else if chainTag == conf.TTChainTag {
 		client = transaction.NewChainClient(conf.TTChainNet, big.NewInt(int64(conf.TTChainID)))
+		palaTokenAddress = conf.TtPalaTokenAddress
 	} else {
 		return "", errors.New("不存在的chainTag")
 	}
 
 	// 1. 检查from的pala余额是否足够
-	palaBalance, err := client.GetTokenBalance(common.HexToAddress(p.FromAddress), common.HexToAddress(conf.EthPalaTokenAddress))
+	palaBalance, err := client.GetTokenBalance(common.HexToAddress(p.FromAddress), common.HexToAddress(palaTokenAddress))
 	if err != nil {
 		log.Errorf("获取pala余额error: %v", err)
 		return "", err
@@ -78,7 +81,7 @@ func (p *PalaTransfer) SendPalaTx(chainTag int) (string, error) {
 	}
 	gasLimit := uint64(60000)
 	gasPrice := suggestPrice.Mul(suggestPrice, big.NewInt(2)) // 两倍suggest gasPrice
-	tx, err := client.SendTokenTx(private, nonce, gasLimit, gasPrice, common.HexToAddress(p.ToAddress), common.HexToAddress(conf.EthPalaTokenAddress), amount)
+	tx, err := client.SendTokenTx(private, nonce, gasLimit, gasPrice, common.HexToAddress(p.ToAddress), common.HexToAddress(palaTokenAddress), amount)
 	if err != nil {
 		log.Errorf("发送eth pala交易失败；error: %v", err)
 		return "", err

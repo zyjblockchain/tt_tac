@@ -77,6 +77,10 @@ func SendPalaTransfer(chainTag int) gin.HandlerFunc {
 		// logic
 		txHash, err := logic.SendPalaTx(chainTag)
 		if err != nil {
+			if err == utils.VerifyPasswordErr {
+				serializer.ErrorResponse(c, utils.CheckPasswordErrCode, utils.CheckPasswordErrMsg, "密码错误")
+				return
+			}
 			// 发送pala转账交易失败
 			log.Errorf("发送pala转账交易失败；error: %v", err)
 			serializer.ErrorResponse(c, utils.SendPalaTransferErrCode, utils.SendPalaTransferErrMsg, err.Error())
@@ -103,6 +107,10 @@ func SendMainCoin(chainTag int) gin.HandlerFunc {
 		// logic
 		txHash, err := logic.SendMainNetCoinTransfer(chainTag)
 		if err != nil {
+			if err == utils.VerifyPasswordErr {
+				serializer.ErrorResponse(c, utils.CheckPasswordErrCode, utils.CheckPasswordErrMsg, "密码错误")
+				return
+			}
 			log.Errorf("发送主网币转账交易；error: %v", err)
 			serializer.ErrorResponse(c, utils.SendMainCoinTransferErrCode, utils.SendMainCoinTransferErrMsg, err.Error())
 			return
@@ -130,6 +138,11 @@ func SendEthUsdtTransfer() gin.HandlerFunc {
 		// logic
 		txHash, err := logic.SendEthUsdtTransfer()
 		if err != nil {
+			if err == utils.VerifyPasswordErr {
+				serializer.ErrorResponse(c, utils.CheckPasswordErrCode, utils.CheckPasswordErrMsg, "密码错误")
+				return
+			}
+
 			// 发送usdt转账交易失败
 			log.Errorf("发送usdt转账交易失败；error: %v", err)
 			serializer.ErrorResponse(c, utils.SendUsdtTransferErrCode, utils.SendUsdtTransferErrMsg, err.Error())

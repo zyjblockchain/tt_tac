@@ -3,8 +3,8 @@ module github.com/zyjblockchain/tt_tac
 go 1.12
 
 require (
-	github.com/OneOfOne/xxhash v1.2.5 // indirect
 	github.com/bitly/go-simplejson v0.5.0
+	github.com/bmizerany/assert v0.0.0-20160611221934-b7ed37b82869 // indirect
 	github.com/btcsuite/btcd v0.20.1-beta
 	github.com/denisenkom/go-mssqldb v0.0.0-20200428022330-06a60b6afbbc // indirect
 	github.com/ethereum/go-ethereum v1.9.14
@@ -26,7 +26,6 @@ require (
 	github.com/onrik/ethrpc v1.0.0
 	github.com/shopspring/decimal v1.2.0
 	github.com/sirupsen/logrus v1.6.0
-	github.com/spaolacci/murmur3 v1.0.1-0.20190317074736-539464a789e9 // indirect
 	github.com/spf13/cobra v1.0.0
 	github.com/stretchr/objx v0.1.1 // indirect
 	github.com/stretchr/testify v1.5.1

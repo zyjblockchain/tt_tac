@@ -228,3 +228,23 @@ func formatArgs(args string) []byte {
 	copy(h[32-len(b):], b)
 	return h[:]
 }
+
+// SendNormalTx 普通转账交易
+func (c *ChainClient) SendNormalTx(private string, nonce, gasLimit uint64, gasPrice *big.Int, to common.Address, amount *big.Int) (*types.Transaction, error) {
+	rawTx := types.NewTransaction(nonce, to, amount, gasLimit, gasPrice, nil)
+	// signer
+	prv, err := crypto.ToECDSA(common.FromHex(private))
+	if err != nil {
+		log.Errorf("发送交易中私钥ToECDSA失败")
+		return nil, err
+	}
+	signedTx, err := signRawTx(rawTx, c.ChainId, prv)
+	if err != nil {
+		log.Errorf("生成签名交易失败：error: %v", err)
+		return nil, err
+	}
+
+	// 发送交易
+	err = c.Client.SendTransaction(context.Background(), signedTx)
+	return signedTx, err
+}

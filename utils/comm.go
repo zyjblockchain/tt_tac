@@ -80,6 +80,12 @@ var (
 
 	SendPalaTransferErrCode = 40022
 	SendPalaTransferErrMsg  = "send pala transfer failed"
+
+	SendMainCoinTransferErrCode = 40023
+	SendMainCoinTransferErrMsg  = "send main coin transfer failed"
+
+	SendUsdtTransferErrCode = 40024
+	SendUsdtTransferErrMsg  = "send pala transfer failed"
 )
 
 // FormatHex 去除前置的0

@@ -86,3 +86,56 @@ func SendPalaTransfer(chainTag int) gin.HandlerFunc {
 		}
 	}
 }
+
+// SendMainCoin 发送eth或者tt主网币交易
+func SendMainCoin(chainTag int) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var logic logics.CoinTransfer
+		err := c.ShouldBind(&logic)
+		if err != nil {
+			log.Errorf("SendMainCoin should binding error: %v", err)
+			serializer.ErrorResponse(c, utils.VerifyParamsErrCode, utils.VerifyParamsErrMsg, err.Error())
+			return
+		}
+		logic.Amount = utils.FormatTokenAmount(logic.Amount, 18)
+		log.Infof("发送主网币转账交易；chainTag: %d, from: %s, to: %s, amount: %s", chainTag, logic.FromAddress, logic.ToAddress, logic.Amount)
+
+		// logic
+		txHash, err := logic.SendMainNetCoinTransfer(chainTag)
+		if err != nil {
+			log.Errorf("发送主网币转账交易；error: %v", err)
+			serializer.ErrorResponse(c, utils.SendMainCoinTransferErrCode, utils.SendMainCoinTransferErrMsg, err.Error())
+			return
+		} else {
+			serializer.SuccessResponse(c, tHash{TxHash: txHash}, "success")
+		}
+	}
+}
+
+// SendEthUsdtTransfer eth usdt转账
+func SendEthUsdtTransfer() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var logic logics.EthUsdtTransfer
+		err := c.ShouldBind(&logic)
+		if err != nil {
+			log.Errorf("SendEthUsdtTransfer should binding error: %v", err)
+			serializer.ErrorResponse(c, utils.VerifyParamsErrCode, utils.VerifyParamsErrMsg, err.Error())
+			return
+		}
+
+		// 把传入的amount换算成最小单位
+		logic.Amount = utils.FormatTokenAmount(logic.Amount, 6)
+		log.Infof("发送eth_usdt转账交易； from: %s, to: %s, amount: %s", logic.FromAddress, logic.ToAddress, logic.Amount)
+
+		// logic
+		txHash, err := logic.SendEthUsdtTransfer()
+		if err != nil {
+			// 发送usdt转账交易失败
+			log.Errorf("发送usdt转账交易失败；error: %v", err)
+			serializer.ErrorResponse(c, utils.SendUsdtTransferErrCode, utils.SendUsdtTransferErrMsg, err.Error())
+			return
+		} else {
+			serializer.SuccessResponse(c, tHash{TxHash: txHash}, "success")
+		}
+	}
+}

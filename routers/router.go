@@ -2,6 +2,7 @@ package routers
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/zyjblockchain/tt_tac/conf"
 	"github.com/zyjblockchain/tt_tac/controllers"
 	"github.com/zyjblockchain/tt_tac/middleware"
 	"os"
@@ -57,6 +58,12 @@ func NewRouter(addr string) {
 		v1.POST("/get_eth_receive", controllers.GetEthReceiveRecords())
 		// 16. 获取发送一笔以太坊token转账交易或者tt的token转账交易需要的gas fee
 		v1.POST("/get_gas_fee", controllers.GetGasFee())
+		// 17. 发送eth上的pala转账交易
+		v1.POST("/send_eth_pala", controllers.SendPalaTransfer(conf.EthChainTag))
+		// 18. 发送tt上的pala转账交易
+		v1.POST("/send_tt_pala", controllers.SendPalaTransfer(conf.TTChainTag))
+		// 19. 发送tt币转账交易
+		// 20. 发送eth币转账交易
 
 		// 内部管理接口
 		// 1. 对私钥进行对称加密，用于配置中间地址的私钥加密

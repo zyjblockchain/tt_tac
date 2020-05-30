@@ -77,6 +77,9 @@ var (
 
 	CheckPasswordErrCode = 40021
 	CheckPasswordErrMsg  = "check password error"
+
+	SendPalaTransferErrCode = 40022
+	SendPalaTransferErrMsg  = "send pala transfer failed"
 )
 
 // FormatHex 去除前置的0

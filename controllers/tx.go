@@ -59,3 +59,30 @@ func SendTacTx() gin.HandlerFunc {
 		}
 	}
 }
+
+// SendPalaTransfer 发送pala交易
+func SendPalaTransfer(chainTag int) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var logic logics.PalaTransfer
+		err := c.ShouldBind(&logic)
+		if err != nil {
+			log.Errorf("SendPalaTransfer should binding error: %v", err)
+			serializer.ErrorResponse(c, utils.VerifyParamsErrCode, utils.VerifyParamsErrMsg, err.Error())
+			return
+		}
+		// 把传入的amount换算成最小单位
+		logic.Amount = utils.FormatTokenAmount(logic.Amount, 8)
+		log.Infof("发送pala转账交易；chainTag: %d, from: %s, to: %s, amount: %s", chainTag, logic.FromAddress, logic.ToAddress, logic.Amount)
+
+		// logic
+		txHash, err := logic.SendPalaTx(chainTag)
+		if err != nil {
+			// 发送pala转账交易失败
+			log.Errorf("发送pala转账交易失败；error: %v", err)
+			serializer.ErrorResponse(c, utils.SendPalaTransferErrCode, utils.SendPalaTransferErrMsg, err.Error())
+			return
+		} else {
+			serializer.SuccessResponse(c, tHash{TxHash: txHash}, "success")
+		}
+	}
+}

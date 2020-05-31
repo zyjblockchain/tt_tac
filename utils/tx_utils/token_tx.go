@@ -64,20 +64,24 @@ func (c *ChainClient) GetLatestNonce(address string) (uint64, error) {
 	defer c.mutex.Unlock()
 	key := address + c.ChainId.String()
 
-	// 查看是否有之前使用失败的nonce可以再次使用
-	failNonce, ok := failNonceMap[key]
-	if ok {
-		// 使用该nonce
-		// 先把此地址的fail nonce记录删除掉
-		delete(failNonceMap, key)
-		return failNonce, nil
-	}
-
 	txNonce, err := c.GetNonce(common.HexToAddress(address))
 	if err != nil {
 		log.Errorf("从链上获取nonce失败：%v", err)
 		return 0, err
 	}
+	// 查看是否有之前使用失败的nonce可以再次使用
+	failNonce, ok := failNonceMap[key]
+	if ok {
+		// 使用该nonce
+		if txNonce <= failNonce { // 增加txNonce <= failNonce为 防止误判
+			// 先把此地址的fail nonce记录删除掉
+			delete(failNonceMap, key)
+			return failNonce, nil
+		} else {
+			delete(failNonceMap, key)
+		}
+	}
+
 	stable, ok := stableNonceMap[key]
 	if ok { // 存在
 		if txNonce == stable {

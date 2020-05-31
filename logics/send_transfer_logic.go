@@ -11,6 +11,7 @@ import (
 	"github.com/zyjblockchain/tt_tac/utils"
 	transaction "github.com/zyjblockchain/tt_tac/utils/tx_utils"
 	"math/big"
+	"time"
 )
 
 // 发送pala转账交易
@@ -67,13 +68,8 @@ func (p *PalaTransfer) SendPalaTx(chainTag int) (string, error) {
 		log.Errorf("私钥aes解码失败， error: %v, address: %s", err, user.Address)
 		return "", err
 	}
-	// 3.2 获取nonce
-	nonce, err := client.GetNonce(common.HexToAddress(p.FromAddress))
-	if err != nil {
-		log.Errorf("获取nonce失败, error: %v,address: %s", err, p.FromAddress)
-		return "", err
-	}
-	// 3.3 获取suggest gasPrice
+
+	// 3.2 获取suggest gasPrice
 	suggestPrice, err := client.Client.SuggestGasPrice(context.Background())
 	if err != nil {
 		log.Errorf("获取suggest gasPrice error: %v", err)
@@ -81,11 +77,72 @@ func (p *PalaTransfer) SendPalaTx(chainTag int) (string, error) {
 	}
 	gasLimit := uint64(60000)
 	gasPrice := suggestPrice.Mul(suggestPrice, big.NewInt(2)) // 两倍suggest gasPrice
+
+	// 3.3 获取nonce
+	nonce, err := client.GetLatestNonce(p.FromAddress)
+	if err != nil {
+		log.Errorf("获取nonce失败, error: %v,address: %s", err, p.FromAddress)
+		return "", err
+	}
+	// 3.4 把交易info保存到sendTransfer表
+	ss := &models.SendTransfer{
+		From:         p.FromAddress,
+		To:           p.ToAddress,
+		Amount:       p.Amount,
+		TokenAddress: palaTokenAddress,
+		TxHash:       "",
+		OwnChain:     chainTag,
+		CoinType:     2, // pala币
+		TxStatus:     0,
+		ErrMsg:       "",
+	}
+	err = ss.Create()
+	if err != nil {
+		client.SetFailNonce(p.FromAddress, nonce)
+		log.Errorf("创建sendTransfer记录失败； error: %v", err)
+		return "", err
+	}
+	// 4. 发送交易
 	tx, err := client.SendTokenTx(private, nonce, gasLimit, gasPrice, common.HexToAddress(p.ToAddress), common.HexToAddress(palaTokenAddress), amount)
 	if err != nil {
+		// 交易发送失败，设置交易记录状态
+		_ = ss.Update(models.SendTransfer{TxStatus: 2, ErrMsg: err.Error()})
+		// 回归nonce
+		client.SetFailNonce(p.FromAddress, nonce)
 		log.Errorf("发送eth pala交易失败；error: %v", err)
 		return "", err
 	}
+	// 4.1 更新交易hash
+	_ = ss.Update(models.SendTransfer{TxHash: tx.Hash().String()})
+	// 4.2 保存交易到kv表中
+	byteTx, _ := tx.MarshalJSON()
+	_ = models.SetKv(tx.Hash().String(), byteTx)
+
+	// 5. 监听交易链上状态
+	go func() {
+		count := 0
+		for {
+			if count > 10 {
+				// 超时
+				_ = ss.Update(models.SendTransfer{TxStatus: 3})
+				// 回归nonce
+				client.SetFailNonce(p.FromAddress, nonce)
+				return
+			}
+
+			time.Sleep(15 * time.Second)
+			_, isPending, err := client.Client.TransactionByHash(context.Background(), tx.Hash())
+			if err == nil && !isPending {
+				// 查询到了交易，修改交易状态为成功
+				log.Infof("链上查询到了转账交易；txHash: %s", tx.Hash().String())
+				_ = ss.Update(models.SendTransfer{TxStatus: 1})
+				return
+			}
+			// 增加count
+			count++
+		}
+	}()
+
 	return tx.Hash().String(), nil
 }
 
@@ -140,13 +197,8 @@ func (c *CoinTransfer) SendMainNetCoinTransfer(chainTag int) (string, error) {
 		log.Errorf("私钥aes解码失败， error: %v, address: %s", err, user.Address)
 		return "", err
 	}
-	// 3.2 获取nonce
-	nonce, err := client.GetNonce(common.HexToAddress(c.FromAddress))
-	if err != nil {
-		log.Errorf("获取nonce失败, error: %v,address: %s", err, c.FromAddress)
-		return "", err
-	}
-	// 3.3 获取suggest gasPrice
+
+	// 3.2 获取suggest gasPrice
 	suggestPrice, err := client.Client.SuggestGasPrice(context.Background())
 	if err != nil {
 		log.Errorf("获取suggest gasPrice error: %v", err)
@@ -154,11 +206,73 @@ func (c *CoinTransfer) SendMainNetCoinTransfer(chainTag int) (string, error) {
 	}
 	gasLimit := uint64(22000)
 	gasPrice := suggestPrice.Mul(suggestPrice, big.NewInt(2)) // 两倍suggest gasPrice
+
+	// 3.3 获取nonce
+	nonce, err := client.GetLatestNonce(c.FromAddress)
+	if err != nil {
+		log.Errorf("获取nonce失败, error: %v,address: %s", err, c.FromAddress)
+		return "", err
+	}
+
+	// 3.4 把交易info保存到sendTransfer
+	ss := &models.SendTransfer{
+		From:         c.FromAddress,
+		To:           c.ToAddress,
+		Amount:       c.Amount,
+		TokenAddress: "",
+		TxHash:       "",
+		OwnChain:     chainTag,
+		CoinType:     1,
+		TxStatus:     0,
+		ErrMsg:       "",
+	}
+	err = ss.Create()
+	if err != nil {
+		client.SetFailNonce(c.FromAddress, nonce)
+		log.Errorf("创建sendTransfer记录失败； error: %v", err)
+		return "", err
+	}
+
+	// 4. 发送交易
 	tx, err := client.SendNormalTx(private, nonce, gasLimit, gasPrice, common.HexToAddress(c.ToAddress), amount)
 	if err != nil {
+		// 交易发送失败，设置交易记录状态
+		_ = ss.Update(models.SendTransfer{TxStatus: 2, ErrMsg: err.Error()})
+		// 回归nonce
+		client.SetFailNonce(c.FromAddress, nonce)
 		log.Errorf("发送主网币交易失败；error: %v", err)
 		return "", err
 	}
+	// 4.1 更新交易hash
+	_ = ss.Update(models.SendTransfer{TxHash: tx.Hash().String()})
+	// 4.2 保存交易到kv表中
+	byteTx, _ := tx.MarshalJSON()
+	_ = models.SetKv(tx.Hash().String(), byteTx)
+	// 5. 监听交易链上状态
+	go func() {
+		count := 0
+		for {
+			if count > 10 {
+				// 超时
+				_ = ss.Update(models.SendTransfer{TxStatus: 3})
+				// 回归nonce
+				client.SetFailNonce(c.FromAddress, nonce)
+				return
+			}
+
+			time.Sleep(15 * time.Second)
+			_, isPending, err := client.Client.TransactionByHash(context.Background(), tx.Hash())
+			if err == nil && !isPending {
+				// 查询到了交易，修改交易状态为成功
+				_ = ss.Update(models.SendTransfer{TxStatus: 1})
+				log.Infof("链上查询到了转账交易；txHash: %s", tx.Hash().String())
+				return
+			}
+			// 增加count
+			count++
+		}
+	}()
+
 	return tx.Hash().String(), nil
 }
 
@@ -203,13 +317,8 @@ func (c *EthUsdtTransfer) SendEthUsdtTransfer() (string, error) {
 		log.Errorf("私钥aes解码失败， error: %v, address: %s", err, user.Address)
 		return "", err
 	}
-	// 3.2 获取nonce
-	nonce, err := client.GetNonce(common.HexToAddress(c.FromAddress))
-	if err != nil {
-		log.Errorf("获取nonce失败, error: %v,address: %s", err, c.FromAddress)
-		return "", err
-	}
-	// 3.3 获取suggest gasPrice
+
+	// 3.2 获取suggest gasPrice
 	suggestPrice, err := client.Client.SuggestGasPrice(context.Background())
 	if err != nil {
 		log.Errorf("获取suggest gasPrice error: %v", err)
@@ -217,11 +326,72 @@ func (c *EthUsdtTransfer) SendEthUsdtTransfer() (string, error) {
 	}
 	gasLimit := uint64(60000)
 	gasPrice := suggestPrice.Mul(suggestPrice, big.NewInt(2)) // 两倍suggest gasPrice
+
+	// 3.3 获取nonce
+	nonce, err := client.GetLatestNonce(c.FromAddress)
+	if err != nil {
+		log.Errorf("获取nonce失败, error: %v,address: %s", err, c.FromAddress)
+		return "", err
+	}
+	// 3.4 把交易info保存到sendTransfer表
+	ss := &models.SendTransfer{
+		From:         c.FromAddress,
+		To:           c.ToAddress,
+		Amount:       c.Amount,
+		TokenAddress: conf.EthUSDTTokenAddress,
+		TxHash:       "",
+		OwnChain:     conf.EthChainTag,
+		CoinType:     3, // usdt币
+		TxStatus:     0,
+		ErrMsg:       "",
+	}
+	err = ss.Create()
+	if err != nil {
+		client.SetFailNonce(c.FromAddress, nonce)
+		log.Errorf("创建sendTransfer记录失败； error: %v", err)
+		return "", err
+	}
+
+	// 4. 发送交易
 	tx, err := client.SendTokenTx(private, nonce, gasLimit, gasPrice, common.HexToAddress(c.ToAddress), common.HexToAddress(conf.EthUSDTTokenAddress), amount)
 	if err != nil {
+		// 交易发送失败，设置交易记录状态
+		_ = ss.Update(models.SendTransfer{TxStatus: 2, ErrMsg: err.Error()})
+		// 回归nonce
+		client.SetFailNonce(c.FromAddress, nonce)
 		log.Errorf("发送eth usdt交易失败；error: %v", err)
 		return "", err
 	}
-	return tx.Hash().String(), nil
+	// 4.1 更新交易hash
+	_ = ss.Update(models.SendTransfer{TxHash: tx.Hash().String()})
+	// 4.2 保存交易到kv表中
+	byteTx, _ := tx.MarshalJSON()
+	_ = models.SetKv(tx.Hash().String(), byteTx)
 
+	// 5. 监听交易链上状态
+	go func() {
+		count := 0
+		for {
+			if count > 10 {
+				// 超时
+				_ = ss.Update(models.SendTransfer{TxStatus: 3})
+				// 回归nonce
+				client.SetFailNonce(c.FromAddress, nonce)
+				return
+			}
+
+			time.Sleep(15 * time.Second)
+			_, isPending, err := client.Client.TransactionByHash(context.Background(), tx.Hash())
+			if err == nil && !isPending {
+				// 查询到了交易，修改交易状态为成功
+				log.Infof("链上查询到了转账交易；txHash: %s", tx.Hash().String())
+				_ = ss.Update(models.SendTransfer{TxStatus: 1})
+				return
+			}
+			// 增加count
+			count++
+		}
+	}()
+
+	return tx.Hash().String(), nil
 }

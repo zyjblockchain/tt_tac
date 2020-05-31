@@ -89,6 +89,9 @@ var (
 
 	SetAppVersionErrCode = 40025
 	SetAppVersionErrMsg  = "设置app version失败"
+
+	GetSendTransferRecordsErrCode = 40026
+	GetSendTransferRecordsErrMsg  = "GetSendTransferRecords失败"
 )
 
 // FormatHex 去除前置的0

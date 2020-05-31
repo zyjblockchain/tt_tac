@@ -1067,3 +1067,168 @@
 ```
 ----
 
+
+#### 分页拉取eth_pala的发送交易记录
+###### 请求url
+- POST /tac/get_eth_pala_send_records
+###### 请求参数
+```$xslt
+{
+	"address":"0x59375A522876aB96B0ed2953D0D3b92674701Cc2",
+	"page": 1,
+	"limit":5
+}
+```
+###### 返回示例
+```$xslt
+{
+    "status": 200,
+    "data": {
+        "total": 1,
+        "list": [
+            {
+                "created_at": 1590901424,
+                "amount": "200000.000000",
+                "state": 1
+            }
+        ]
+    },
+    "msg": "success",
+    "error": ""
+}
+```
+----
+
+#### 分页拉取tt_pala的发送交易记录
+###### 请求url
+- POST /tac/get_tt_pala_send_records
+###### 请求参数
+```$xslt
+{
+	"address":"0x59375A522876aB96B0ed2953D0D3b92674701Cc2",
+	"page": 1,
+	"limit":5
+}
+```
+###### 返回示例
+```$xslt
+{
+    "status": 200,
+    "data": {
+        "total": 1,
+        "list": [
+            {
+                "created_at": 1590901509,
+                "amount": "10.000000",
+                "state": 1
+            }
+        ]
+    },
+    "msg": "success",
+    "error": ""
+}
+```
+----
+
+#### 分页拉取eth coin的发送交易记录
+###### 请求url
+- POST /tac/get_eth_send_records
+###### 请求参数
+```$xslt
+{
+	"address":"0x59375A522876aB96B0ed2953D0D3b92674701Cc2",
+	"page": 1,
+	"limit":5
+}
+```
+###### 返回示例
+```$xslt
+{
+    "status": 200,
+    "data": {
+        "total": 2,
+        "list": [
+            {
+                "created_at": 1590907272,
+                "amount": "0.000100",
+                "state": 0
+            },
+            {
+                "created_at": 1590901672,
+                "amount": "0.00",
+                "state": 1
+            }
+        ]
+    },
+    "msg": "success",
+    "error": ""
+}
+```
+----
+
+#### 分页拉取tt coin的发送交易记录
+###### 请求url
+- POST /tac/get_tt_send_records
+###### 请求参数
+```$xslt
+{
+	"address":"0x59375A522876aB96B0ed2953D0D3b92674701Cc2",
+	"page": 1,
+	"limit":5
+}
+```
+###### 返回示例
+```$xslt
+{
+    "status": 200,
+    "data": {
+        "total": 2,
+        "list": [
+            {
+                "created_at": 1590907260,
+                "amount": "0.001000",
+                "state": 1
+            },
+            {
+                "created_at": 1590901765,
+                "amount": "0.00",
+                "state": 1
+            }
+        ]
+    },
+    "msg": "success",
+    "error": ""
+}
+```
+----
+
+#### 分页拉取eth_usdt的发送交易记录
+###### 请求url
+- POST /tac/get_eth_usdt_send_records
+###### 请求参数
+```$xslt
+{
+	"address":"0x59375A522876aB96B0ed2953D0D3b92674701Cc2",
+	"page": 1,
+	"limit":5
+}
+```
+###### 返回示例
+```$xslt
+{
+    "status": 200,
+    "data": {
+        "total": 1,
+        "list": [
+            {
+                "created_at": 1590901832,
+                "amount": "1.000000",
+                "state": 1
+            }
+        ]
+    },
+    "msg": "success",
+    "error": ""
+}
+```
+----

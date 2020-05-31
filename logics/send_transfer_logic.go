@@ -86,8 +86,8 @@ func (p *PalaTransfer) SendPalaTx(chainTag int) (string, error) {
 	}
 	// 3.4 把交易info保存到sendTransfer表
 	ss := &models.SendTransfer{
-		From:         p.FromAddress,
-		To:           p.ToAddress,
+		FromAddress:  p.FromAddress,
+		ToAddress:    p.ToAddress,
 		Amount:       p.Amount,
 		TokenAddress: palaTokenAddress,
 		TxHash:       "",
@@ -216,8 +216,8 @@ func (c *CoinTransfer) SendMainNetCoinTransfer(chainTag int) (string, error) {
 
 	// 3.4 把交易info保存到sendTransfer
 	ss := &models.SendTransfer{
-		From:         c.FromAddress,
-		To:           c.ToAddress,
+		FromAddress:  c.FromAddress,
+		ToAddress:    c.ToAddress,
 		Amount:       c.Amount,
 		TokenAddress: "",
 		TxHash:       "",
@@ -335,8 +335,8 @@ func (c *EthUsdtTransfer) SendEthUsdtTransfer() (string, error) {
 	}
 	// 3.4 把交易info保存到sendTransfer表
 	ss := &models.SendTransfer{
-		From:         c.FromAddress,
-		To:           c.ToAddress,
+		FromAddress:  c.FromAddress,
+		ToAddress:    c.ToAddress,
 		Amount:       c.Amount,
 		TokenAddress: conf.EthUSDTTokenAddress,
 		TxHash:       "",

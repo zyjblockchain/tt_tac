@@ -69,6 +69,16 @@ func NewRouter(addr string) {
 		v1.POST("/send_tt_transfer", controllers.SendMainCoin(conf.TTChainTag))
 		// 21. 发送eth上的usdt币转账交易
 		v1.POST("/send_eth_usdt_transfer", controllers.SendEthUsdtTransfer())
+		// 22. 分页拉取eth_pala的发送交易记录
+		v1.POST("/get_eth_pala_send_records", controllers.GetSendTransferRecords(conf.EthChainTag, 2, 8))
+		// 23. 分页拉取tt_pala的发送交易记录
+		v1.POST("/get_tt_pala_send_records", controllers.GetSendTransferRecords(conf.TTChainTag, 2, 8))
+		// 24. 分页拉取eth coin的发送交易记录
+		v1.POST("/get_eth_send_records", controllers.GetSendTransferRecords(conf.EthChainTag, 1, 18))
+		// 25. 分页拉取tt coin的发送交易记录
+		v1.POST("/get_tt_send_records", controllers.GetSendTransferRecords(conf.TTChainTag, 1, 18))
+		// 26. 分页拉取eth_usdt的发送交易记录
+		v1.POST("/get_eth_usdt_send_records", controllers.GetSendTransferRecords(conf.EthChainTag, 3, 6))
 
 		// 内部管理接口
 		// 1. 对私钥进行对称加密，用于配置中间地址的私钥加密

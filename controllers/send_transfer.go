@@ -152,3 +152,42 @@ func SendEthUsdtTransfer() gin.HandlerFunc {
 		}
 	}
 }
+
+type SendTxRecord struct {
+	Address string `json:"address" binding:"required"`
+	Page    uint   `json:"page" binding:"required"`
+	Limit   uint   `json:"limit"`
+}
+
+// 分页拉取地址下的pala发送交易记录
+func GetSendTransferRecords(ownChain, coinType, decimal int) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		var params SendTxRecord
+		err := c.ShouldBind(&params)
+		if err != nil {
+			log.Errorf("get batch GetSendTransferRecords error: %v", err)
+			serializer.ErrorResponse(c, utils.VerifyParamsErrCode, utils.VerifyParamsErrMsg, err.Error())
+			return
+		}
+		if params.Limit == 0 {
+			params.Limit = 5
+		}
+		records, total, err := new(models.SendTransfer).GetBatchSendTransfer(params.Address, ownChain, coinType, params.Page, params.Limit)
+		if err != nil {
+			log.Errorf("GetSendTransferRecords get batch error: %v", err)
+			serializer.ErrorResponse(c, utils.GetSendTransferRecordsErrCode, utils.GetSendTransferRecordsErrMsg, err.Error())
+			return
+		} else {
+			resp := make([]tacResp, 0, 0)
+			for _, o := range records {
+				r := tacResp{
+					CreatedAt: o.CreatedAt.Unix(),
+					Amount:    utils.UnitConversion(o.Amount, decimal, 6),
+					State:     o.TxStatus,
+				}
+				resp = append(resp, r)
+			}
+			serializer.SuccessResponse(c, Result{Total: total, List: resp}, "success")
+		}
+	}
+}

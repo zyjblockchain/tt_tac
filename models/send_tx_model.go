@@ -1,11 +1,14 @@
 package models
 
-import "github.com/jinzhu/gorm"
+import (
+	"github.com/jinzhu/gorm"
+	"github.com/zyjblockchain/sandy_log/log"
+)
 
 type SendTransfer struct {
 	gorm.Model
-	From         string
-	To           string
+	FromAddress  string
+	ToAddress    string
 	Amount       string
 	TokenAddress string
 	TxHash       string
@@ -31,4 +34,22 @@ func (t *SendTransfer) Get() (*SendTransfer, error) {
 
 func (t *SendTransfer) Update(tt SendTransfer) error {
 	return DB.Model(t).Updates(tt).Error
+}
+
+// GetBatchSendTransfer page 页数，从第一页开始，limit 每一页的数量
+func (t *SendTransfer) GetBatchSendTransfer(fromAddr string, ownChain, coinType int, page, limit uint) ([]*SendTransfer, int, error) {
+	// 获取总的记录
+	total := 0
+	err := DB.Model(SendTransfer{}).Where("from_address = ? and own_chain = ? and coin_type = ?", fromAddr, ownChain, coinType).Count(&total).Error
+	if err != nil {
+		return nil, 0, err
+	}
+	offset := (page - 1) * limit
+	var orders []*SendTransfer
+	err = DB.Where("from_address = ? and own_chain = ? and coin_type = ?", fromAddr, ownChain, coinType).Order("id desc").Limit(limit).Offset(offset).Find(&orders).Error
+	if err != nil {
+		log.Errorf("get batch SendTransfer err: %v", err)
+		return nil, 0, err
+	}
+	return orders, total, nil
 }

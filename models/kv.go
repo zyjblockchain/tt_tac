@@ -6,8 +6,8 @@ import (
 
 type Kv struct {
 	gorm.Model
-	Key string
-	Val []byte `gorm:"type:text(0)"`
+	TKey string
+	TVal []byte `gorm:"type:text(0)"`
 }
 
 func (Kv) TableName() string {
@@ -16,21 +16,21 @@ func (Kv) TableName() string {
 
 func SetKv(k string, v []byte) error {
 	kv := Kv{
-		Key: k,
-		Val: v,
+		TKey: k,
+		TVal: v,
 	}
 	return DB.Create(&kv).Error
 }
 
 func GetKv(k string) ([]byte, error) {
 	var vv Kv
-	err := DB.Where(&Kv{Key: k}).First(&vv).Error
+	err := DB.Where(&Kv{TKey: k}).First(&vv).Error
 	if err != nil {
 		return nil, err
 	}
-	return vv.Val, nil
+	return vv.TVal, nil
 }
 
 func Update(key string, newVal []byte) error {
-	return DB.Model(&Kv{}).Updates(Kv{Key: key, Val: newVal}).Error
+	return DB.Model(Kv{}).Where("t_key = ?", key).Update("t_val", newVal).Error
 }

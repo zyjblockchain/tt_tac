@@ -26,7 +26,7 @@ func CheckUpdate() gin.HandlerFunc {
 			return
 		}
 		resp := logics.CheckUpdate(version)
-		serializer.SuccessResponse(c, resp, "success")
+		serializer.SuccessResponse(c, &resp, "success")
 	}
 }
 

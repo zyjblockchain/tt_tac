@@ -56,6 +56,15 @@ func CheckUpdate(version string) RespUpdate {
 
 	latestVersionArr := strings.Split(AppVersionInfo.Version, ".")
 	clientVersionArr := strings.Split(version, ".")
+	// todo 应该返回error
+	if len(clientVersionArr) != 3 {
+		return RespUpdate{
+			Update:  false,
+			Version: "",
+			WgtUrl:  "",
+			PkgUrl:  "",
+		}
+	}
 
 	lArr0, _ := strconv.Atoi(latestVersionArr[0])
 	cArr0, _ := strconv.Atoi(clientVersionArr[0])

@@ -14,6 +14,7 @@ import (
 	"github.com/zyjblockchain/tt_tac/utils/ding_robot"
 	eth_watcher "github.com/zyjblockchain/tt_tac/utils/eth-watcher"
 	"os"
+	"strings"
 )
 
 func main() {
@@ -102,29 +103,52 @@ func startBefore() {
 
 func initConf() {
 	var err error
+	// 1. 跨链地址和私钥
 	conf.TacMiddleAddress = os.Getenv("TacMiddleAddress")
 	log.Infof("tac_middles_address: %s", conf.TacMiddleAddress)
 	conf.TacMiddleAddressPrivate, err = utils.DecryptPrivate(os.Getenv("TacMiddleAddressPrivate"))
 	if err != nil {
 		panic(err)
 	}
+	// 检查私钥是否能还原出地址
+	address, err := utils.PrivateToAddress(conf.TacMiddleAddressPrivate)
+	if err != nil {
+		panic(fmt.Sprintf("跨链转账中转地址私钥转地址失败，请检查跨链转账私钥是否正确。error: %v", err))
+	}
+	// 地址比较
+	if strings.ToUpper(conf.TacMiddleAddress) != strings.ToUpper(address.String()) {
+		panic(fmt.Sprintf("跨链转账中转地址私钥还原出的地址与配置的地址不一致, oldAddress: %s, newAddress: %s", conf.TacMiddleAddress, address.String()))
+	}
 	log.Infof("tac_middles_encryto_private: %s", conf.TacMiddleAddressPrivate)
 
+	// 2. 数据库的dsn
 	conf.Dsn = os.Getenv("MYSQL_DSN")
 
+	// 3. 闪兑的地址和私钥
 	conf.EthFlashChangeMiddleAddress = os.Getenv("EthFlashChangeMiddleAddress")
 	log.Infof("flash_middles_address: %s", conf.EthFlashChangeMiddleAddress)
 	conf.EthFlashChangeMiddlePrivate, err = utils.DecryptPrivate(os.Getenv("EthFlashChangeMiddlePrivate"))
 	if err != nil {
 		panic(err)
 	}
+	// 检查私钥是否能还原出地址
+	address, err = utils.PrivateToAddress(conf.EthFlashChangeMiddlePrivate)
+	if err != nil {
+		panic(fmt.Sprintf("闪兑中转地址私钥转地址失败，请检查闪兑私钥是否正确。error: %v", err))
+	}
+	// 地址比较
+	if strings.ToUpper(conf.EthFlashChangeMiddleAddress) != strings.ToUpper(address.String()) {
+		panic(fmt.Sprintf("闪兑中转地址私钥还原出的地址与配置的地址不一致，oldAddress: %s, newAddress: %s", conf.EthFlashChangeMiddleAddress, address.String()))
+	}
 	log.Infof("flash_encryto_private: %s", conf.EthFlashChangeMiddlePrivate)
 
+	// 4. 钉钉webHook
 	conf.BalanceWebHook = os.Getenv("BalanceWebHook") // 中转地址余额不足的钉钉告警webHook
 	log.Infof("BalanceWebHook: %s", conf.BalanceWebHook)
 	conf.AbnormalWebHook = os.Getenv("AbnormalWebHook") // 其他异常的钉钉告警webHook
 	log.Infof("AbnormalWebHook: %s", conf.AbnormalWebHook)
 
+	// 5. usdt归集接收地址
 	conf.ReceiveUSDTAddress = os.Getenv("ReceiveUSDTAddress") // usdt归集接收地址
 	log.Infof("ReceiveUSDTAddress: %s", conf.ReceiveUSDTAddress)
 }

@@ -54,7 +54,7 @@ func (t *TacProcess) ListenErc20CollectionAddress() {
 				if err != nil {
 					// 钉钉群推送
 					content := fmt.Sprintf("tac 跨链转账失败；\nfrom：%s, \ntokenAddress: %s, \namount: %s. \nerror: %s", utils.FormatAddressHex(from), tokenAddress, amount.String(), err.Error())
-					_ = ding_robot.NewRobot(conf.WebHook).SendText(content, nil, false)
+					_ = ding_robot.NewRobot(conf.AbnormalWebHook).SendText(content, nil, false)
 					log.Errorf("执行跨链转账逻辑失败，error: %v；from: %s; to: %s; amount: %s; tokenAddress: %s", err, utils.FormatAddressHex(from), utils.FormatAddressHex(to), amount.String(), tokenAddress)
 				}
 			}()
@@ -95,7 +95,7 @@ func (t *TacProcess) ProcessCollectionTx(from, amount string) error {
 		// todo 监听到的收款信息在order中查不到，可能是充值余额到中转地址的操作，所以不用退还，需要钉钉推送通知
 		content := fmt.Sprintf("tac 收到了一笔没有转账订单的转入交易；\nfrom: %s, \nto: %s, \ntokenAddress: %s, \namount: %s",
 			utils.FormatAddressHex(from), utils.FormatAddressHex(t.TransferMiddleAddress), utils.FormatAddressHex(t.TransferTokenAddress), amount)
-		_ = ding_robot.NewRobot(conf.WebHook).SendText(content, nil, false)
+		_ = ding_robot.NewRobot(conf.AbnormalWebHook).SendText(content, nil, false)
 		return nil
 	}
 

@@ -31,7 +31,7 @@ func main() {
 			log.Errorf("以太坊上的block watcher error: %v", err)
 			// 钉钉推送
 			content := fmt.Sprintf("以太坊上的block watcher返回error,服务已经停止，请重启服务")
-			_ = ding_robot.NewRobot(conf.WebHook).SendText(content, nil, true)
+			_ = ding_robot.NewRobot(conf.AbnormalWebHook).SendText(content, nil, true)
 			panic(err)
 		}
 	}()
@@ -44,7 +44,7 @@ func main() {
 			log.Errorf("thundercore上的block watcher error: %v", err)
 			// 钉钉推送
 			content := fmt.Sprintf("thundercore上的block watcher返回error,服务已经停止，请重启服务")
-			_ = ding_robot.NewRobot(conf.WebHook).SendText(content, nil, true)
+			_ = ding_robot.NewRobot(conf.AbnormalWebHook).SendText(content, nil, true)
 			panic(err)
 		}
 	}()
@@ -103,19 +103,28 @@ func startBefore() {
 func initConf() {
 	var err error
 	conf.TacMiddleAddress = os.Getenv("TacMiddleAddress")
-	// todo 正式环境配置文件中的private是aes加密之后的，所以这里需要解密
+	log.Infof("tac_middles_address: %s", conf.TacMiddleAddress)
 	conf.TacMiddleAddressPrivate, err = utils.DecryptPrivate(os.Getenv("TacMiddleAddressPrivate"))
 	if err != nil {
 		panic(err)
 	}
+	log.Infof("tac_middles_encryto_private: %s", conf.TacMiddleAddressPrivate)
 
 	conf.Dsn = os.Getenv("MYSQL_DSN")
 
 	conf.EthFlashChangeMiddleAddress = os.Getenv("EthFlashChangeMiddleAddress")
+	log.Infof("flash_middles_address: %s", conf.EthFlashChangeMiddleAddress)
 	conf.EthFlashChangeMiddlePrivate, err = utils.DecryptPrivate(os.Getenv("EthFlashChangeMiddlePrivate"))
 	if err != nil {
 		panic(err)
 	}
-	conf.WebHook = os.Getenv("WEBHOOK")                       // 钉钉告警webHook
+	log.Infof("flash_encryto_private: %s", conf.EthFlashChangeMiddlePrivate)
+
+	conf.BalanceWebHook = os.Getenv("BalanceWebHook") // 中转地址余额不足的钉钉告警webHook
+	log.Infof("BalanceWebHook: %s", conf.BalanceWebHook)
+	conf.AbnormalWebHook = os.Getenv("AbnormalWebHook") // 其他异常的钉钉告警webHook
+	log.Infof("AbnormalWebHook: %s", conf.AbnormalWebHook)
+
 	conf.ReceiveUSDTAddress = os.Getenv("ReceiveUSDTAddress") // usdt归集接收地址
+	log.Infof("ReceiveUSDTAddress: %s", conf.ReceiveUSDTAddress)
 }

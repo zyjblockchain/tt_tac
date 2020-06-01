@@ -5,9 +5,13 @@ MYSQL_DSN="tac_user:NwHJhkcTKHmDr2RZ@tcp(223.27.39.183:3306)/tac_db?charset=utf8
 # gin运行mode
 GIN_MODE="debug"
 
-# 钉钉告警webHook
-# WEBHOOK="https://oapi.dingtalk.com/robot/send?access_token=b4ff4c39e202803e650886c6a93003e5423796525d9ff1f777c13a2a03762da8"
-WEBHOOK="https://oapi.dingtalk.com/robot/send?access_token=6c639cfa542d62c6a63af694c2e8eccef6fb1fe51c6d036a53bfdaa7bef5e38f"
+# 监听到中转地址余额不足的钉钉告警webHook, 第一个为测试环境的webHook,第二个为正式环境的webHook
+# BalanceWebHook="https://oapi.dingtalk.com/robot/send?access_token=b4ff4c39e202803e650886c6a93003e5423796525d9ff1f777c13a2a03762da8"
+BalanceWebHook="https://oapi.dingtalk.com/robot/send?access_token=6c639cfa542d62c6a63af694c2e8eccef6fb1fe51c6d036a53bfdaa7bef5e38f"
+
+# 系统普通异常的钉钉告警，第一个为测试环境的webHook,第二个为正式环境的webHook
+# AbnormalWebHook="https://oapi.dingtalk.com/robot/send?access_token=b4ff4c39e202803e650886c6a93003e5423796525d9ff1f777c13a2a03762da8"
+AbnormalWebHook="https://oapi.dingtalk.com/robot/send?access_token=e16274dc8e99cc343f31d9ca390ae3905c5965f937538f5424124be0c95607d1"
 
 # 跨链转账中转地址
 TacMiddleAddress="0x59375A522876aB96B0ed2953D0D3b92674701Cc2"

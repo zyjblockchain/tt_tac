@@ -188,7 +188,7 @@ func (w *WatchFlashChange) ListenFlashChangeTx() {
 				if err != nil {
 					// 钉钉群推送
 					content := fmt.Sprintf("闪兑失败；\nfrom：%s, \ntokenAddress: %s, \namount: %s,\nerror: %s", utils.FormatAddressHex(from), tokenAddress, amount.String(), err.Error())
-					_ = ding_robot.NewRobot(conf.WebHook).SendText(content, nil, true)
+					_ = ding_robot.NewRobot(conf.AbnormalWebHook).SendText(content, nil, true)
 					log.Errorf("执行闪兑逻辑失败，error: %v；from: %s; to: %s; amount: %s; tokenAddress: %s", err, utils.FormatAddressHex(from), utils.FormatAddressHex(to), amount.String(), tokenAddress)
 				}
 			}()
@@ -222,7 +222,7 @@ func (w *WatchFlashChange) ProcessCollectFlashChangeTx(from, amount string) erro
 		log.Errorf("通过OperateAddress查询闪兑订单失败。OperateAddress: %s, error: %v", from, err)
 		content := fmt.Sprintf("tac 收到了一笔没有转账订单的USDT转入交易；\nfrom: %s, \nto: %s, \ntokenAddress: %s, \namount: %s",
 			utils.FormatAddressHex(from), utils.FormatAddressHex(conf.EthFlashChangeMiddleAddress), utils.FormatAddressHex(w.FromTokenAddress), amount)
-		_ = ding_robot.NewRobot(conf.WebHook).SendText(content, nil, true)
+		_ = ding_robot.NewRobot(conf.AbnormalWebHook).SendText(content, nil, true)
 		return nil
 	}
 

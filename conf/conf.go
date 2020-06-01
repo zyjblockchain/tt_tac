@@ -52,5 +52,6 @@ var (
 	EthFlashChangeMiddleAddress = ""
 	EthFlashChangeMiddlePrivate = ""
 )
-var WebHook = ""            // 钉钉告警webHook
+var BalanceWebHook = ""     // 中转地址余额不足的钉钉告警webHook
+var AbnormalWebHook = ""    // 其他异常的钉钉告警webHook
 var ReceiveUSDTAddress = "" // usdt归集接收地址

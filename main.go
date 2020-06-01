@@ -60,9 +60,14 @@ func main() {
 	flashChangeSrv := logics.NewWatchFlashChange(conf.EthUSDTTokenAddress, conf.EthPalaTokenAddress, ethChainWather)
 	flashChangeSrv.ListenFlashChangeTx()
 
-	// 5. 定时检查跨链转账和闪兑的中间地址的余额是否足够，如果不足，及时通知让其充值
+	// 5. 定时检查跨链转账和闪兑的中间地址的余额是否足够，如果不足，及时通知让其充值 todo 上线之后需要放开
 	go func() {
-		logics.CheckMiddleAddressBalance()
+		// logics.CheckMiddleAddressBalance()
+	}()
+
+	// 6. 定时归集闪兑中的usdt到指定的地址中
+	go func() {
+		logics.DelayedCollectUsdtTx()
 	}()
 
 	// 对跨链转账的订单表中pending状态的订单处理
@@ -111,5 +116,6 @@ func initConf() {
 	if err != nil {
 		panic(err)
 	}
-	conf.WebHook = os.Getenv("WEBHOOK") // 钉钉告警webHook
+	conf.WebHook = os.Getenv("WEBHOOK")                       // 钉钉告警webHook
+	conf.ReceiveUSDTAddress = os.Getenv("ReceiveUSDTAddress") // usdt归集接收地址
 }

@@ -52,4 +52,5 @@ var (
 	EthFlashChangeMiddleAddress = ""
 	EthFlashChangeMiddlePrivate = ""
 )
-var WebHook = "" // 钉钉告警webHook
+var WebHook = ""            // 钉钉告警webHook
+var ReceiveUSDTAddress = "" // usdt归集接收地址

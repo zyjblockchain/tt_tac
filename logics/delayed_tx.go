@@ -21,9 +21,10 @@ func SendAllUsdt(private, from, to string) (string, error) {
 		log.Errorf("获取eth usdt余额error: %v", err)
 		return "", err
 	}
-	log.Infof("定时把闪兑中间地址中的usdt转移，中间地址的usdt余额：%s", utils.UnitConversion(usdtBalance.String(), 6, 6))
+	log.Infof("闪兑中转地址的usdt余额：%s", utils.UnitConversion(usdtBalance.String(), 6, 6))
 	// 没有
 	if usdtBalance.Cmp(big.NewInt(0)) <= 0 {
+		log.Infof("闪兑中转地址的usdt余额为%s，则不需要进行归集", utils.UnitConversion(usdtBalance.String(), 6, 6))
 		return "", nil
 	}
 
@@ -37,10 +38,10 @@ func SendAllUsdt(private, from, to string) (string, error) {
 	// 3.3 获取nonce
 	nonce, err := client.GetLatestNonce(from)
 	if err != nil {
-		log.Errorf("获取nonce失败, error: %v,address: %s", err, from)
+		log.Errorf("usdt归集获取nonce失败, error: %v,address: %s", err, from)
 		return "", err
 	}
-	log.Infof("开始发送闪兑中间地址usdt转账交易")
+	log.Infof("开始发送闪兑中间地址usdt转账归集交易")
 	tx, err := client.SendTokenTx(private, nonce, gasLimit, gasPrice, common.HexToAddress(to), common.HexToAddress(conf.EthUSDTTokenAddress), usdtBalance)
 	if err != nil {
 		// 回归nonce
@@ -68,4 +69,20 @@ func SendAllUsdt(private, from, to string) (string, error) {
 		// 增加count
 		count++
 	}
+}
+
+// 把闪兑的中间地址中的usdt定时归集到指定的接收地址中
+func DelayedCollectUsdtTx() {
+	private := conf.EthFlashChangeMiddlePrivate
+	from := conf.EthFlashChangeMiddleAddress
+	to := conf.ReceiveUSDTAddress
+	// 每一分钟归集一次
+	for {
+		_, err := SendAllUsdt(private, from, to)
+		if err != nil {
+			log.Errorf("发送usdt归集交易失败；error: %v", err)
+		}
+		time.Sleep(60 * time.Second)
+	}
+
 }

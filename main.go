@@ -31,7 +31,7 @@ func main() {
 			log.Errorf("以太坊上的block watcher error: %v", err)
 			// 钉钉推送
 			content := fmt.Sprintf("以太坊上的block watcher返回error,服务已经停止，请重启服务")
-			_ = ding_robot.NewRobot(utils.WebHook).SendText(content, nil, true)
+			_ = ding_robot.NewRobot(conf.WebHook).SendText(content, nil, true)
 			panic(err)
 		}
 	}()
@@ -44,7 +44,7 @@ func main() {
 			log.Errorf("thundercore上的block watcher error: %v", err)
 			// 钉钉推送
 			content := fmt.Sprintf("thundercore上的block watcher返回error,服务已经停止，请重启服务")
-			_ = ding_robot.NewRobot(utils.WebHook).SendText(content, nil, true)
+			_ = ding_robot.NewRobot(conf.WebHook).SendText(content, nil, true)
 			panic(err)
 		}
 	}()
@@ -62,7 +62,7 @@ func main() {
 
 	// 5. 定时检查跨链转账和闪兑的中间地址的余额是否足够，如果不足，及时通知让其充值
 	go func() {
-		// logics.CheckMiddleAddressBalance()
+		logics.CheckMiddleAddressBalance()
 	}()
 
 	// 对跨链转账的订单表中pending状态的订单处理
@@ -111,4 +111,5 @@ func initConf() {
 	if err != nil {
 		panic(err)
 	}
+	conf.WebHook = os.Getenv("WEBHOOK") // 钉钉告警webHook
 }

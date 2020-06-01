@@ -52,3 +52,4 @@ var (
 	EthFlashChangeMiddleAddress = ""
 	EthFlashChangeMiddlePrivate = ""
 )
+var WebHook = "" // 钉钉告警webHook

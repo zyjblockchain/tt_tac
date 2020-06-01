@@ -40,7 +40,7 @@ func (r *Robot) SendText(content string, atMobiles []string, isAtall bool) error
 	return r.send(&textMsg{
 		MsgType: "text",
 		Text: textParams{
-			Content: content,
+			Content: content + ".",
 		},
 		At: AtParams{
 			AtMobiles: atMobiles,

@@ -130,7 +130,8 @@ func (g *GetGasFee) GetGasFee() (*Fee, error) {
 
 // CheckMiddleAddressBalance 定时检查中间地址的各种资产的balance是否足够
 func CheckMiddleAddressBalance() {
-	dingRobot := ding_robot.NewRobot(utils.WebHook)
+	dingRobot := ding_robot.NewRobot(conf.WebHook)
+	log.Infof("钉钉告警webHook: %s", conf.WebHook)
 	getBalanceTicker := time.NewTicker(30 * time.Second)
 	ethClient := transaction.NewChainClient(conf.EthChainNet, big.NewInt(int64(conf.EthChainID)))
 	ttClient := transaction.NewChainClient(conf.TTChainNet, big.NewInt(int64(conf.TTChainID)))

@@ -15,12 +15,14 @@ const (
 	EthChainTag = 17
 )
 
+// 正式环境的token
 // const (
 // 	EthPalaTokenAddress = "0xD20fb5cf926Dc29c88f64725e6f911f40f7bf531" // 以太坊主网上的pala合约地址
 // 	TtPalaTokenAddress = "0xeff6f1612d03205BA5E8d26cAc1397bf778ab1AC" // tt主网上的pala合约地址
 // 	EthUSDTTokenAddress = "0xdAC17F958D2ee523a2206206994597C13D831ec7" // 以太坊主网上的USDT合约地址
 // )
 
+// 测试环境的token
 const (
 	EthPalaTokenAddress = "0x03332638A6b4F5442E85d6e6aDF929Cd678914f1" // 以太坊上的pala erc20 地址，目前是测试环境 以太坊rinkeby 上的test3
 	TtPalaTokenAddress  = "0x087cC4Aaa83aCA54bDCC89920483c8e2a30Bc47c" // tt上的pala 地址，目前是测试环境tt主网上的sandy

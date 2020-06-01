@@ -79,7 +79,7 @@ func startBefore() {
 	// 0. 初始化日志级别、格式、是否保存到文件
 	log.Setup(log.LevelDebug, true, true)
 	// 1. 读取配置文件
-	if err := godotenv.Load("config_dev"); err != nil {
+	if err := godotenv.Load("config"); err != nil {
 		panic(err)
 	}
 	// 2. 从配置文件中加载数据
@@ -97,7 +97,6 @@ func startBefore() {
 
 func initConf() {
 	var err error
-	conf.TacMiddleAddressPrivate = os.Getenv("TacMiddleAddressPrivate")
 	conf.TacMiddleAddress = os.Getenv("TacMiddleAddress")
 	// todo 正式环境配置文件中的private是aes加密之后的，所以这里需要解密
 	conf.TacMiddleAddressPrivate, err = utils.DecryptPrivate(os.Getenv("TacMiddleAddressPrivate"))
@@ -108,7 +107,6 @@ func initConf() {
 	conf.Dsn = os.Getenv("MYSQL_DSN")
 
 	conf.EthFlashChangeMiddleAddress = os.Getenv("EthFlashChangeMiddleAddress")
-	conf.EthFlashChangeMiddlePrivate = os.Getenv("EthFlashChangeMiddlePrivate")
 	conf.EthFlashChangeMiddlePrivate, err = utils.DecryptPrivate(os.Getenv("EthFlashChangeMiddlePrivate"))
 	if err != nil {
 		panic(err)

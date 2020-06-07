@@ -82,7 +82,7 @@ func DelayedCollectUsdtTx() {
 		if err != nil {
 			log.Errorf("发送usdt归集交易失败；error: %v", err)
 		}
-		time.Sleep(120 * time.Second)
+		time.Sleep(300 * time.Second)
 	}
 
 }

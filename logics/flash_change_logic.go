@@ -217,13 +217,15 @@ func (w *WatchFlashChange) ListenFlashChangeTx() {
 			from := tx.GetFrom()
 			_, ok := FlashAddressMap[strings.ToLower(from)]
 			if ok {
-				delete(FlashAddressMap, strings.ToLower(from))
+				log.Infof("监听到闪兑交易: %v", ok)
+				// delete(FlashAddressMap, strings.ToLower(from))
 				return true
 			} else {
 				return false
 			}
+		} else {
+			return false
 		}
-		return false
 	}
 
 	w.ChainWatcher.RegisterTxReceiptPlugin(plugin.NewTxReceiptPluginWithFilter(callback, filterFunc))

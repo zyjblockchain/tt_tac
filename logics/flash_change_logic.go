@@ -76,7 +76,7 @@ func (f *FlashChange) FlashChange() (uint, error) {
 	// 3. 执行闪兑process
 	// 3.1 保存闪兑订单
 	fo := &models.FlashChangeOrder{
-		OperateAddress:   f.OperateAddress,
+		OperateAddress:   strings.ToLower(f.OperateAddress),
 		FromTokenAddress: f.FromTokenAddress,
 		ToTokenAddress:   f.ToTokenAddress,
 		FromTokenAmount:  f.FromTokenAmount,
@@ -207,11 +207,19 @@ func (w *WatchFlashChange) ListenFlashChangeTx() {
 
 	filterFunc := func(tx blockchain.Transaction) bool {
 		to := tx.GetTo()
-		// if strings.ToLower(w.FromTokenAddress) == strings.ToLower(to) {
-		// 	log.Warnf("过滤到闪兑的Usdt交易: %s", tx.GetHash())
-		// }
-		return strings.ToLower(w.FromTokenAddress) == strings.ToLower(to)
+		if strings.ToLower(w.FromTokenAddress) == strings.ToLower(to) {
+			// 判断from是否存在于闪兑的订单中
+			from := tx.GetFrom()
+			_, err := (&models.FlashChangeOrder{OperateAddress: strings.ToLower(from)}).Get()
+			if err != nil {
+				return false
+			} else {
+				return true
+			}
+		}
+		return false
 	}
+
 	w.ChainWatcher.RegisterTxReceiptPlugin(plugin.NewTxReceiptPluginWithFilter(callback, filterFunc))
 	// w.ChainWatcher.RegisterTxReceiptPlugin(plugin.NewERC20TransferPlugin(func(tokenAddress, from, to string, amount decimal.Decimal, isRemoved bool) {
 	// 	// 监听中转地址接收到usdt的交易
@@ -252,7 +260,7 @@ func (w *WatchFlashChange) ProcessCollectFlashChangeTx(from, amount string) erro
 	}
 
 	// 2. 在FlashChangeOrder 表中查看此from是否申请了闪兑的订单
-	fo, err := (&models.FlashChangeOrder{OperateAddress: from}).Get()
+	fo, err := (&models.FlashChangeOrder{OperateAddress: strings.ToLower(from)}).Get()
 	if err != nil {
 		log.Errorf("通过OperateAddress查询闪兑订单失败。OperateAddress: %s, error: %v", from, err)
 		content := fmt.Sprintf("tac 收到了一笔没有转账订单的USDT转入交易；\nfrom: %s, \nto: %s, \ntokenAddress: %s, \namount: %s",

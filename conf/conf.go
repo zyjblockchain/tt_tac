@@ -14,11 +14,11 @@ const (
 	// EthChainID  = 4
 
 	// 备用节点
-	// EthChainNet = "https://mainnet.infura.io/v3/5d519236943c40f5a87621317a576060" // 18382255942
+	EthChainNet = "https://mainnet.infura.io/v3/5d519236943c40f5a87621317a576060" // 18382255942
 
 	// 主网
-	EthChainNet = "https://mainnet.infura.io/v3/7bbf73a8855d4c0491f93e6dc498360d" // 1263344073
-	EthChainID  = 1                                                               // 以太坊的主网chainId == 1
+	// EthChainNet = "https://mainnet.infura.io/v3/7bbf73a8855d4c0491f93e6dc498360d" // 1263344073
+	EthChainID  = 1 // 以太坊的主网chainId == 1
 	EthChainTag = 17
 )
 

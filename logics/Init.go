@@ -10,6 +10,7 @@ import (
 	"github.com/zyjblockchain/tt_tac/models"
 	transaction "github.com/zyjblockchain/tt_tac/utils/tx_utils"
 	"math/big"
+	"strings"
 	"time"
 )
 
@@ -151,6 +152,8 @@ func InitFlashOrderState(flashSvr *WatchFlashChange) {
 	}
 	log.Infof("开始遍历查询出来的flash change order。订单数量：%d", len(flashOrds))
 	for _, ord := range flashOrds {
+		// 记录到缓存中
+		FlashAddressMap[strings.ToLower(ord.OperateAddress)] = 1
 		// 1. 查看是否有SendTxId
 		if ord.SendTxId == 0 {
 			log.Infof("1. 闪兑订单中没有sendTxId,则删除订单")

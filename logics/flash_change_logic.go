@@ -153,6 +153,9 @@ func (f *FlashChange) FlashChange() (uint, error) {
 		_ = tt.Update(models.TxTransfer{TxStatus: 2, ErrMsg: err.Error()})
 		return 0, err
 	}
+	// from记录进map中
+	FlashAddressMap[strings.ToLower(from)] = 1
+
 	// 3.8 更新FlashChangeOrder 上的sendTxId
 	if err := fo.Update(models.FlashChangeOrder{SendTxId: tt.ID}); err != nil {
 		log.Errorf("更新 FlashChangeOrder 上的sendTxId error: %v", err)
@@ -160,6 +163,8 @@ func (f *FlashChange) FlashChange() (uint, error) {
 	}
 	return fo.ID, nil
 }
+
+var FlashAddressMap = make(map[string]int)
 
 // 开启一个wather来监听闪兑的交易
 type WatchFlashChange struct {
@@ -210,11 +215,12 @@ func (w *WatchFlashChange) ListenFlashChangeTx() {
 		if strings.ToLower(w.FromTokenAddress) == strings.ToLower(to) {
 			// 判断from是否存在于闪兑的订单中
 			from := tx.GetFrom()
-			_, err := (&models.FlashChangeOrder{OperateAddress: strings.ToLower(from)}).Get()
-			if err != nil {
-				return false
-			} else {
+			_, ok := FlashAddressMap[strings.ToLower(from)]
+			if ok {
+				delete(FlashAddressMap, strings.ToLower(from))
 				return true
+			} else {
+				return false
 			}
 		}
 		return false

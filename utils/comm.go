@@ -4,7 +4,11 @@ import (
 	"errors"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/shopspring/decimal"
 	"github.com/zyjblockchain/tt_tac/conf"
+	"github.com/zyjblockchain/tt_tac/utils/eth-watcher/blockchain"
+	"github.com/zyjblockchain/tt_tac/utils/eth-watcher/plugin"
+	"github.com/zyjblockchain/tt_tac/utils/eth-watcher/structs"
 	"math/big"
 	"strings"
 )
@@ -202,4 +206,33 @@ func FormatTokenAmount(input string, decimal int) string {
 	// 去除前缀的0
 	result = strings.TrimLeft(result, "0")
 	return result
+}
+
+type TransferEvent struct {
+	Token string
+	From  string
+	To    string
+	Value decimal.Decimal
+}
+
+func ExtractERC20TransfersIfExist(r *structs.RemovableTxAndReceipt) (rst []TransferEvent) {
+	transferEventSig := "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef"
+
+	// todo a little weird
+	if receipt, ok := r.Receipt.(*blockchain.EthereumTransactionReceipt); ok {
+		for _, log := range receipt.Logs {
+			if len(log.Topics) != 3 || log.Topics[0] != transferEventSig {
+				continue
+			}
+
+			from := log.Topics[1]
+			to := log.Topics[2]
+
+			if amount, ok := plugin.HexToDecimal(log.Data); ok {
+				rst = append(rst, TransferEvent{log.Address, from, to, amount})
+			}
+		}
+	}
+
+	return
 }

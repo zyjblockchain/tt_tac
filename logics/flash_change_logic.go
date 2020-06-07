@@ -6,14 +6,15 @@ import (
 	"fmt"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/jinzhu/gorm"
-	"github.com/shopspring/decimal"
 	"github.com/zyjblockchain/sandy_log/log"
 	"github.com/zyjblockchain/tt_tac/conf"
 	"github.com/zyjblockchain/tt_tac/models"
 	"github.com/zyjblockchain/tt_tac/utils"
 	"github.com/zyjblockchain/tt_tac/utils/ding_robot"
 	eth_watcher "github.com/zyjblockchain/tt_tac/utils/eth-watcher"
+	"github.com/zyjblockchain/tt_tac/utils/eth-watcher/blockchain"
 	"github.com/zyjblockchain/tt_tac/utils/eth-watcher/plugin"
+	"github.com/zyjblockchain/tt_tac/utils/eth-watcher/structs"
 	transaction "github.com/zyjblockchain/tt_tac/utils/tx_utils"
 	"math/big"
 	"strings"
@@ -178,22 +179,56 @@ func NewWatchFlashChange(fromTokenAddress, toTokenAddress string, ethChainWatche
 }
 
 func (w *WatchFlashChange) ListenFlashChangeTx() {
-	w.ChainWatcher.RegisterTxReceiptPlugin(plugin.NewERC20TransferPlugin(func(tokenAddress, from, to string, amount decimal.Decimal, isRemoved bool) {
-		// 监听中转地址接收到usdt的交易
-		if (!isRemoved) && strings.ToLower(utils.FormatAddressHex(tokenAddress)) == strings.ToLower(w.FromTokenAddress) && strings.ToLower(utils.FormatAddressHex(to)) == strings.ToLower(utils.FormatAddressHex(conf.EthFlashChangeMiddleAddress)) {
-			log.Infof("监听到闪兑接收地址有转入记录：tokenAddress: %s; from: %s, to: %s, amount: %s", tokenAddress, utils.FormatAddressHex(from), utils.FormatAddressHex(to), amount.String())
-			// 开启一个协程来处理闪兑接收地址
-			go func() {
-				err := w.ProcessCollectFlashChangeTx(utils.FormatAddressHex(from), amount.String())
-				if err != nil {
-					// 钉钉群推送
-					content := fmt.Sprintf("闪兑失败；\nfrom：%s, \ntokenAddress: %s, \namount: %s,\nerror: %s", utils.FormatAddressHex(from), tokenAddress, amount.String(), err.Error())
-					_ = ding_robot.NewRobot(conf.AbnormalWebHook).SendText(content, nil, true)
-					log.Errorf("执行闪兑逻辑失败，error: %v；from: %s; to: %s; amount: %s; tokenAddress: %s", err, utils.FormatAddressHex(from), utils.FormatAddressHex(to), amount.String(), tokenAddress)
-				}
-			}()
+	callback := func(txAndReceipt *structs.RemovableTxAndReceipt) {
+		events := utils.ExtractERC20TransfersIfExist(txAndReceipt)
+		for _, e := range events {
+			tokenAddress := e.Token
+			from := e.From
+			to := e.To
+			amount := e.Value
+			isRemoved := txAndReceipt.IsRemoved
+			// 监听中转地址接收到usdt的交易
+			if (!isRemoved) && strings.ToLower(utils.FormatAddressHex(tokenAddress)) == strings.ToLower(w.FromTokenAddress) && strings.ToLower(utils.FormatAddressHex(to)) == strings.ToLower(utils.FormatAddressHex(conf.EthFlashChangeMiddleAddress)) {
+				log.Infof("监听到闪兑接收地址有转入记录：tokenAddress: %s; from: %s, to: %s, amount: %s", tokenAddress, utils.FormatAddressHex(from), utils.FormatAddressHex(to), amount.String())
+				// 开启一个协程来处理闪兑接收地址
+				go func() {
+					err := w.ProcessCollectFlashChangeTx(utils.FormatAddressHex(from), amount.String())
+					if err != nil {
+						// 钉钉群推送
+						content := fmt.Sprintf("闪兑失败；\nfrom：%s, \ntokenAddress: %s, \namount: %s,\nerror: %s", utils.FormatAddressHex(from), tokenAddress, amount.String(), err.Error())
+						_ = ding_robot.NewRobot(conf.AbnormalWebHook).SendText(content, nil, true)
+						log.Errorf("执行闪兑逻辑失败，error: %v；from: %s; to: %s; amount: %s; tokenAddress: %s", err, utils.FormatAddressHex(from), utils.FormatAddressHex(to), amount.String(), tokenAddress)
+					}
+				}()
+			}
+
 		}
-	}))
+	}
+
+	filterFunc := func(tx blockchain.Transaction) bool {
+		to := tx.GetTo()
+		// if strings.ToLower(w.FromTokenAddress) == strings.ToLower(to) {
+		// 	log.Warnf("过滤到闪兑的Usdt交易: %s", tx.GetHash())
+		// }
+		return strings.ToLower(w.FromTokenAddress) == strings.ToLower(to)
+	}
+	w.ChainWatcher.RegisterTxReceiptPlugin(plugin.NewTxReceiptPluginWithFilter(callback, filterFunc))
+	// w.ChainWatcher.RegisterTxReceiptPlugin(plugin.NewERC20TransferPlugin(func(tokenAddress, from, to string, amount decimal.Decimal, isRemoved bool) {
+	// 	// 监听中转地址接收到usdt的交易
+	// 	if (!isRemoved) && strings.ToLower(utils.FormatAddressHex(tokenAddress)) == strings.ToLower(w.FromTokenAddress) && strings.ToLower(utils.FormatAddressHex(to)) == strings.ToLower(utils.FormatAddressHex(conf.EthFlashChangeMiddleAddress)) {
+	// 		log.Infof("监听到闪兑接收地址有转入记录：tokenAddress: %s; from: %s, to: %s, amount: %s", tokenAddress, utils.FormatAddressHex(from), utils.FormatAddressHex(to), amount.String())
+	// 		// 开启一个协程来处理闪兑接收地址
+	// 		go func() {
+	// 			err := w.ProcessCollectFlashChangeTx(utils.FormatAddressHex(from), amount.String())
+	// 			if err != nil {
+	// 				// 钉钉群推送
+	// 				content := fmt.Sprintf("闪兑失败；\nfrom：%s, \ntokenAddress: %s, \namount: %s,\nerror: %s", utils.FormatAddressHex(from), tokenAddress, amount.String(), err.Error())
+	// 				_ = ding_robot.NewRobot(conf.AbnormalWebHook).SendText(content, nil, true)
+	// 				log.Errorf("执行闪兑逻辑失败，error: %v；from: %s; to: %s; amount: %s; tokenAddress: %s", err, utils.FormatAddressHex(from), utils.FormatAddressHex(to), amount.String(), tokenAddress)
+	// 			}
+	// 		}()
+	// 	}
+	// }))
 }
 
 // ProcessCollectFlashChangeTx 处理监听的闪兑接口监听到转入交易流程

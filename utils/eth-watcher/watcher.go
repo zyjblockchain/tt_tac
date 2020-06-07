@@ -260,7 +260,7 @@ func (watcher *AbstractWatcher) needReceipt(tx blockchain.Transaction) bool {
 	plugins := watcher.TxReceiptPlugins
 
 	for _, p := range plugins {
-		if filterPlugin, ok := p.(plugin.TxReceiptPluginWithFilter); ok {
+		if filterPlugin, ok := p.(*plugin.TxReceiptPluginWithFilter); ok {
 			if filterPlugin.NeedReceipt(tx) {
 				return true
 			}
@@ -300,10 +300,12 @@ func (watcher *AbstractWatcher) addNewBlock(block *structs.RemovableBlock, curHi
 		tx := block.GetTransactions()[i]
 
 		if !watcher.needReceipt(tx) {
-			//logrus.Debugf("no need to get receipt of tx(%s), skipped", tx.GetHash())
+			// log.Infof("不需要receipt, txHash: %s", tx.GetHash())
+			// logrus.Debugf("no need to get receipt of tx(%s), skipped", tx.GetHash())
 			continue
 		} else {
-			logrus.Debugf("needReceipt of tx: %s in block: %d", tx.GetHash(), block.Number())
+			// log.Infof("需要receipt, txHash: %s", tx.GetHash())
+			// logrus.Debugf("needReceipt of tx: %s in block: %d", tx.GetHash(), block.Number())
 		}
 
 		syncSigName := fmt.Sprintf("B:%d T:%s", block.Number(), tx.GetHash())

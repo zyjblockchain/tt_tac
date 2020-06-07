@@ -214,7 +214,7 @@ func (p *TokenTxsReceiveRecord) GetEthTokenTxRecord(tokenAddress string, decimal
 	// 筛选出接收的record
 	var receiveTxs = make([]ReceiveTxRecord, 0, 5)
 	for _, tx := range txs {
-		if tx.To == address {
+		if strings.ToLower(tx.To) == strings.ToLower(address) {
 			receiveTxs = append(receiveTxs, ReceiveTxRecord{
 				From:   tx.From,
 				To:     address,
@@ -246,7 +246,7 @@ func (e *EthTxsRecord) GetEthTxsRecord() ([]ReceiveTxRecord, error) {
 	// 筛选出接收的record
 	var receiveTxs = make([]ReceiveTxRecord, 0, 5)
 	for _, tx := range txs {
-		if tx.To == address {
+		if strings.ToLower(tx.To) == strings.ToLower(address) {
 			receiveTxs = append(receiveTxs, ReceiveTxRecord{
 				From:   tx.From,
 				To:     address,

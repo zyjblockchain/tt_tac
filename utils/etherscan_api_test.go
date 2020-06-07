@@ -5,8 +5,8 @@ import (
 )
 
 func TestEtherscanApi(t *testing.T) {
-	contractAddress := "0x3f69636Af46718cBd27002c65256226742309E1f"
-	address := "0xb378413ef8b086628d1f0f01fef785ab501970fa"
+	contractAddress := "0xD20fb5cf926Dc29c88f64725e6f911f40f7bf531"
+	address := "0xF9891E1A2635CB8D8C25A6A2ec8E453bFb2E67c4"
 	page := 1
 	offset := 5
 	txs, err := GetAddressTokenTransfers(contractAddress, address, page, offset)

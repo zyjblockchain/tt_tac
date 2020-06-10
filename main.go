@@ -63,12 +63,12 @@ func main() {
 
 	// 5. 定时检查跨链转账和闪兑的中间地址的余额是否足够，如果不足，及时通知让其充值 todo 上线之后需要放开
 	go func() {
-		// logics.CheckMiddleAddressBalance()
+		logics.CheckMiddleAddressBalance()
 	}()
 
 	// 6. 定时归集闪兑中的usdt到指定的地址中
 	go func() {
-		// logics.DelayedCollectUsdtTx()
+		logics.DelayedCollectUsdtTx()
 	}()
 
 	// 对跨链转账的订单表中pending状态的订单处理

@@ -10,8 +10,7 @@ const (
 	TTChainTag = 77
 
 	// 测试网
-	// EthChainNet = "https://rinkeby.infura.io/v3/36b98a13557c4b8583d57934ede2f74d"
-	EthChainNet = "https://rinkeby.infura.io/v3/7bbf73a8855d4c0491f93e6dc498360d"
+	EthChainNet = "https://rinkeby.infura.io/v3/19d753b2600445e292d54b1ef58d4df4"
 	EthChainID  = 4
 
 	// 备用节点
